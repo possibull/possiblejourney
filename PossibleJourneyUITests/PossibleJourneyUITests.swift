@@ -109,7 +109,7 @@ final class PossibleJourneyUITests: XCTestCase {
 
 extension XCUIApplication {
     func checkOnScreen(identifier: String, timeout: TimeInterval = 2, message: String? = nil) {
-        let element = self.otherElements[identifier]
+        let element = self.descendants(matching: .any)[identifier]
         let msg = message ?? "Should be on screen with identifier \(identifier)"
         XCTAssertTrue(element.waitForExistence(timeout: timeout), msg)
     }
