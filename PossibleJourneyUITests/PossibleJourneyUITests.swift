@@ -10,7 +10,6 @@ final class PossibleJourneyUITests: XCTestCase {
     func testAddTaskFlow() throws {
         let app = XCUIApplication()
         app.launch()
-        print(app.debugDescription) // Print accessibility hierarchy for diagnosis
         app.addTask(title: "Read", description: "Read 10 pages")
         // Verify the task appears in the list
         let taskCell = app.staticTexts["Read"]
@@ -111,7 +110,10 @@ extension XCUIApplication {
     func checkOnScreen(identifier: String, timeout: TimeInterval = 2, message: String? = nil) {
         let element = self.descendants(matching: .any)[identifier]
         let msg = message ?? "Should be on screen with identifier \(identifier)"
-        XCTAssertTrue(element.waitForExistence(timeout: timeout), msg)
+        if !element.waitForExistence(timeout: timeout) {
+            XCTFail(msg)
+            return
+        }
     }
     
     func addTask(title: String, description: String) {
