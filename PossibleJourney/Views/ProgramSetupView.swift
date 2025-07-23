@@ -69,7 +69,7 @@ struct ProgramSetupView: View {
                                 .accessibilityIdentifier("Task Description")
                             Button(action: {
                                 if !newTaskTitle.isEmpty {
-                                    let newTask = Task(title: newTaskTitle, description: newTaskDescription)
+                                    let newTask = Task(id: UUID(), title: newTaskTitle, description: newTaskDescription)
                                     tasks.append(newTask)
                                     newTaskTitle = ""
                                     newTaskDescription = ""
