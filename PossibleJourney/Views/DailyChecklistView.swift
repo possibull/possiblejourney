@@ -143,7 +143,15 @@ struct DailyChecklistView: View {
             let today = Calendar.current.startOfDay(for: Date())
             if let progress = DailyProgressStorage().load(for: today) {
                 completedTaskIDs = Set(progress.completedTaskIDs)
+                print("DEBUG: Loaded completedTaskIDs from storage: \(progress.completedTaskIDs)")
+            } else {
+                print("DEBUG: No DailyProgress found for today")
             }
+            print("DEBUG: Task IDs in checklist:")
+            for task in program.tasks {
+                print("DEBUG: Task title: \(task.title), id: \(task.id)")
+            }
+            print("DEBUG: completedTaskIDs in state: \(completedTaskIDs)")
         }
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
