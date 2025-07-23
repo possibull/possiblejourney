@@ -108,6 +108,8 @@ final class PossibleJourneyUITests: XCTestCase {
 
 extension XCUIApplication {
     func addTask(title: String, description: String) {
+        let setupScreen = self.otherElements["ProgramSetupScreen"]
+        XCTAssertTrue(setupScreen.waitForExistence(timeout: 2), "Should be on Program Setup screen before adding a task")
         let titleField = self.textFields["Task Title"]
         XCTAssertTrue(titleField.exists)
         titleField.tap()
@@ -122,6 +124,8 @@ extension XCUIApplication {
     }
     
     func saveProgram() {
+        let setupScreen = self.otherElements["ProgramSetupScreen"]
+        XCTAssertTrue(setupScreen.waitForExistence(timeout: 2), "Should be on Program Setup screen before saving program")
         let saveButton = self.buttons["Save Program"]
         XCTAssertTrue(saveButton.exists)
         saveButton.tap()
@@ -131,6 +135,6 @@ extension XCUIApplication {
         addTask(title: taskTitle, description: taskDescription)
         saveProgram()
         let checklistScreen = self.otherElements["DailyChecklistScreen"]
-        XCTAssertTrue(checklistScreen.waitForExistence(timeout: 5))
+        XCTAssertTrue(checklistScreen.waitForExistence(timeout: 5), "Should be on Daily Checklist screen after saving program")
     }
 } 
