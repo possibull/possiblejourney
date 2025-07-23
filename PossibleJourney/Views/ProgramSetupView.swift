@@ -11,23 +11,27 @@ struct ProgramSetupView: View {
     @State private var tasks: [Task] = []
     @State private var newTaskTitle: String = ""
     @State private var newTaskDescription: String = ""
+    @Namespace private var bottomID
     
     var onSave: (Program) -> Void
     
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
-            ScrollView {
-                VStack(spacing: 24) {
-                    headerSection
-                    numberOfDaysSection
-                    startDateSection
-                    addTaskSection
-                    taskListSection
-                    saveButton
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(spacing: 24) {
+                        headerSection
+                        numberOfDaysSection
+                        startDateSection
+                        addTaskSection(proxy: proxy)
+                        taskListSection
+                        saveButton
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 16)
+                    .id(bottomID)
                 }
-                .padding(.horizontal)
-                .padding(.bottom, 32) // Ensure Save Program button is reachable
             }
         }
     }
@@ -41,21 +45,19 @@ struct ProgramSetupView: View {
     
     private var numberOfDaysSection: some View {
         VStack(alignment: .leading) {
-            // No heading or number in the top left
             Text("Number of Days:")
                 .font(.headline)
                 .foregroundColor(.white)
-            // Removed the top HStack with the red TextField
             Picker("Number of Days", selection: $numberOfDays) {
                 ForEach(1...365, id: \.self) { day in
                     Text("\(day)").tag(day)
                 }
             }
             .pickerStyle(.wheel)
-            .frame(height: 100)
+            .frame(height: 60) // Reduced height
             .clipped()
             .background(RoundedRectangle(cornerRadius: 12).fill(Color.white))
-            .padding(.vertical, 8)
+            .padding(.vertical, 4)
             .onChange(of: numberOfDays) { newValue in
                 numberOfDaysText = "\(newValue)"
             }
@@ -64,9 +66,9 @@ struct ProgramSetupView: View {
                 TextField("Days", text: $numberOfDaysText)
                     .keyboardType(.numberPad)
                     .multilineTextAlignment(.center)
-                    .font(.system(size: 48, weight: .heavy))
+                    .font(.system(size: 28, weight: .heavy)) // Reduced font size
                     .foregroundColor(.hardRed)
-                    .frame(width: 100)
+                    .frame(width: 70)
                     .onChange(of: numberOfDaysText) { newValue in
                         let filtered = newValue.filter { $0.isNumber }
                         if let value = Int(filtered), value >= 1, value <= 365 {
@@ -106,8 +108,8 @@ struct ProgramSetupView: View {
         .padding()
         .background(RoundedRectangle(cornerRadius: 12).fill(Color.white))
     }
-    
-    private var addTaskSection: some View {
+
+    private func addTaskSection(proxy: ScrollViewProxy) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Add Task")
                 .font(.headline)
@@ -128,6 +130,12 @@ struct ProgramSetupView: View {
                     tasks.append(newTask)
                     newTaskTitle = ""
                     newTaskDescription = ""
+                    // Auto-scroll to bottom after adding a task
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        withAnimation {
+                            proxy.scrollTo(bottomID, anchor: .bottom)
+                        }
+                    }
                 }
             }) {
                 Text("Add Task")
