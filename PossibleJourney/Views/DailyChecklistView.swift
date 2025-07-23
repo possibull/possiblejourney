@@ -26,7 +26,13 @@ struct DailyChecklistView: View {
         VStack(spacing: 0) {
             // Header row with logo, DAY XX, and checklist icon
             HStack(alignment: .center) {
-                // Removed the Circle and number in the top left
+                // Circle with total number of days in program (restored)
+                ZStack {
+                    Circle().fill(Color.white).frame(width: 40, height: 40)
+                    Text("\(program.numberOfDays)")
+                        .font(.system(size: 18, weight: .heavy))
+                        .foregroundColor(hardRed)
+                }
                 HStack(spacing: 6) {
                     Text("DAY \(currentDay)")
                         .font(.system(size: 36, weight: .heavy))
