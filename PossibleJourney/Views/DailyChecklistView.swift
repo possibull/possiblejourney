@@ -138,6 +138,13 @@ struct DailyChecklistView: View {
         }
         .accessibilityIdentifier("DailyChecklistScreen")
         .background(Color.black.ignoresSafeArea())
+        .onAppear {
+            // Load today's progress from storage
+            let today = Calendar.current.startOfDay(for: Date())
+            if let progress = DailyProgressStorage().load(for: today) {
+                completedTaskIDs = Set(progress.completedTaskIDs)
+            }
+        }
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button(action: { showCalendar = true }) {
