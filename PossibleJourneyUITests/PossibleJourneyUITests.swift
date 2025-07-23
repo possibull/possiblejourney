@@ -121,11 +121,15 @@ extension XCUIApplication {
         addButton.tap()
     }
     
-    func addProgramAndNavigateToChecklist(taskTitle: String = "Read", taskDescription: String = "Read 10 pages") {
-        addTask(title: taskTitle, description: taskDescription)
+    func saveProgram() {
         let saveButton = self.buttons["Save Program"]
         XCTAssertTrue(saveButton.exists)
         saveButton.tap()
+    }
+    
+    func addProgramAndNavigateToChecklist(taskTitle: String = "Read", taskDescription: String = "Read 10 pages") {
+        addTask(title: taskTitle, description: taskDescription)
+        saveProgram()
         let checklistScreen = self.otherElements["DailyChecklistScreen"]
         XCTAssertTrue(checklistScreen.waitForExistence(timeout: 5))
     }
