@@ -41,41 +41,26 @@ struct ProgramSetupView: View {
     }
     
     private var numberOfDaysSection: some View {
-        HStack {
+        VStack(alignment: .leading) {
             Text("Number of Days:")
                 .font(.headline)
                 .foregroundColor(.white)
-            Spacer()
-            TextField("Days", text: $numberOfDaysText)
-                .keyboardType(.numberPad)
-                .frame(width: 60)
-                .multilineTextAlignment(.center)
-                .font(.title2.bold())
-                .foregroundColor(.hardRed)
-                .background(RoundedRectangle(cornerRadius: 6).fill(Color.white))
-                .onChange(of: numberOfDaysText) { newValue in
-                    let filtered = newValue.filter { $0.isNumber }
-                    if let value = Int(filtered), value >= 1, value <= 365 {
-                        numberOfDays = value
-                        numberOfDaysText = "\(value)"
-                    } else if filtered.isEmpty {
-                        numberOfDays = 1
-                        numberOfDaysText = "1"
-                    } else if let value = Int(filtered), value < 1 {
-                        numberOfDays = 1
-                        numberOfDaysText = "1"
-                    } else if let value = Int(filtered), value > 365 {
-                        numberOfDays = 365
-                        numberOfDaysText = "365"
-                    } else {
-                        numberOfDaysText = filtered
-                    }
+            Picker("Number of Days", selection: $numberOfDays) {
+                ForEach(1...365, id: \.self) { day in
+                    Text("\(day)").tag(day)
                 }
-            Stepper(value: $numberOfDays, in: 1...365) {
-                EmptyView()
             }
-            .onChange(of: numberOfDays) { newValue in
-                numberOfDaysText = "\(newValue)"
+            .pickerStyle(.wheel)
+            .frame(height: 100)
+            .clipped()
+            .background(RoundedRectangle(cornerRadius: 12).fill(Color.white))
+            .padding(.vertical, 8)
+            HStack {
+                Spacer()
+                Text("Selected: \(numberOfDays)")
+                    .font(.title2.bold())
+                    .foregroundColor(.hardRed)
+                    .padding(.trailing)
             }
         }
         .padding()
