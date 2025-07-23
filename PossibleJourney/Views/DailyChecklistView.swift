@@ -84,6 +84,7 @@ struct DailyChecklistView: View {
                                             Image(systemName: "checkmark")
                                                 .font(.system(size: 18, weight: .bold))
                                                 .foregroundColor(.white)
+                                                .accessibilityIdentifier("checkmark")
                                         }
                                     }
                                 }
