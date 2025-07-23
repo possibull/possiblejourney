@@ -138,6 +138,11 @@ extension XCUIApplication {
         let saveButton = self.buttons["Save Program"]
         XCTAssertTrue(saveButton.exists)
         saveButton.tap()
+        // Wait briefly to ensure save completes
+        sleep(1)
+        // Check UserDefaults for the saved program
+        let data = UserDefaults.standard.data(forKey: "SavedProgram")
+        XCTAssertNotNil(data, "Program should be saved in UserDefaults after saving via UI")
     }
     
     func addProgramAndNavigateToChecklist(taskTitle: String = "Read", taskDescription: String = "Read 10 pages") {
