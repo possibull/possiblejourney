@@ -18,17 +18,16 @@ struct ProgramSetupView: View {
         ZStack {
             Color.black.ignoresSafeArea()
             ScrollView {
-                VStack(spacing: 0) {
-                    VStack(alignment: .leading, spacing: 24) {
-                        headerSection
-                        numberOfDaysSection
-                        startDateSection
-                        addTaskSection
-                        taskListSection
-                    }
-                    .padding(.horizontal)
+                VStack(spacing: 24) {
+                    headerSection
+                    numberOfDaysSection
+                    startDateSection
+                    addTaskSection
+                    taskListSection
                     saveButton
                 }
+                .padding(.horizontal)
+                .padding(.bottom, 32) // Ensure Save Program button is reachable
             }
         }
     }
@@ -162,10 +161,12 @@ struct ProgramSetupView: View {
                 }
                 .padding(8)
                 .background(RoundedRectangle(cornerRadius: 8).fill(Color.white))
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .padding()
         .background(RoundedRectangle(cornerRadius: 12).fill(Color.white))
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
     
     private var saveButton: some View {
