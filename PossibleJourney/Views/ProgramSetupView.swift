@@ -42,10 +42,7 @@ struct ProgramSetupView: View {
     
     private var numberOfDaysSection: some View {
         VStack(alignment: .leading) {
-            Text("Days")
-                .font(.title2.bold())
-                .foregroundColor(.hardRed)
-                .padding(.bottom, 2)
+            // Removed the 'Days' heading
             Text("Number of Days:")
                 .font(.headline)
                 .foregroundColor(.white)
@@ -116,8 +113,9 @@ struct ProgramSetupView: View {
                             numberOfDaysText = filtered
                         }
                     }
-                Spacer()
+                    .padding(.trailing, 8)
             }
+            .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .padding()
         .background(RoundedRectangle(cornerRadius: 12).fill(Color.white))
