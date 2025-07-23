@@ -1,4 +1,5 @@
 import SwiftUI
+import Foundation
 
 struct DailyChecklistView: View {
     let program: Program
@@ -70,6 +71,9 @@ struct DailyChecklistView: View {
                                     } else {
                                         completedTaskIDs.insert(task.id)
                                     }
+                                    // Save progress to storage
+                                    let progress = DailyProgress(id: UUID(), date: Calendar.current.startOfDay(for: Date()), completedTaskIDs: Array(completedTaskIDs))
+                                    DailyProgressStorage().save(progress: progress)
                                 }) {
                                     ZStack {
                                         Circle()
