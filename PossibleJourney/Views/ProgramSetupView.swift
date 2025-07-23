@@ -6,30 +6,35 @@ extension Color {
 
 struct ProgramSetupView: View {
     @State private var numberOfDays: Int = 75
+    @State private var numberOfDaysText: String = "75"
     @State private var startDate: Date = Date()
     @State private var tasks: [Task] = []
     @State private var newTaskTitle: String = ""
     @State private var newTaskDescription: String = ""
+    @Namespace private var bottomID
     
     var onSave: (Program) -> Void
     
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
-            VStack(spacing: 0) {
+            ScrollViewReader { proxy in
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 24) {
+                    VStack(spacing: 24) {
                         headerSection
                         numberOfDaysSection
                         startDateSection
-                        addTaskSection
+                        addTaskSection(proxy: proxy)
                         taskListSection
+                        saveButton
                     }
                     .padding(.horizontal)
+                    .padding(.bottom, 16)
+                    .id(bottomID)
                 }
-                saveButton
             }
         }
+        .accessibilityIdentifier("ProgramSetupScreen")
     }
     
     private var headerSection: some View {
@@ -40,19 +45,56 @@ struct ProgramSetupView: View {
     }
     
     private var numberOfDaysSection: some View {
-        HStack {
+        VStack(alignment: .leading) {
+            Text("Days")
+                .font(.headline)
+                .foregroundColor(.hardRed)
+                .padding(.bottom, 2)
             Text("Number of Days:")
                 .font(.headline)
                 .foregroundColor(.white)
-            Spacer()
-            Stepper(value: $numberOfDays, in: 1...365) {
-                Text("\(numberOfDays)")
-                    .font(.title2.bold())
-                    .foregroundColor(.hardRed)
-                    .frame(width: 60)
-                    .multilineTextAlignment(.center)
-                    .background(RoundedRectangle(cornerRadius: 6).fill(Color.white))
+            Picker("Number of Days", selection: $numberOfDays) {
+                ForEach(1...365, id: \.self) { day in
+                    Text("\(day)").tag(day)
+                }
             }
+            .pickerStyle(.wheel)
+            .frame(height: 60) // Reduced height
+            .clipped()
+            .background(RoundedRectangle(cornerRadius: 12).fill(Color.white))
+            .padding(.vertical, 4)
+            .onChange(of: numberOfDays) { newValue in
+                numberOfDaysText = "\(newValue)"
+            }
+            HStack {
+                Spacer()
+                TextField("Days", text: $numberOfDaysText)
+                    .keyboardType(.numberPad)
+                    .multilineTextAlignment(.center)
+                    .font(.system(size: 28, weight: .heavy)) // Reduced font size
+                    .foregroundColor(.hardRed)
+                    .frame(width: 70)
+                    .onChange(of: numberOfDaysText) { newValue in
+                        let filtered = newValue.filter { $0.isNumber }
+                        if let value = Int(filtered), value >= 1, value <= 365 {
+                            numberOfDays = value
+                            numberOfDaysText = "\(value)"
+                        } else if filtered.isEmpty {
+                            numberOfDays = 1
+                            numberOfDaysText = "1"
+                        } else if let value = Int(filtered), value < 1 {
+                            numberOfDays = 1
+                            numberOfDaysText = "1"
+                        } else if let value = Int(filtered), value > 365 {
+                            numberOfDays = 365
+                            numberOfDaysText = "365"
+                        } else {
+                            numberOfDaysText = filtered
+                        }
+                    }
+                    .padding(.trailing, 8)
+            }
+            .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .padding()
         .background(RoundedRectangle(cornerRadius: 12).fill(Color.white))
@@ -71,8 +113,8 @@ struct ProgramSetupView: View {
         .padding()
         .background(RoundedRectangle(cornerRadius: 12).fill(Color.white))
     }
-    
-    private var addTaskSection: some View {
+
+    private func addTaskSection(proxy: ScrollViewProxy) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Add Task")
                 .font(.headline)
@@ -93,6 +135,12 @@ struct ProgramSetupView: View {
                     tasks.append(newTask)
                     newTaskTitle = ""
                     newTaskDescription = ""
+                    // Auto-scroll to bottom after adding a task
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        withAnimation {
+                            proxy.scrollTo(bottomID, anchor: .bottom)
+                        }
+                    }
                 }
             }) {
                 Text("Add Task")
@@ -118,26 +166,28 @@ struct ProgramSetupView: View {
                     Text(task.title)
                         .font(.title3.bold())
                         .foregroundColor(.black)
-                    if !task.description.isEmpty {
-                        Text(task.description)
+                    if let desc = task.description, !desc.isEmpty {
+                        Text(desc)
                             .font(.subheadline)
                             .foregroundColor(.black.opacity(0.7))
                     }
                 }
                 .padding(8)
                 .background(RoundedRectangle(cornerRadius: 8).fill(Color.white))
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .padding()
         .background(RoundedRectangle(cornerRadius: 12).fill(Color.white))
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
     
     private var saveButton: some View {
         Button(action: {
             let program = Program(
                 id: UUID(),
-                numberOfDays: numberOfDays,
                 startDate: startDate,
+                numberOfDays: numberOfDays,
                 tasks: tasks
             )
             onSave(program)
