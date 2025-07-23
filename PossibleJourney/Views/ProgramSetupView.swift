@@ -118,8 +118,8 @@ struct ProgramSetupView: View {
                     Text(task.title)
                         .font(.title3.bold())
                         .foregroundColor(.black)
-                    if !task.description.isEmpty {
-                        Text(task.description)
+                    if let desc = task.description, !desc.isEmpty {
+                        Text(desc)
                             .font(.subheadline)
                             .foregroundColor(.black.opacity(0.7))
                     }
