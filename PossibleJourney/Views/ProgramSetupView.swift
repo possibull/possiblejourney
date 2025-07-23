@@ -34,6 +34,7 @@ struct ProgramSetupView: View {
                 }
             }
         }
+        .accessibilityIdentifier("ProgramSetupScreen")
     }
     
     private var headerSection: some View {
