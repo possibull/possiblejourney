@@ -52,6 +52,18 @@ final class PossibleJourneyUITests: XCTestCase {
         app.checkOnScreen(identifier: "DailyChecklistScreen", timeout: 5, message: "Should be on Daily Checklist screen after relaunch")
     }
 
+    func testSaveProgramActuallySaves() throws {
+        let app = XCUIApplication()
+        app.launch()
+        app.addTask(title: "Read", description: "Read 10 pages")
+        app.saveProgram()
+        // Wait briefly to ensure save completes
+        sleep(1)
+        // Check UserDefaults for the saved program
+        let data = UserDefaults.standard.data(forKey: "SavedProgram")
+        XCTAssertNotNil(data, "Program should be saved in UserDefaults after saving via UI")
+    }
+
     /*
     func testResetProgramReturnsToSetupScreen() throws {
         let app = XCUIApplication()
