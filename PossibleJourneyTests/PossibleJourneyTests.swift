@@ -137,4 +137,19 @@ final class DailyProgressStorageTests: XCTestCase {
         XCTAssertNotNil(loaded, "Should load saved progress for today")
         XCTAssertEqual(loaded?.completedTaskIDs, [taskID], "Loaded completedTaskIDs should match saved")
     }
+}
+
+func testProgramStorageSaveAndLoad() throws {
+    let storage = ProgramStorage()
+    let program = Program(
+        id: UUID(),
+        startDate: Date(),
+        numberOfDays: 75,
+        tasks: [Task(id: UUID(), title: "Test Task", description: "Test Desc")]
+    )
+    storage.save(program)
+    let loaded = storage.load()
+    XCTAssertNotNil(loaded, "Should load a saved program")
+    XCTAssertEqual(loaded?.numberOfDays, 75)
+    XCTAssertEqual(loaded?.tasks.first?.title, "Test Task")
 } 
