@@ -42,7 +42,7 @@ struct ProgramSetupView: View {
     
     private var numberOfDaysSection: some View {
         VStack(alignment: .leading) {
-            // Removed the 'Days' heading
+            // No heading or number in the top left
             Text("Number of Days:")
                 .font(.headline)
                 .foregroundColor(.white)
