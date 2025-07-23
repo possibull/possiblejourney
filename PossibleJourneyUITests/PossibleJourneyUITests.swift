@@ -10,24 +10,7 @@ final class PossibleJourneyUITests: XCTestCase {
     func testAddTaskFlow() throws {
         let app = XCUIApplication()
         app.launch()
-
-        // Enter task title
-        let titleField = app.textFields["Task Title"]
-        XCTAssertTrue(titleField.exists)
-        titleField.tap()
-        titleField.typeText("Read")
-
-        // Enter task description
-        let descriptionField = app.textFields["Task Description"]
-        XCTAssertTrue(descriptionField.exists)
-        descriptionField.tap()
-        descriptionField.typeText("Read 10 pages")
-
-        // Tap Add Task button
-        let addButton = app.buttons["Add Task"]
-        XCTAssertTrue(addButton.exists)
-        addButton.tap()
-
+        app.addTask(title: "Read", description: "Read 10 pages")
         // Verify the task appears in the list
         let taskCell = app.staticTexts["Read"]
         XCTAssertTrue(taskCell.waitForExistence(timeout: 1))
@@ -124,18 +107,22 @@ final class PossibleJourneyUITests: XCTestCase {
 }
 
 extension XCUIApplication {
-    func addProgramAndNavigateToChecklist(taskTitle: String = "Read", taskDescription: String = "Read 10 pages") {
+    func addTask(title: String, description: String) {
         let titleField = self.textFields["Task Title"]
         XCTAssertTrue(titleField.exists)
         titleField.tap()
-        titleField.typeText(taskTitle)
+        titleField.typeText(title)
         let descriptionField = self.textFields["Task Description"]
         XCTAssertTrue(descriptionField.exists)
         descriptionField.tap()
-        descriptionField.typeText(taskDescription)
+        descriptionField.typeText(description)
         let addButton = self.buttons["Add Task"]
         XCTAssertTrue(addButton.exists)
         addButton.tap()
+    }
+    
+    func addProgramAndNavigateToChecklist(taskTitle: String = "Read", taskDescription: String = "Read 10 pages") {
+        addTask(title: taskTitle, description: taskDescription)
         let saveButton = self.buttons["Save Program"]
         XCTAssertTrue(saveButton.exists)
         saveButton.tap()
