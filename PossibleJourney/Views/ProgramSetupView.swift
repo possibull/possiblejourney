@@ -92,10 +92,11 @@ struct ProgramSetupView: View {
             }
             HStack {
                 Spacer()
-                Text("Selected: \(numberOfDays)")
-                    .font(.title2.bold())
+                Text("\(numberOfDays)")
+                    .font(.system(size: 48, weight: .heavy))
                     .foregroundColor(.hardRed)
-                    .padding(.trailing)
+                    .padding(.vertical, 8)
+                Spacer()
             }
         }
         .padding()
