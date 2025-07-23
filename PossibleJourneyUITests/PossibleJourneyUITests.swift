@@ -19,9 +19,8 @@ final class PossibleJourneyUITests: XCTestCase {
     func testSaveProgramButtonExistsAndCanBeTapped() throws {
         let app = XCUIApplication()
         app.launch()
-        let saveButton = app.buttons["Save Program"]
-        XCTAssertTrue(saveButton.exists)
-        saveButton.tap()
+        app.addTask(title: "Read", description: "Read 10 pages")
+        app.saveProgram()
         // No confirmation required yet
     }
 
@@ -44,22 +43,13 @@ final class PossibleJourneyUITests: XCTestCase {
         app.launchArguments.append("--uitesting-reset")
         app.launch()
         // Verify we are on the Program Setup screen before adding a program
-        let setupScreen = app.otherElements["ProgramSetupScreen"]
-        XCTAssertTrue(setupScreen.waitForExistence(timeout: 2), "Should start on Program Setup screen")
+        app.checkOnScreen(identifier: "ProgramSetupScreen", message: "Should start on Program Setup screen")
         // First launch: create and save a program, navigate to checklist
         app.addProgramAndNavigateToChecklist()
         // Relaunch: check for checklist or setup screen using accessibility identifiers
         app.terminate()
         app.launch()
-        let checklistScreen2 = app.otherElements["DailyChecklistScreen"]
-        let setupScreen2 = app.otherElements["ProgramSetupScreen"]
-        if checklistScreen2.waitForExistence(timeout: 5) {
-            XCTAssertTrue(true)
-        } else if setupScreen2.waitForExistence(timeout: 1) {
-            XCTFail("Setup screen is visible after relaunch, expected checklist")
-        } else {
-            XCTFail("Neither checklist nor setup screen is visible after relaunch")
-        }
+        app.checkOnScreen(identifier: "DailyChecklistScreen", timeout: 5, message: "Should be on Daily Checklist screen after relaunch")
     }
 
     /*
