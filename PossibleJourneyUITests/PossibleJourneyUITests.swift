@@ -74,7 +74,7 @@ final class PossibleJourneyUITests: XCTestCase {
         app.checkOnScreen(identifier: "DailyChecklistScreen", timeout: 5, message: "Should be on Daily Checklist screen after relaunch")
         // Verify the first task is still marked as complete (checkmark exists)
         let checkmark = app.images["checkmark"]
-        XCTAssertTrue(checkmark.exists, "First task should be checked after relaunch")
+        XCTAssertTrue(checkmark.waitForExistence(timeout: 3), "First task should be checked after relaunch")
     }
 
     /*
