@@ -116,7 +116,7 @@ final class ProgramStorageTests: XCTestCase {
             numberOfDays: 75,
             tasks: [Task(id: UUID(), title: "Test Task", description: "Test Desc")]
         )
-        storage.save(program)
+        storage.save(program: program)
         let loaded = storage.load()
         XCTAssertNotNil(loaded)
         XCTAssertEqual(loaded?.numberOfDays, 75)

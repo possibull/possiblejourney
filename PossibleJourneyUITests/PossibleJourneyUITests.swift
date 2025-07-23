@@ -1,15 +1,20 @@
 import XCTest
 
+func launchAppWithReset() -> XCUIApplication {
+    let app = XCUIApplication()
+    app.launchArguments.append("--uitesting-reset")
+    app.launch()
+    return app
+}
+
 final class PossibleJourneyUITests: XCTestCase {
     override func setUp() {
         super.setUp()
-        // Clear persistence before each test
-        UserDefaults.standard.removeObject(forKey: "savedProgram")
+        // No need to clear UserDefaults here; handled by launch argument
     }
 
     func testAddTaskFlow() throws {
-        let app = XCUIApplication()
-        app.launch()
+        let app = launchAppWithReset()
         app.addTask(title: "Read", description: "Read 10 pages")
         // Verify the task appears in the list
         let taskCell = app.staticTexts["Read"]
@@ -17,39 +22,59 @@ final class PossibleJourneyUITests: XCTestCase {
     }
 
     func testSaveProgramButtonExistsAndCanBeTapped() throws {
-        let app = XCUIApplication()
-        app.launch()
+        let app = launchAppWithReset()
         app.addTask(title: "Read", description: "Read 10 pages")
         app.saveProgram()
-        // No confirmation required yet
+        app.checkOnScreen(identifier: "DailyChecklistScreen", message: "Should navigate to checklist after saving program")
     }
 
     func testSaveProgramButtonDisabledWhenNoTasks() throws {
-        let app = XCUIApplication()
-        app.launch()
+        let app = launchAppWithReset()
         let saveButton = app.buttons["Save Program"]
         XCTAssertTrue(saveButton.exists)
         XCTAssertFalse(saveButton.isEnabled)
     }
 
     func testSaveProgramNavigatesToDailyChecklist() throws {
-        let app = XCUIApplication()
-        app.launch()
+        let app = launchAppWithReset()
         app.addProgramAndNavigateToChecklist()
     }
 
     func testProgramPersistsAndChecklistAppearsOnRelaunch() throws {
-        let app = XCUIApplication()
-        app.launchArguments.append("--uitesting-reset")
-        app.launch()
+        let app = launchAppWithReset()
         // Verify we are on the Program Setup screen before adding a program
         app.checkOnScreen(identifier: "ProgramSetupScreen", message: "Should start on Program Setup screen")
         // First launch: create and save a program, navigate to checklist
         app.addProgramAndNavigateToChecklist()
         // Relaunch: check for checklist or setup screen using accessibility identifiers
         app.terminate()
+        // On relaunch, do not use the reset argument
+        app.launchArguments = []
+        app.launch()
+        print(app.debugDescription) // Print accessibility hierarchy after relaunch
+        app.checkOnScreen(identifier: "DailyChecklistScreen", timeout: 5, message: "Should be on Daily Checklist screen after relaunch")
+    }
+
+    func testChecklistTaskCompletionPersistsAfterRelaunch() throws {
+        let app = launchAppWithReset()
+        // Add two tasks and save program
+        app.addTask(title: "Read", description: "Read 10 pages")
+        app.addTask(title: "Drink Water", description: "Drink 2L of water")
+        app.saveProgram()
+        // Mark the first task as complete
+        let firstTask = app.staticTexts["Read"]
+        XCTAssertTrue(firstTask.exists)
+        // Tap the checkmark button (assume it's the first button in the cell)
+        let firstTaskCell = firstTask.coordinate(withNormalizedOffset: CGVector(dx: -0.2, dy: 0.5))
+        firstTaskCell.tap()
+        // Relaunch app (no reset)
+        app.terminate()
+        app.launchArguments = []
         app.launch()
         app.checkOnScreen(identifier: "DailyChecklistScreen", timeout: 5, message: "Should be on Daily Checklist screen after relaunch")
+        // Verify the first task is still marked as complete (checkmark exists)
+        let checkmark = app.images["checkmark"]
+        XCTAssertTrue(checkmark.exists, "First task should be checked after relaunch")
     }
 
     /*
@@ -126,11 +151,8 @@ extension XCUIApplication {
         let saveButton = self.buttons["Save Program"]
         XCTAssertTrue(saveButton.exists)
         saveButton.tap()
-        // Wait briefly to ensure save completes
-        sleep(1)
-        // Check UserDefaults for the saved program
-        let data = UserDefaults.standard.data(forKey: "SavedProgram")
-        XCTAssertNotNil(data, "Program should be saved in UserDefaults after saving via UI")
+        // Wait for the checklist screen to appear
+        checkOnScreen(identifier: "DailyChecklistScreen", message: "Should navigate to checklist after saving program")
     }
     
     func addProgramAndNavigateToChecklist(taskTitle: String = "Read", taskDescription: String = "Read 10 pages") {

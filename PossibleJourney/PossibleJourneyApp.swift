@@ -7,33 +7,30 @@
 
 import SwiftUI
 
+func resetForUITestingIfNeeded() {
+    if CommandLine.arguments.contains("--uitesting-reset") {
+        ProgramStorage().clear()
+    }
+}
+
 @main
 struct PossibleJourneyApp: App {
-    @State private var showChecklist = false
-    @State private var savedProgram: Program? = nil
-
     init() {
-        print("DEBUG: PossibleJourneyApp init called")
-        // Load the saved program on launch
-        if let loaded = ProgramStorage().load() {
-            savedProgram = loaded
-            showChecklist = true
-        }
+        resetForUITestingIfNeeded()
     }
+    @StateObject private var appState = ProgramAppState()
 
     var body: some Scene {
         WindowGroup {
             NavigationStack {
-                if showChecklist, let program = savedProgram {
+                if let program = appState.loadedProgram {
                     DailyChecklistView(program: program, onReset: {
-                        showChecklist = false
-                        savedProgram = nil
+                        appState.loadedProgram = nil
                         ProgramStorage().clear()
                     })
                 } else {
                     ProgramSetupView(onSave: { program in
-                        savedProgram = program
-                        showChecklist = true
+                        appState.loadedProgram = program
                         ProgramStorage().save(program)
                     })
                 }
