@@ -79,7 +79,9 @@ final class PossibleJourneyUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments.append("--uitesting-reset")
         app.launch()
-        print(app.debugDescription)
+        // Verify we are on the Program Setup screen before adding a program
+        let setupScreen = app.otherElements["ProgramSetupScreen"]
+        XCTAssertTrue(setupScreen.waitForExistence(timeout: 2), "Should start on Program Setup screen")
         // First launch: create and save a program
         let titleField = app.textFields["Task Title"]
         XCTAssertTrue(titleField.exists)
@@ -100,17 +102,13 @@ final class PossibleJourneyUITests: XCTestCase {
         // Relaunch: check for checklist or setup screen using accessibility identifiers
         app.terminate()
         app.launch()
-        print(app.debugDescription)
         let checklistScreen2 = app.otherElements["DailyChecklistScreen"]
-        let setupScreen = app.otherElements["ProgramSetupScreen"]
+        let setupScreen2 = app.otherElements["ProgramSetupScreen"]
         if checklistScreen2.waitForExistence(timeout: 5) {
-            print("Checklist screen is visible after relaunch.")
             XCTAssertTrue(true)
-        } else if setupScreen.waitForExistence(timeout: 1) {
-            print("Setup screen is visible after relaunch, expected checklist.")
+        } else if setupScreen2.waitForExistence(timeout: 1) {
             XCTFail("Setup screen is visible after relaunch, expected checklist")
         } else {
-            print("Neither checklist nor setup screen is visible after relaunch.")
             XCTFail("Neither checklist nor setup screen is visible after relaunch")
         }
     }
