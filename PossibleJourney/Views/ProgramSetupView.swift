@@ -46,7 +46,7 @@ struct ProgramSetupView: View {
     private var numberOfDaysSection: some View {
         VStack(alignment: .leading) {
             Text("Days")
-                .font(.title2.bold())
+                .font(.headline)
                 .foregroundColor(.hardRed)
                 .padding(.bottom, 2)
             Text("Number of Days:")
