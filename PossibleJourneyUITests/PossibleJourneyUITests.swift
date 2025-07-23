@@ -107,9 +107,14 @@ final class PossibleJourneyUITests: XCTestCase {
 }
 
 extension XCUIApplication {
+    func checkOnScreen(identifier: String, timeout: TimeInterval = 2, message: String? = nil) {
+        let element = self.otherElements[identifier]
+        let msg = message ?? "Should be on screen with identifier \(identifier)"
+        XCTAssertTrue(element.waitForExistence(timeout: timeout), msg)
+    }
+    
     func addTask(title: String, description: String) {
-        let setupScreen = self.otherElements["ProgramSetupScreen"]
-        XCTAssertTrue(setupScreen.waitForExistence(timeout: 2), "Should be on Program Setup screen before adding a task")
+        checkOnScreen(identifier: "ProgramSetupScreen", message: "Should be on Program Setup screen before adding a task")
         let titleField = self.textFields["Task Title"]
         XCTAssertTrue(titleField.exists)
         titleField.tap()
@@ -124,8 +129,7 @@ extension XCUIApplication {
     }
     
     func saveProgram() {
-        let setupScreen = self.otherElements["ProgramSetupScreen"]
-        XCTAssertTrue(setupScreen.waitForExistence(timeout: 2), "Should be on Program Setup screen before saving program")
+        checkOnScreen(identifier: "ProgramSetupScreen", message: "Should be on Program Setup screen before saving program")
         let saveButton = self.buttons["Save Program"]
         XCTAssertTrue(saveButton.exists)
         saveButton.tap()
@@ -134,7 +138,6 @@ extension XCUIApplication {
     func addProgramAndNavigateToChecklist(taskTitle: String = "Read", taskDescription: String = "Read 10 pages") {
         addTask(title: taskTitle, description: taskDescription)
         saveProgram()
-        let checklistScreen = self.otherElements["DailyChecklistScreen"]
-        XCTAssertTrue(checklistScreen.waitForExistence(timeout: 5), "Should be on Daily Checklist screen after saving program")
+        checkOnScreen(identifier: "DailyChecklistScreen", timeout: 5, message: "Should be on Daily Checklist screen after saving program")
     }
 } 
