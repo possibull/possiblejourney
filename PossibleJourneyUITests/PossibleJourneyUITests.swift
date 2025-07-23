@@ -125,9 +125,10 @@ extension XCUIApplication {
     func checkOnScreen(identifier: String, timeout: TimeInterval = 2, message: String? = nil) {
         let element = self.descendants(matching: .any)[identifier]
         let msg = message ?? "Should be on screen with identifier \(identifier)"
-        if !element.waitForExistence(timeout: timeout) {
+        guard element.waitForExistence(timeout: timeout) else {
             XCTFail(msg)
-            return
+            // Immediately stop further test execution
+            fatalError(msg)
         }
     }
     
