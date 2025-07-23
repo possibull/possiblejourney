@@ -92,10 +92,30 @@ struct ProgramSetupView: View {
             }
             HStack {
                 Spacer()
-                Text("\(numberOfDays)")
+                TextField("Days", text: $numberOfDaysText)
+                    .keyboardType(.numberPad)
+                    .multilineTextAlignment(.center)
                     .font(.system(size: 48, weight: .heavy))
                     .foregroundColor(.hardRed)
-                    .padding(.vertical, 8)
+                    .frame(width: 100)
+                    .onChange(of: numberOfDaysText) { newValue in
+                        let filtered = newValue.filter { $0.isNumber }
+                        if let value = Int(filtered), value >= 1, value <= 365 {
+                            numberOfDays = value
+                            numberOfDaysText = "\(value)"
+                        } else if filtered.isEmpty {
+                            numberOfDays = 1
+                            numberOfDaysText = "1"
+                        } else if let value = Int(filtered), value < 1 {
+                            numberOfDays = 1
+                            numberOfDaysText = "1"
+                        } else if let value = Int(filtered), value > 365 {
+                            numberOfDays = 365
+                            numberOfDaysText = "365"
+                        } else {
+                            numberOfDaysText = filtered
+                        }
+                    }
                 Spacer()
             }
         }
