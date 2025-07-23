@@ -61,6 +61,12 @@ final class PossibleJourneyUITests: XCTestCase {
         app.addTask(title: "Read", description: "Read 10 pages")
         app.addTask(title: "Drink Water", description: "Drink 2L of water")
         app.saveProgram()
+        // Print task IDs before relaunch
+        print("DEBUG: Task IDs before relaunch:")
+        let taskCells = app.staticTexts.allElementsBoundByIndex
+        for cell in taskCells {
+            print("DEBUG: Task cell label: \(cell.label)")
+        }
         // Mark the first task as complete
         let firstTask = app.staticTexts["Read"]
         XCTAssertTrue(firstTask.exists)
@@ -72,6 +78,12 @@ final class PossibleJourneyUITests: XCTestCase {
         app.launchArguments = []
         app.launch()
         app.checkOnScreen(identifier: "DailyChecklistScreen", timeout: 5, message: "Should be on Daily Checklist screen after relaunch")
+        // Print task IDs after relaunch
+        print("DEBUG: Task IDs after relaunch:")
+        let taskCellsAfter = app.staticTexts.allElementsBoundByIndex
+        for cell in taskCellsAfter {
+            print("DEBUG: Task cell label: \(cell.label)")
+        }
         // Verify the first task is still marked as complete (checkmark exists)
         let checkmark = app.images["checkmark"]
         XCTAssertTrue(checkmark.waitForExistence(timeout: 3), "First task should be checked after relaunch")
