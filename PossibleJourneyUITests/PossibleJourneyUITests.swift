@@ -50,29 +50,10 @@ final class PossibleJourneyUITests: XCTestCase {
         XCTAssertFalse(saveButton.isEnabled)
     }
 
-        func testSaveProgramNavigatesToDailyChecklist() throws {
+    func testSaveProgramNavigatesToDailyChecklist() throws {
         let app = XCUIApplication()
         app.launch()
-        // Enter program details (number of days and start date are defaulted)
-        let titleField = app.textFields["Task Title"]
-        XCTAssertTrue(titleField.exists)
-        titleField.tap()
-        titleField.typeText("Read")
-        let descriptionField = app.textFields["Task Description"]
-        XCTAssertTrue(descriptionField.exists)
-        descriptionField.tap()
-        descriptionField.typeText("Read 10 pages")
-        let addButton = app.buttons["Add Task"]
-        XCTAssertTrue(addButton.exists)
-        addButton.tap()
-        // Tap Save Program
-        let saveButton = app.buttons["Save Program"]
-        XCTAssertTrue(saveButton.exists)
-        saveButton.tap()
-        // Assert that the daily checklist view appears (look for the header)
-        let checklistScreen = app.otherElements["DailyChecklistScreen"]
-        print(app.debugDescription)
-        XCTAssertTrue(checklistScreen.waitForExistence(timeout: 5))
+        app.addProgramAndNavigateToChecklist()
     }
 
     func testProgramPersistsAndChecklistAppearsOnRelaunch() throws {
@@ -82,23 +63,8 @@ final class PossibleJourneyUITests: XCTestCase {
         // Verify we are on the Program Setup screen before adding a program
         let setupScreen = app.otherElements["ProgramSetupScreen"]
         XCTAssertTrue(setupScreen.waitForExistence(timeout: 2), "Should start on Program Setup screen")
-        // First launch: create and save a program
-        let titleField = app.textFields["Task Title"]
-        XCTAssertTrue(titleField.exists)
-        titleField.tap()
-        titleField.typeText("Read")
-        let descriptionField = app.textFields["Task Description"]
-        XCTAssertTrue(descriptionField.exists)
-        descriptionField.tap()
-        descriptionField.typeText("Read 10 pages")
-        let addButton = app.buttons["Add Task"]
-        XCTAssertTrue(addButton.exists)
-        addButton.tap()
-        let saveButton = app.buttons["Save Program"]
-        XCTAssertTrue(saveButton.exists)
-        saveButton.tap()
-        let checklistScreen = app.otherElements["DailyChecklistScreen"]
-        XCTAssertTrue(checklistScreen.waitForExistence(timeout: 5))
+        // First launch: create and save a program, navigate to checklist
+        app.addProgramAndNavigateToChecklist()
         // Relaunch: check for checklist or setup screen using accessibility identifiers
         app.terminate()
         app.launch()
@@ -155,4 +121,25 @@ final class PossibleJourneyUITests: XCTestCase {
 */
 
     // NOTE: Swipe-to-delete is tested manually due to XCTest limitations with SwiftUI Lists. The system Delete button is not reliably accessible in UI tests.
+}
+
+extension XCUIApplication {
+    func addProgramAndNavigateToChecklist(taskTitle: String = "Read", taskDescription: String = "Read 10 pages") {
+        let titleField = self.textFields["Task Title"]
+        XCTAssertTrue(titleField.exists)
+        titleField.tap()
+        titleField.typeText(taskTitle)
+        let descriptionField = self.textFields["Task Description"]
+        XCTAssertTrue(descriptionField.exists)
+        descriptionField.tap()
+        descriptionField.typeText(taskDescription)
+        let addButton = self.buttons["Add Task"]
+        XCTAssertTrue(addButton.exists)
+        addButton.tap()
+        let saveButton = self.buttons["Save Program"]
+        XCTAssertTrue(saveButton.exists)
+        saveButton.tap()
+        let checklistScreen = self.otherElements["DailyChecklistScreen"]
+        XCTAssertTrue(checklistScreen.waitForExistence(timeout: 5))
+    }
 } 
