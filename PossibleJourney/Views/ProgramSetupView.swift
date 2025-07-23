@@ -136,8 +136,8 @@ struct ProgramSetupView: View {
         Button(action: {
             let program = Program(
                 id: UUID(),
-                numberOfDays: numberOfDays,
                 startDate: startDate,
+                numberOfDays: numberOfDays,
                 tasks: tasks
             )
             onSave(program)
