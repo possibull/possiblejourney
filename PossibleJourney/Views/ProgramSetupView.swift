@@ -6,6 +6,7 @@ extension Color {
 
 struct ProgramSetupView: View {
     @State private var numberOfDays: Int = 75
+    @State private var numberOfDaysText: String = "75"
     @State private var startDate: Date = Date()
     @State private var tasks: [Task] = []
     @State private var newTaskTitle: String = ""
@@ -45,13 +46,36 @@ struct ProgramSetupView: View {
                 .font(.headline)
                 .foregroundColor(.white)
             Spacer()
+            TextField("Days", text: $numberOfDaysText)
+                .keyboardType(.numberPad)
+                .frame(width: 60)
+                .multilineTextAlignment(.center)
+                .font(.title2.bold())
+                .foregroundColor(.hardRed)
+                .background(RoundedRectangle(cornerRadius: 6).fill(Color.white))
+                .onChange(of: numberOfDaysText) { newValue in
+                    let filtered = newValue.filter { $0.isNumber }
+                    if let value = Int(filtered), value >= 1, value <= 365 {
+                        numberOfDays = value
+                        numberOfDaysText = "\(value)"
+                    } else if filtered.isEmpty {
+                        numberOfDays = 1
+                        numberOfDaysText = "1"
+                    } else if let value = Int(filtered), value < 1 {
+                        numberOfDays = 1
+                        numberOfDaysText = "1"
+                    } else if let value = Int(filtered), value > 365 {
+                        numberOfDays = 365
+                        numberOfDaysText = "365"
+                    } else {
+                        numberOfDaysText = filtered
+                    }
+                }
             Stepper(value: $numberOfDays, in: 1...365) {
-                Text("\(numberOfDays)")
-                    .font(.title2.bold())
-                    .foregroundColor(.hardRed)
-                    .frame(width: 60)
-                    .multilineTextAlignment(.center)
-                    .background(RoundedRectangle(cornerRadius: 6).fill(Color.white))
+                EmptyView()
+            }
+            .onChange(of: numberOfDays) { newValue in
+                numberOfDaysText = "\(newValue)"
             }
         }
         .padding()
