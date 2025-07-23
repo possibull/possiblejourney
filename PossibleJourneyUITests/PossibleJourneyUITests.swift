@@ -10,6 +10,7 @@ final class PossibleJourneyUITests: XCTestCase {
     func testAddTaskFlow() throws {
         let app = XCUIApplication()
         app.launch()
+        print(app.debugDescription) // Print accessibility hierarchy for diagnosis
         app.addTask(title: "Read", description: "Read 10 pages")
         // Verify the task appears in the list
         let taskCell = app.staticTexts["Read"]
