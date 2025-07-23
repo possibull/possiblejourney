@@ -116,7 +116,7 @@ final class ProgramStorageTests: XCTestCase {
             numberOfDays: 75,
             tasks: [Task(id: UUID(), title: "Test Task", description: "Test Desc")]
         )
-        storage.save(program: program)
+        storage.save(program)
         let loaded = storage.load()
         XCTAssertNotNil(loaded)
         XCTAssertEqual(loaded?.numberOfDays, 75)
@@ -132,7 +132,7 @@ final class DailyProgressStorageTests: XCTestCase {
         let today = Calendar.current.startOfDay(for: Date())
         let taskID = UUID()
         let progress = DailyProgress(id: UUID(), date: today, completedTaskIDs: [taskID])
-        storage.save(progress: progress)
+        storage.save(progress)
         let loaded = storage.load(for: today)
         XCTAssertNotNil(loaded, "Should load saved progress for today")
         XCTAssertEqual(loaded?.completedTaskIDs, [taskID], "Loaded completedTaskIDs should match saved")
