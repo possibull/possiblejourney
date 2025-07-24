@@ -40,6 +40,12 @@ struct SettingsView: View {
                         DatePicker("End of Day", selection: $endOfDayTime, displayedComponents: .hourAndMinute)
                             .datePickerStyle(.wheel)
                             .accessibilityIdentifier("EndOfDayTimePicker")
+                            .onChange(of: endOfDayTime) { newValue in
+                                let calendar = Calendar.current
+                                let comps = calendar.dateComponents([.hour, .minute], from: newValue)
+                                // Always use today's date for storage
+                                endOfDayTime = calendar.date(bySettingHour: comps.hour ?? 0, minute: comps.minute ?? 0, second: 0, of: Date()) ?? newValue
+                            }
                     }
                 }
                 .frame(height: 180)
