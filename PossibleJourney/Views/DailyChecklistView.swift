@@ -143,6 +143,7 @@ struct DailyChecklistView: View {
                 .padding([.horizontal, .bottom])
             }
         }
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("DailyChecklistScreen")
         .background(Color.black.ignoresSafeArea())
         .onAppear {
