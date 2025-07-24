@@ -122,7 +122,7 @@ final class PossibleJourneyUITests: XCTestCase {
         XCTAssertTrue(settingsButton.exists)
         settingsButton.tap()
         // Assert End of Day Time picker/label exists
-        let endOfDayTime = app.otherElements["EndOfDayTimePicker"]
+        let endOfDayTime = app.datePickers["EndOfDayTimePicker"]
         XCTAssertTrue(endOfDayTime.exists, "End of Day Time picker/label should exist in Settings view")
     }
 
