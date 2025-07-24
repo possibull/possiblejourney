@@ -10,6 +10,7 @@ struct DailyChecklistView: View {
     @State private var completedTaskIDs: Set<UUID> = []
     @AppStorage("endOfDayTime") private var endOfDayTime: Date = Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22) // Default 10pm
     var onReset: (() -> Void)? = nil
+    var currentTimeOverride: Date? = nil // For test injection
     
     // 75 Hard deep red
     let hardRed = Color(red: 183/255, green: 28/255, blue: 28/255)
@@ -38,14 +39,14 @@ struct DailyChecklistView: View {
     }
 
     private var isAfterEndOfDay: Bool {
-        let now = Date()
+        let now = currentTimeOverride ?? Date()
         let bounds = appDayBounds(for: now)
         return now >= bounds.end
     }
 
     private var appToday: Date {
         // Returns the app's logical "today" date (start of app day)
-        let now = Date()
+        let now = currentTimeOverride ?? Date()
         let bounds = appDayBounds(for: now)
         return bounds.start
     }

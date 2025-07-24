@@ -130,7 +130,7 @@ final class PossibleJourneyUITests: XCTestCase {
         // Do NOT complete all tasks
         // Relaunch checklist (simulate app open after end of day)
         app.terminate()
-        app.launchArguments = []
+        app.launchArguments = ["--uitesting-current-time", String(Date().timeIntervalSince1970)]
         app.launch()
         app.checkOnScreen(identifier: "DailyChecklistScreen", timeout: 5, message: "Should be on Daily Checklist screen after relaunch")
         // Assert missed day modal appears
