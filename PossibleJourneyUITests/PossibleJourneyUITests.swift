@@ -112,6 +112,17 @@ final class PossibleJourneyUITests: XCTestCase {
         }
     }
 
+    func testSettingsViewShowsEndOfDayTimePicker() throws {
+        let app = launchAppWithReset()
+        // Navigate to Settings
+        let settingsButton = app.buttons["SettingsButton"]
+        XCTAssertTrue(settingsButton.exists)
+        settingsButton.tap()
+        // Assert End of Day Time picker/label exists
+        let endOfDayTime = app.otherElements["EndOfDayTimePicker"]
+        XCTAssertTrue(endOfDayTime.exists, "End of Day Time picker/label should exist in Settings view")
+    }
+
     /*
     func testResetProgramReturnsToSetupScreen() throws {
         let app = XCUIApplication()
