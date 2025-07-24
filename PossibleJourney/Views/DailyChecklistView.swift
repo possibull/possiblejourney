@@ -370,13 +370,16 @@ struct TaskNotesSheet: View {
                 .background(Color(.secondarySystemBackground))
                 .cornerRadius(10)
             Spacer()
-            Button("Done") { onDone() }
-                .font(.headline)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color.purple.opacity(0.8))
-                .foregroundColor(.white)
-                .cornerRadius(12)
+            Button(action: onDone) {
+                Text("Done")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.purple.opacity(0.8))
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+            }
+            .buttonStyle(PlainButtonStyle())
         }
         .padding()
     }
