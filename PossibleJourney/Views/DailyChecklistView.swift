@@ -273,11 +273,11 @@ struct DailyChecklistView: View {
         id: UUID(),
         startDate: Date(),
         numberOfDays: 75,
-        endOfDayTime: Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22), // Default 10pm
         tasks: [
             Task(id: UUID(), title: "Drink 1 gallon of water", description: nil),
             Task(id: UUID(), title: "Read 10 pages", description: nil),
             Task(id: UUID(), title: "Follow a diet", description: nil)
-        ]
+        ],
+        endOfDayTime: Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22) // Default 10pm
     ))
 } 
