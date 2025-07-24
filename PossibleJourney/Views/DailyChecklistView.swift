@@ -72,13 +72,6 @@ struct DailyChecklistView: View {
     }
     var body: some View {
         ZStack {
-            // Hidden debug element for UI tests, outside the main VStack
-            Text(program.tasks.map { $0.id.uuidString }.joined(separator: ","))
-                .accessibilityIdentifier("TaskIDsDebug")
-                .opacity(0)
-            Text(completedTaskIDs.map { $0.uuidString }.joined(separator: ","))
-                .accessibilityIdentifier("CompletedTaskIDsDebug")
-                .opacity(0)
             VStack(spacing: 0) {
                 // Header row with logo, DAY XX, and checklist icon
                 HStack(alignment: .center) {
@@ -237,28 +230,6 @@ struct DailyChecklistView: View {
             let today = appToday
             if let progress = DailyProgressStorage().load(for: today) {
                 completedTaskIDs = Set(progress.completedTaskIDs)
-                print("DEBUG: Loaded completedTaskIDs from storage: \(progress.completedTaskIDs)")
-            } else {
-                print("DEBUG: No DailyProgress found for today")
-            }
-            print("DEBUG: Task IDs in checklist:")
-            for task in program.tasks {
-                print("DEBUG: Task title: \(task.title), id: \(task.id)")
-            }
-            print("DEBUG: completedTaskIDs in state: \(completedTaskIDs)")
-            // Write completedTaskIDs to a file for debugging
-            let idsString = completedTaskIDs.map { $0.uuidString }.joined(separator: ",")
-            if let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
-                let fileURL = dir.appendingPathComponent("completedTaskIDs.txt")
-                print("DEBUG: Attempting to write completedTaskIDs to file at: \(fileURL.path)")
-                do {
-                    try idsString.write(to: fileURL, atomically: true, encoding: .utf8)
-                    print("DEBUG: Successfully wrote completedTaskIDs to file at: \(fileURL.path)")
-                } catch {
-                    print("DEBUG: Failed to write completedTaskIDs to file at: \(fileURL.path), error: \(error)")
-                }
-            } else {
-                print("DEBUG: Could not find documents directory to write completedTaskIDs.txt")
             }
             // Debug: Print current time, computed endOfAppDay, and isAfterEndOfDay
             let now = currentTimeOverride ?? Date()
