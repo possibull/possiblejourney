@@ -21,24 +21,25 @@ extension Program {
     }
     func isDayMissed(for date: Date, completedTaskIDs: Set<UUID>) -> Bool {
         let calendar = Calendar.current
-        let appDay = self.appDay(for: date)
-        if appDay < 1 || appDay > numberOfDays { return false } // Not in program range
-
-        // Compute the start of this app day
-        let appDayStart = calendar.date(byAdding: .day, value: appDay - 1, to: calendar.startOfDay(for: startDate))!
         let endHour = calendar.component(.hour, from: endOfDayTime)
         let endMinute = calendar.component(.minute, from: endOfDayTime)
+        var appDayToCheck = self.appDay(for: date)
+        var appDayStart = calendar.date(byAdding: .day, value: appDayToCheck - 1, to: calendar.startOfDay(for: startDate))!
         var endOfAppDay: Date
         if endHour < 12 {
             // AM: EOD is next calendar day at that time
-            let nextDay = calendar.date(byAdding: .day, value: 1, to: appDayStart)!
-            endOfAppDay = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: nextDay)!
+            let eod = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: calendar.date(byAdding: .day, value: 1, to: appDayStart)!)!
+            if date < eod {
+                appDayToCheck -= 1
+                if appDayToCheck < 1 || appDayToCheck > numberOfDays { return false }
+                appDayStart = calendar.date(byAdding: .day, value: appDayToCheck - 1, to: calendar.startOfDay(for: startDate))!
+            }
+            endOfAppDay = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: calendar.date(byAdding: .day, value: 1, to: appDayStart)!)!
         } else {
             // PM: EOD is today at that time
             endOfAppDay = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: appDayStart)!
         }
-
-        // If any task is not in completedTaskIDs, it's missed
+        if appDayToCheck < 1 || appDayToCheck > numberOfDays { return false }
         let missed = tasks.contains { !completedTaskIDs.contains($0.id) }
         return date >= endOfAppDay && missed
     }
