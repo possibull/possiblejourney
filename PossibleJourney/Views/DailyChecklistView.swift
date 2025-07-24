@@ -116,7 +116,8 @@ struct DailyChecklistView: View {
                     RoundedRectangle(cornerRadius: 24)
                         .fill(Color(red: 24/255, green: 24/255, blue: 24/255))
                         .shadow(color: .black.opacity(0.18), radius: 12, x: 0, y: 6)
-                    let visibleTasks = program.tasks.filter { !hideCompletedTasks || !completedTaskIDs.contains($0.id) }
+                    // Break up filtered tasks for type-checking
+                    let visibleTasks: [Task] = program.tasks.filter { !hideCompletedTasks || !completedTaskIDs.contains($0.id) }
                     List {
                         ForEach(visibleTasks, id: \.id) { task in
                             let isCompleted = completedTaskIDs.contains(task.id)
