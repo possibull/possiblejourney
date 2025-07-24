@@ -345,3 +345,32 @@ struct DailyChecklistView: View {
         endOfDayTime: Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22) // Default 10pm
     ))
 } 
+
+// Dedicated subview for editing notes
+struct TaskNotesSheet: View {
+    let title: String
+    @Binding var note: String
+    var onDone: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Notes for Task")
+                .font(.headline)
+            Text(title)
+                .font(.title3.bold())
+            TextEditor(text: $note)
+                .frame(minHeight: 120)
+                .background(Color(.secondarySystemBackground))
+                .cornerRadius(10)
+            Spacer()
+            Button("Done") { onDone() }
+                .font(.headline)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.purple.opacity(0.8))
+                .foregroundColor(.white)
+                .cornerRadius(12)
+        }
+        .padding()
+    }
+} 
