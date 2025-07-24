@@ -108,8 +108,7 @@ struct DailyChecklistView: View {
                         .fill(Color(red: 24/255, green: 24/255, blue: 24/255))
                         .shadow(color: .black.opacity(0.18), radius: 12, x: 0, y: 6)
                     List {
-                        ForEach(program.tasks.indices, id: \ .self) { idx in
-                            let task = program.tasks[idx]
+                        ForEach(program.tasks, id: \.id) { task in
                             let isCompleted = completedTaskIDs.contains(task.id)
                             HStack(alignment: .center, spacing: 16) {
                                 Button(action: {
