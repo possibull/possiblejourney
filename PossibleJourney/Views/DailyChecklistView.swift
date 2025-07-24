@@ -10,7 +10,8 @@ struct DailyChecklistView: View {
     @State private var completedTaskIDs: Set<UUID> = []
     @State private var hideCompletedTasks = false
     @State private var notesForTask: [UUID: String] = [:]
-    @State private var notesSheetTaskID: UUID? = nil
+    // Wrapper for Identifiable UUID for sheet
+    @State private var notesSheetTaskID: TaskIDWrapper? = nil
     @State private var notesSheetText: String = ""
     @State private var reminderAlertTaskID: UUID? = nil
     // endOfDayTime is now part of Program
@@ -124,7 +125,7 @@ struct DailyChecklistView: View {
                             HStack(alignment: .center, spacing: 16) {
                                 // Notes icon
                                 Button(action: {
-                                    notesSheetTaskID = task.id
+                                    notesSheetTaskID = TaskIDWrapper(id: task.id)
                                     notesSheetText = notesForTask[task.id, default: ""]
                                 }) {
                                     Image(systemName: "note.text")
@@ -318,7 +319,8 @@ struct DailyChecklistView: View {
             .accessibilityIdentifier("MissedDayModal")
         }
         // Dedicated subview for editing notes
-        .sheet(item: $notesSheetTaskID) { taskID in
+        .sheet(item: $notesSheetTaskID) { wrapper in
+            let taskID = wrapper.id
             let task = program.tasks.first(where: { $0.id == taskID })
             TaskNotesSheet(
                 title: task?.title ?? "",
