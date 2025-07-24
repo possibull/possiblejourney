@@ -11,6 +11,7 @@ struct DailyChecklistView: View {
     @State private var hideCompletedTasks = false
     @State private var notesForTask: [UUID: String] = [:]
     @State private var notesSheetTaskID: UUID? = nil
+    @State private var notesSheetText: String = ""
     @State private var reminderAlertTaskID: UUID? = nil
     // endOfDayTime is now part of Program
     var onReset: (() -> Void)? = nil
@@ -121,7 +122,10 @@ struct DailyChecklistView: View {
                             let isCompleted = completedTaskIDs.contains(task.id)
                             HStack(alignment: .center, spacing: 16) {
                                 // Notes icon
-                                Button(action: { notesSheetTaskID = task.id }) {
+                                Button(action: {
+                                    notesSheetTaskID = task.id
+                                    notesSheetText = notesForTask[task.id, default: ""]
+                                }) {
                                     Image(systemName: "note.text")
                                         .foregroundColor(Color.purple)
                                         .font(.system(size: 20, weight: .medium))
@@ -317,11 +321,11 @@ struct DailyChecklistView: View {
             let task = program.tasks.first(where: { $0.id == taskID })
             TaskNotesSheet(
                 title: task?.title ?? "",
-                note: Binding(
-                    get: { notesForTask[taskID, default: ""] },
-                    set: { notesForTask[taskID] = $0 }
-                ),
-                onDone: { notesSheetTaskID = nil }
+                note: $notesSheetText,
+                onDone: {
+                    notesForTask[taskID] = notesSheetText
+                    notesSheetTaskID = nil
+                }
             )
         }
     }
