@@ -119,6 +119,7 @@ final class PossibleJourneyUITests: XCTestCase {
         app.addTask(title: "Drink Water", description: "Drink 2L of water")
         app.saveProgram()
         // Set end of day time to just before now (simulate after end of day)
+        print("DEBUG: Button identifiers: \(app.buttons.allElementsBoundByIndex.map { $0.identifier })")
         let settingsButton = app.buttons["SettingsButton"]
         XCTAssertTrue(settingsButton.exists)
         settingsButton.tap()
