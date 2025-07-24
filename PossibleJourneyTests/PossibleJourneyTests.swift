@@ -202,13 +202,13 @@ final class ProgramModelDayLogicTests: XCTestCase {
         let startDate = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1))!
         let task1 = Task(id: UUID(), title: "A", description: nil)
         let program = Program(id: UUID(), startDate: startDate, numberOfDays: 20, tasks: [task1], endOfDayTime: Calendar.current.date(bySettingHour: 2, minute: 0, second: 0, of: startDate)!)
-        // Before EOD (Jan 2, 1:00 AM)
-        let beforeEOD = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 2, hour: 1, minute: 0))!
+        // Just before EOD (Jan 2, 1:59:59 AM)
+        let beforeEOD = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 2, hour: 1, minute: 59, second: 59))!
         let missedBefore = program.isDayMissed(for: beforeEOD, completedTaskIDs: [])
-        XCTAssertFalse(missedBefore, "Should not be missed before AM EOD on next day")
-        // After EOD (Jan 2, 2:00 AM)
-        let afterEOD = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 2, hour: 2, minute: 0))!
-        let missedAfter = program.isDayMissed(for: afterEOD, completedTaskIDs: [])
-        XCTAssertTrue(missedAfter, "Should be missed after AM EOD on next day if not complete")
+        XCTAssertFalse(missedBefore, "Should not be missed just before AM EOD on next day")
+        // At EOD (Jan 2, 2:00 AM)
+        let atEOD = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 2, hour: 2, minute: 0, second: 0))!
+        let missedAtEOD = program.isDayMissed(for: atEOD, completedTaskIDs: [])
+        XCTAssertTrue(missedAtEOD, "Should be missed at or after AM EOD on next day if not complete")
     }
 } 
