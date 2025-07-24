@@ -24,122 +24,124 @@ struct DailyChecklistView: View {
         return formatter.string(from: today)
     }
     var body: some View {
-        VStack(spacing: 0) {
-            // Header row with logo, DAY XX, and checklist icon
-            HStack(alignment: .center) {
-                // Circle with total number of days in program (restored)
-                ZStack {
-                    Circle().fill(Color.white).frame(width: 40, height: 40)
-                    Text("\(program.numberOfDays)")
-                        .font(.system(size: 18, weight: .heavy))
-                        .foregroundColor(hardRed)
-                }
-                HStack(spacing: 6) {
-                    Text("DAY \(currentDay)")
-                        .font(.system(size: 36, weight: .heavy))
-                        .foregroundColor(.white)
-                    Text("OF \(program.numberOfDays)")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundColor(.white)
-                        .baselineOffset(10)
-                }
-                .frame(maxWidth: .infinity, alignment: .center)
-                // Checklist icon placeholder
-                Image(systemName: "checklist")
-                    .font(.system(size: 28, weight: .bold))
-                    .foregroundColor(.white)
-            }
-            .padding(.top, 24)
-            .padding(.horizontal)
-            .accessibilityElement()
-            .accessibilityIdentifier("ChecklistScreenHeader")
-            // Date below header
-            Text(formattedDate)
-                .font(.headline)
-                .foregroundColor(.white)
-                .padding(.bottom, 16)
-            // Task list
-            ScrollView {
-                VStack(spacing: 0) {
-                    ForEach(program.tasks, id: \.id) { task in
-                        let isCompleted = completedTaskIDs.contains(task.id)
-                        VStack(spacing: 0) {
-                            HStack(alignment: .center, spacing: 16) {
-                                Button(action: {
-                                    if isCompleted {
-                                        completedTaskIDs.remove(task.id)
-                                    } else {
-                                        completedTaskIDs.insert(task.id)
-                                    }
-                                    // Save progress to storage
-                                    let progress = DailyProgress(id: UUID(), date: Calendar.current.startOfDay(for: Date()), completedTaskIDs: Array(completedTaskIDs))
-                                    DailyProgressStorage().save(progress: progress)
-                                }) {
-                                    ZStack {
-                                        Circle()
-                                            .strokeBorder(Color.white, lineWidth: 2)
-                                            .background(Circle().fill(isCompleted ? hardRed : Color.black))
-                                            .frame(width: 32, height: 32)
-                                        if isCompleted {
-                                            Image(systemName: "checkmark")
-                                                .font(.system(size: 18, weight: .bold))
-                                                .foregroundColor(.white)
-                                                .accessibilityIdentifier("checkmark")
-                                        }
-                                    }
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                                Text(task.title)
-                                    .font(.system(size: 20, weight: .bold))
-                                    .foregroundColor(.white)
-                                    .strikethrough(isCompleted, color: hardRed)
-                                Spacer()
-                                // Optional: right-side icon placeholder (e.g., camera)
-                            }
-                            .padding(.vertical, 18)
-                            // Add Reminder row
-                            HStack(spacing: 8) {
-                                Image(systemName: "clock.badge.plus")
-                                    .font(.system(size: 16, weight: .regular))
-                                    .foregroundColor(.white.opacity(0.7))
-                                Text("Add Reminder")
-                                    .font(.system(size: 15, weight: .medium))
-                                    .foregroundColor(.white.opacity(0.7))
-                                Spacer()
-                            }
-                            .padding(.bottom, 8)
-                            .padding(.leading, 48)
-                            // Separator
-                            Rectangle()
-                                .fill(Color.white.opacity(0.15))
-                                .frame(height: 1)
-                        }
-                    }
-                }
-                .padding(.horizontal)
-                .padding(.bottom, 24)
-            }
-            // NOTES section
-            VStack(alignment: .leading, spacing: 8) {
-                Text("NOTES:")
-                    .font(.system(size: 18, weight: .heavy))
-                    .foregroundColor(.white)
-                Divider().background(Color.white)
-                Text("Make notes of any challenges, insights, or breakthroughs you achieve.")
-                    .font(.system(size: 15))
-                    .foregroundColor(.white)
-            }
-            .padding()
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.white, lineWidth: 2)
-                    .background(Color.black)
-            )
-            .padding([.horizontal, .bottom])
-            // Hidden debug element for UI tests
+        ZStack {
+            // Hidden debug element for UI tests, outside the main VStack
             Text(program.tasks.map { $0.id.uuidString }.joined(separator: ","))
                 .accessibilityIdentifier("TaskIDsDebug")
                 .opacity(0)
+            VStack(spacing: 0) {
+                // Header row with logo, DAY XX, and checklist icon
+                HStack(alignment: .center) {
+                    // Circle with total number of days in program (restored)
+                    ZStack {
+                        Circle().fill(Color.white).frame(width: 40, height: 40)
+                        Text("\(program.numberOfDays)")
+                            .font(.system(size: 18, weight: .heavy))
+                            .foregroundColor(hardRed)
+                    }
+                    HStack(spacing: 6) {
+                        Text("DAY \(currentDay)")
+                            .font(.system(size: 36, weight: .heavy))
+                            .foregroundColor(.white)
+                        Text("OF \(program.numberOfDays)")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(.white)
+                            .baselineOffset(10)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    // Checklist icon placeholder
+                    Image(systemName: "checklist")
+                        .font(.system(size: 28, weight: .bold))
+                        .foregroundColor(.white)
+                }
+                .padding(.top, 24)
+                .padding(.horizontal)
+                .accessibilityElement()
+                .accessibilityIdentifier("ChecklistScreenHeader")
+                // Date below header
+                Text(formattedDate)
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding(.bottom, 16)
+                // Task list
+                ScrollView {
+                    VStack(spacing: 0) {
+                        ForEach(program.tasks, id: \.id) { task in
+                            let isCompleted = completedTaskIDs.contains(task.id)
+                            VStack(spacing: 0) {
+                                HStack(alignment: .center, spacing: 16) {
+                                    Button(action: {
+                                        if isCompleted {
+                                            completedTaskIDs.remove(task.id)
+                                        } else {
+                                            completedTaskIDs.insert(task.id)
+                                        }
+                                        // Save progress to storage
+                                        let progress = DailyProgress(id: UUID(), date: Calendar.current.startOfDay(for: Date()), completedTaskIDs: Array(completedTaskIDs))
+                                        DailyProgressStorage().save(progress: progress)
+                                    }) {
+                                        ZStack {
+                                            Circle()
+                                                .strokeBorder(Color.white, lineWidth: 2)
+                                                .background(Circle().fill(isCompleted ? hardRed : Color.black))
+                                                .frame(width: 32, height: 32)
+                                            if isCompleted {
+                                                Image(systemName: "checkmark")
+                                                    .font(.system(size: 18, weight: .bold))
+                                                    .foregroundColor(.white)
+                                                    .accessibilityIdentifier("checkmark")
+                                            }
+                                        }
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                    Text(task.title)
+                                        .font(.system(size: 20, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .strikethrough(isCompleted, color: hardRed)
+                                    Spacer()
+                                    // Optional: right-side icon placeholder (e.g., camera)
+                                }
+                                .padding(.vertical, 18)
+                                // Add Reminder row
+                                HStack(spacing: 8) {
+                                    Image(systemName: "clock.badge.plus")
+                                        .font(.system(size: 16, weight: .regular))
+                                        .foregroundColor(.white.opacity(0.7))
+                                    Text("Add Reminder")
+                                        .font(.system(size: 15, weight: .medium))
+                                        .foregroundColor(.white.opacity(0.7))
+                                    Spacer()
+                                }
+                                .padding(.bottom, 8)
+                                .padding(.leading, 48)
+                                // Separator
+                                Rectangle()
+                                    .fill(Color.white.opacity(0.15))
+                                    .frame(height: 1)
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                    .padding(.bottom, 24)
+                }
+                // NOTES section
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("NOTES:")
+                        .font(.system(size: 18, weight: .heavy))
+                        .foregroundColor(.white)
+                    Divider().background(Color.white)
+                    Text("Make notes of any challenges, insights, or breakthroughs you achieve.")
+                        .font(.system(size: 15))
+                        .foregroundColor(.white)
+                }
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.white, lineWidth: 2)
+                        .background(Color.black)
+                )
+                .padding([.horizontal, .bottom])
+            }
         }
         .accessibilityIdentifier("DailyChecklistScreen")
         .background(Color.black.ignoresSafeArea())
