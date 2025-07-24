@@ -32,14 +32,18 @@ struct DailyChecklistView: View {
         let calendar = Calendar.current
         let endHour = calendar.component(.hour, from: program.endOfDayTime)
         let endMinute = calendar.component(.minute, from: program.endOfDayTime)
+        let startOfToday = calendar.startOfDay(for: date)
         var endOfAppDay: Date
-        if endHour < 12 { // AM: end of day is next calendar day at that time
-            let nextDay = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: date))!
+        if endHour < 12 {
+            // AM: end of day is next calendar day at that time
+            let nextDay = calendar.date(byAdding: .day, value: 1, to: startOfToday)!
             endOfAppDay = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: nextDay) ?? date
-        } else { // PM: end of day is today at that time
-            endOfAppDay = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: date) ?? date
+        } else {
+            // PM: end of day is today at that time
+            endOfAppDay = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: startOfToday) ?? date
         }
-        let startOfAppDay = calendar.date(byAdding: .second, value: 1, to: endOfAppDay.addingTimeInterval(-86400)) ?? date // 1 second after previous day's endOfDay
+        // Start of app day is previous end of day + 1 second
+        let startOfAppDay = calendar.date(byAdding: .second, value: 1, to: endOfAppDay.addingTimeInterval(-86400)) ?? date
         return (startOfAppDay, endOfAppDay)
     }
 
