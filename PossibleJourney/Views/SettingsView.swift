@@ -34,23 +34,21 @@ struct SettingsView: View {
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)
-                // End of Day Time Picker Section
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("End of Day Time")
-                        .font(.headline)
-                        .foregroundColor(hardRed)
-                    DatePicker("End of Day", selection: $endOfDayTime, displayedComponents: .hourAndMinute)
-                        .datePickerStyle(.wheel)
-                        .frame(height: 150)
-                        .accessibilityIdentifier("EndOfDayTimePicker")
-                        .colorScheme(.dark)
+                // End of Day Time Picker Section in Form
+                Form {
+                    Section(header: Text("End of Day Time").font(.headline).foregroundColor(hardRed)) {
+                        DatePicker("End of Day", selection: $endOfDayTime, displayedComponents: .hourAndMinute)
+                            .datePickerStyle(.wheel)
+                            .accessibilityIdentifier("EndOfDayTimePicker")
+                    }
                 }
-                .padding()
-                .background(RoundedRectangle(cornerRadius: 16).fill(Color.white.opacity(0.95)))
+                .frame(height: 180)
+                .cornerRadius(16)
                 .padding(.horizontal)
                 // Reset Button
                 Button(action: {
                     ProgramStorage().clear()
+                    endOfDayTime = Calendar.current.startOfDay(for: Date()) // Set to 12:00AM
                     onReset?()
                 }) {
                     Text("Reset Program")
