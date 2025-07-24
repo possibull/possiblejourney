@@ -72,6 +72,9 @@ final class PossibleJourneyUITests: XCTestCase {
         for cell in taskCells {
             print("DEBUG: Task cell label: \(cell.label)")
         }
+        // Print debug task IDs before relaunch
+        let debugTaskIDsBefore = app.staticTexts["TaskIDsDebug"].label
+        print("DEBUG: TaskIDsDebug before relaunch: \(debugTaskIDsBefore)")
         // Mark the first task as complete
         let firstTask = app.staticTexts["Read"]
         XCTAssertTrue(firstTask.exists)
@@ -89,6 +92,9 @@ final class PossibleJourneyUITests: XCTestCase {
         for cell in taskCellsAfter {
             print("DEBUG: Task cell label: \(cell.label)")
         }
+        // Print debug task IDs after relaunch
+        let debugTaskIDsAfter = app.staticTexts["TaskIDsDebug"].label
+        print("DEBUG: TaskIDsDebug after relaunch: \(debugTaskIDsAfter)")
         // Print all images and their accessibility identifiers
         let images = app.images.allElementsBoundByIndex
         for image in images {
