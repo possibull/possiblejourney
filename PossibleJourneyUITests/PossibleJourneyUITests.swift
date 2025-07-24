@@ -126,7 +126,7 @@ final class PossibleJourneyUITests: XCTestCase {
         XCTAssertTrue(endOfDayPicker.exists)
         // Set the picker to a time just before now (simulate after end of day)
         // (For TDD, this is a placeholder; real implementation may need test injection)
-        app.navigationBars.buttons["Back"].tap()
+        app.buttons["Back"].tap()
         // Do NOT complete all tasks
         // Relaunch checklist (simulate app open after end of day)
         app.terminate()
