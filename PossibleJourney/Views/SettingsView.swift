@@ -42,5 +42,6 @@ struct SettingsView: View {
             .padding()
             .background(Color.black.ignoresSafeArea())
         }
+        .tint(hardRed)
     }
 } 
