@@ -10,8 +10,14 @@ struct Program: Codable {
 
 extension Program {
     func appDay(for date: Date) -> Int {
-        // TODO: Implement logic
-        return -1 // placeholder to make test fail
+        let calendar = Calendar.current
+        let startOfStartDate = calendar.startOfDay(for: startDate)
+        let startOfDate = calendar.startOfDay(for: date)
+        let diff = calendar.dateComponents([.day], from: startOfStartDate, to: startOfDate).day ?? 0
+        if diff < 0 {
+            return 0
+        }
+        return diff + 1
     }
     func isDayMissed(for date: Date, completedTaskIDs: Set<UUID>) -> Bool {
         // TODO: Implement logic
