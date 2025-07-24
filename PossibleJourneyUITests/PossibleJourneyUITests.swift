@@ -114,7 +114,10 @@ final class PossibleJourneyUITests: XCTestCase {
 
     func testSettingsViewShowsEndOfDayTimePicker() throws {
         let app = launchAppWithReset()
-        // Navigate to Settings
+        // Complete program setup to reach Daily Checklist screen
+        app.addTask(title: "Read", description: "Read 10 pages")
+        app.saveProgram()
+        // Now tap the Settings button
         let settingsButton = app.buttons["SettingsButton"]
         XCTAssertTrue(settingsButton.exists)
         settingsButton.tap()
