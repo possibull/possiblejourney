@@ -157,11 +157,15 @@ struct DailyChecklistView: View {
             let idsString = completedTaskIDs.map { $0.uuidString }.joined(separator: ",")
             if let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
                 let fileURL = dir.appendingPathComponent("completedTaskIDs.txt")
+                print("DEBUG: Attempting to write completedTaskIDs to file at: \(fileURL.path)")
                 do {
                     try idsString.write(to: fileURL, atomically: true, encoding: .utf8)
+                    print("DEBUG: Successfully wrote completedTaskIDs to file at: \(fileURL.path)")
                 } catch {
-                    print("DEBUG: Failed to write completedTaskIDs to file: \(error)")
+                    print("DEBUG: Failed to write completedTaskIDs to file at: \(fileURL.path), error: \(error)")
                 }
+            } else {
+                print("DEBUG: Could not find documents directory to write completedTaskIDs.txt")
             }
         }
         .toolbar {
