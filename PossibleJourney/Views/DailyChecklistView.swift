@@ -6,6 +6,7 @@ struct DailyChecklistView: View {
     @State private var showSettings = false
     @State private var showCalendar = false
     @State private var completedTaskIDs: Set<UUID> = []
+    @AppStorage("endOfDayTime") private var endOfDayTime: Date = Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22) // Default 10pm
     var onReset: (() -> Void)? = nil
     
     // 75 Hard deep red
