@@ -220,6 +220,12 @@ struct DailyChecklistView: View {
             } else {
                 print("DEBUG: Could not find documents directory to write completedTaskIDs.txt")
             }
+            // Debug: Print current time, computed endOfAppDay, and isAfterEndOfDay
+            let now = currentTimeOverride ?? Date()
+            let bounds = appDayBounds(for: now)
+            print("DEBUG: Now: \(now)")
+            print("DEBUG: Computed endOfAppDay: \(bounds.end)")
+            print("DEBUG: isAfterEndOfDay: \(isAfterEndOfDay)")
             // Show missed day modal if after end of day and not all tasks are complete
             if isAfterEndOfDay && completedTaskIDs.count < program.tasks.count {
                 showMissedDayModal = true
