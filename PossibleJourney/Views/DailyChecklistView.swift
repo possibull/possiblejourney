@@ -11,6 +11,7 @@ struct DailyChecklistView: View {
     @State private var hideCompletedTasks = false
     @State private var notesForTask: [UUID: String] = [:]
     @State private var notesSheetTaskID: UUID? = nil
+    @State private var reminderAlertTaskID: UUID? = nil
     // endOfDayTime is now part of Program
     var onReset: (() -> Void)? = nil
     var currentTimeOverride: Date? = nil // For test injection
@@ -114,10 +115,10 @@ struct DailyChecklistView: View {
                     RoundedRectangle(cornerRadius: 24)
                         .fill(Color(red: 24/255, green: 24/255, blue: 24/255))
                         .shadow(color: .black.opacity(0.18), radius: 12, x: 0, y: 6)
+                    let visibleTasks = program.tasks.filter { !hideCompletedTasks || !completedTaskIDs.contains($0.id) }
                     List {
-                        ForEach(program.tasks.filter { !hideCompletedTasks || !completedTaskIDs.contains($0.id) }, id: \.id) { task in
+                        ForEach(visibleTasks, id: \.id) { task in
                             let isCompleted = completedTaskIDs.contains(task.id)
-                            @State var showReminderAlert = false
                             HStack(alignment: .center, spacing: 16) {
                                 // Notes icon
                                 Button(action: { notesSheetTaskID = task.id }) {
@@ -178,14 +179,11 @@ struct DailyChecklistView: View {
                             .listRowBackground(Color.clear)
                             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                 Button {
-                                    showReminderAlert = true
+                                    reminderAlertTaskID = task.id
                                 } label: {
                                     Label("Remind Me", systemImage: "bell")
                                 }
                                 .tint(Color.purple)
-                            }
-                            .alert(isPresented: $showReminderAlert) {
-                                Alert(title: Text("Set Reminder"), message: Text("Reminder functionality coming soon!"), dismissButton: .default(Text("OK")))
                             }
                         }
                         .onMove { indices, newOffset in
@@ -304,18 +302,19 @@ struct DailyChecklistView: View {
             .accessibilityIdentifier("MissedDayModal")
         }
         .sheet(item: $notesSheetTaskID) { taskID in
+            let noteBinding = Binding(
+                get: { notesForTask[taskID, default: ""] },
+                set: { notesForTask[taskID] = $0 }
+            )
             VStack(alignment: .leading, spacing: 16) {
                 Text("Notes for Task")
                     .font(.headline)
                 Text(program.tasks.first(where: { $0.id == taskID })?.title ?? "")
                     .font(.title3.bold())
-                TextEditor(text: Binding(
-                    get: { notesForTask[taskID, default: ""] },
-                    set: { notesForTask[taskID] = $0 }
-                ))
-                .frame(minHeight: 120)
-                .background(Color(.secondarySystemBackground))
-                .cornerRadius(10)
+                TextEditor(text: noteBinding)
+                    .frame(minHeight: 120)
+                    .background(Color(.secondarySystemBackground))
+                    .cornerRadius(10)
                 Spacer()
                 Button("Done") { notesSheetTaskID = nil }
                     .font(.headline)
@@ -326,6 +325,13 @@ struct DailyChecklistView: View {
                     .cornerRadius(12)
             }
             .padding()
+        }
+        .alert(item: $reminderAlertTaskID) { taskID in
+            Alert(
+                title: Text("Set Reminder"),
+                message: Text("Reminder functionality coming soon!"),
+                dismissButton: .default(Text("OK")) { reminderAlertTaskID = nil }
+            )
         }
     }
 }
