@@ -168,7 +168,7 @@ struct DailyChecklistView: View {
                                 } label: {
                                     Label("Remind Me", systemImage: "bell")
                                 }
-                                .tint(hardRed)
+                                .tint(Color.purple)
                             }
                             .alert(isPresented: $showReminderAlert) {
                                 Alert(title: Text("Set Reminder"), message: Text("Reminder functionality coming soon!"), dismissButton: .default(Text("OK")))
