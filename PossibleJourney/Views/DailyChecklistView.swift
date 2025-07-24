@@ -1,5 +1,7 @@
 import SwiftUI
 import Foundation
+// Import the view model
+import Combine
 
 // Wrapper for Identifiable UUID for sheet
 struct TaskIDWrapper: Identifiable, Equatable {
@@ -7,19 +9,17 @@ struct TaskIDWrapper: Identifiable, Equatable {
 }
 
 struct DailyChecklistView: View {
-    @State var program: Program
+    @StateObject var viewModel: DailyChecklistViewModel
     @State private var showSettings = false
     @State private var showCalendar = false
     @State private var showSettingsNav = false
     @State private var showMissedDayModal = false
-    @State private var completedTaskIDs: Set<UUID> = []
     @State private var hideCompletedTasks = false
     @State private var notesForTask: [UUID: String] = [:]
     // Wrapper for Identifiable UUID for sheet
     @State private var notesSheetTaskID: TaskIDWrapper? = nil
     @State private var notesSheetText: String = ""
     @State private var reminderAlertTaskID: UUID? = nil
-    // endOfDayTime is now part of Program
     var onReset: (() -> Void)? = nil
     var currentTimeOverride: Date? = nil // For test injection
     
@@ -27,10 +27,10 @@ struct DailyChecklistView: View {
     let hardRed = Color(red: 183/255, green: 28/255, blue: 28/255)
     
     private var currentDay: Int {
-        let start = Calendar.current.startOfDay(for: program.startDate)
+        let start = Calendar.current.startOfDay(for: viewModel.program.startDate)
         let today = Calendar.current.startOfDay(for: Date())
         let diff = Calendar.current.dateComponents([.day], from: start, to: today).day ?? 0
-        return min(max(diff + 1, 1), program.numberOfDays)
+        return min(max(diff + 1, 1), viewModel.program.numberOfDays)
     }
     private var formattedDate: String {
         let today = Calendar.current.startOfDay(for: Date())
@@ -41,8 +41,8 @@ struct DailyChecklistView: View {
     // Helper to compute app day start and end based on endOfDayTime
     private func appDayBounds(for date: Date) -> (start: Date, end: Date) {
         let calendar = Calendar.current
-        let endHour = calendar.component(.hour, from: program.endOfDayTime)
-        let endMinute = calendar.component(.minute, from: program.endOfDayTime)
+        let endHour = calendar.component(.hour, from: viewModel.program.endOfDayTime)
+        let endMinute = calendar.component(.minute, from: viewModel.program.endOfDayTime)
         let startOfToday = calendar.startOfDay(for: date)
         var endOfAppDay: Date
         if endHour < 12 {
@@ -58,18 +58,6 @@ struct DailyChecklistView: View {
         return (startOfAppDay, endOfAppDay)
     }
 
-    private var isAfterEndOfDay: Bool {
-        let now = currentTimeOverride ?? Date()
-        let bounds = appDayBounds(for: now)
-        return now >= bounds.end
-    }
-
-    private var appToday: Date {
-        // Returns the app's logical "today" date (start of app day)
-        let now = currentTimeOverride ?? Date()
-        let bounds = appDayBounds(for: now)
-        return bounds.start
-    }
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
@@ -78,7 +66,7 @@ struct DailyChecklistView: View {
                     // Circle with total number of days in program (restored)
                     ZStack {
                         Circle().fill(Color.white).frame(width: 48, height: 48)
-                        Text("\(program.numberOfDays)")
+                        Text("\(viewModel.program.numberOfDays)")
                             .font(.system(size: 22, weight: .heavy))
                             .foregroundColor(hardRed)
                     }
@@ -86,7 +74,7 @@ struct DailyChecklistView: View {
                         Text("DAY \(currentDay)")
                             .font(.system(size: 40, weight: .black))
                             .foregroundColor(.white)
-                        Text("OF \(program.numberOfDays)")
+                        Text("OF \(viewModel.program.numberOfDays)")
                             .font(.system(size: 14, weight: .bold))
                             .foregroundColor(.white)
                             .baselineOffset(12)
@@ -116,22 +104,22 @@ struct DailyChecklistView: View {
                         .fill(Color(red: 24/255, green: 24/255, blue: 24/255))
                         .shadow(color: .black.opacity(0.18), radius: 12, x: 0, y: 6)
                     // Break up filtered tasks for type-checking
-                    let visibleTasks: [Task] = program.tasks.filter { !hideCompletedTasks || !completedTaskIDs.contains($0.id) }
+                    let visibleTasks: [Task] = viewModel.program.tasks.filter { !hideCompletedTasks || !viewModel.completedTaskIDs.contains($0.id) }
                     List {
                         ForEach(visibleTasks, id: \.id) { task in
-                            let isCompleted = completedTaskIDs.contains(task.id)
+                            let isCompleted = viewModel.completedTaskIDs.contains(task.id)
                             HStack(alignment: .center, spacing: 16) {
                                 Button(action: {
                                     if isCompleted {
-                                        completedTaskIDs.remove(task.id)
+                                        viewModel.completedTaskIDs.remove(task.id)
                                     } else {
-                                        completedTaskIDs.insert(task.id)
+                                        viewModel.completedTaskIDs.insert(task.id)
                                     }
                                     // Haptic feedback
                                     let generator = UIImpactFeedbackGenerator(style: .medium)
                                     generator.impactOccurred()
                                     // Save progress to storage
-                                    let progress = DailyProgress(id: UUID(), date: appToday, completedTaskIDs: Array(completedTaskIDs))
+                                    let progress = DailyProgress(id: UUID(), date: viewModel.appToday, completedTaskIDs: Array(viewModel.completedTaskIDs))
                                     DailyProgressStorage().save(progress: progress)
                                 }) {
                                     ZStack {
@@ -202,8 +190,8 @@ struct DailyChecklistView: View {
                             }
                         }
                         .onMove { indices, newOffset in
-                            program.tasks.move(fromOffsets: indices, toOffset: newOffset)
-                            ProgramStorage().save(program)
+                            viewModel.program.tasks.move(fromOffsets: indices, toOffset: newOffset)
+                            ProgramStorage().save(viewModel.program)
                         }
                     }
                     .listStyle(PlainListStyle())
@@ -218,7 +206,7 @@ struct DailyChecklistView: View {
             NavigationLink(destination: SettingsView(onReset: {
                 showSettingsNav = false
                 onReset?()
-            }, endOfDayTime: $program.endOfDayTime), isActive: $showSettingsNav) {
+            }, endOfDayTime: $viewModel.program.endOfDayTime), isActive: $showSettingsNav) {
                 EmptyView()
             }
         }
@@ -226,24 +214,15 @@ struct DailyChecklistView: View {
         .accessibilityIdentifier("DailyChecklistScreen")
         .background(Color.black.ignoresSafeArea())
         .onAppear {
-            // Load today's progress from storage using appToday
-            let today = appToday
-            if let progress = DailyProgressStorage().load(for: today) {
-                completedTaskIDs = Set(progress.completedTaskIDs)
-            }
-            // Debug: Print current time, computed endOfAppDay, and isAfterEndOfDay
-            let now = currentTimeOverride ?? Date()
-            let bounds = appDayBounds(for: now)
-            print("DEBUG: Now: \(now)")
-            print("DEBUG: Computed endOfAppDay: \(bounds.end)")
-            print("DEBUG: isAfterEndOfDay: \(isAfterEndOfDay)")
-            // Show missed day modal if after end of day and not all tasks are complete
-            if isAfterEndOfDay && completedTaskIDs.count < program.tasks.count {
+            // Show missed day modal if the view model says the day is missed
+            if viewModel.isDayMissed {
                 showMissedDayModal = true
             }
         }
-        .onChange(of: program.endOfDayTime) { newValue in
-            ProgramStorage().save(program)
+        .onChange(of: viewModel.isDayMissed) { missed in
+            if missed {
+                showMissedDayModal = true
+            }
         }
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
@@ -297,7 +276,7 @@ struct DailyChecklistView: View {
         // Dedicated subview for editing notes
         .sheet(item: $notesSheetTaskID) { wrapper in
             let taskID = wrapper.id
-            let task = program.tasks.first(where: { $0.id == taskID })
+            let task = viewModel.program.tasks.first(where: { $0.id == taskID })
             TaskNotesSheet(
                 title: task?.title ?? "",
                 note: $notesSheetText,
@@ -311,7 +290,7 @@ struct DailyChecklistView: View {
 }
 
 #Preview {
-    DailyChecklistView(program: Program(
+    let program = Program(
         id: UUID(),
         startDate: Date(),
         numberOfDays: 75,
@@ -321,7 +300,9 @@ struct DailyChecklistView: View {
             Task(id: UUID(), title: "Follow a diet", description: nil)
         ],
         endOfDayTime: Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22) // Default 10pm
-    ))
+    )
+    let dailyProgress = DailyProgress(id: UUID(), date: Date(), completedTaskIDs: [])
+    return DailyChecklistView(viewModel: DailyChecklistViewModel(program: program, dailyProgress: dailyProgress))
 } 
 
 // Dedicated subview for editing notes
