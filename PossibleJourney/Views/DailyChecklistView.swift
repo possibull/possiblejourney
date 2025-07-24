@@ -6,6 +6,7 @@ struct DailyChecklistView: View {
     @State private var showSettings = false
     @State private var showCalendar = false
     @State private var showSettingsNav = false
+    @State private var showMissedDayModal = false
     @State private var completedTaskIDs: Set<UUID> = []
     @AppStorage("endOfDayTime") private var endOfDayTime: Date = Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22) // Default 10pm
     var onReset: (() -> Void)? = nil
@@ -24,6 +25,19 @@ struct DailyChecklistView: View {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         return formatter.string(from: today)
+    }
+    private var isAfterEndOfDay: Bool {
+        let calendar = Calendar.current
+        let now = Date()
+        let today = calendar.startOfDay(for: now)
+        let endOfDay = calendar.date(bySettingHour: calendar.component(.hour, from: endOfDayTime),
+                                     minute: calendar.component(.minute, from: endOfDayTime),
+                                     second: 0, of: today) ?? today
+        // If endOfDayTime is AM and now is after midnight but before endOfDay, treat as next day
+        if endOfDayTime < today && now < endOfDay {
+            return false
+        }
+        return now >= endOfDay
     }
     var body: some View {
         ZStack {
@@ -186,6 +200,10 @@ struct DailyChecklistView: View {
             } else {
                 print("DEBUG: Could not find documents directory to write completedTaskIDs.txt")
             }
+            // Show missed day modal if after end of day and not all tasks are complete
+            if isAfterEndOfDay && completedTaskIDs.count < program.tasks.count {
+                showMissedDayModal = true
+            }
         }
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
@@ -206,6 +224,35 @@ struct DailyChecklistView: View {
             let today = Calendar.current.startOfDay(for: Date())
             let completed = Set([0, 1, 2, 10, 15].compactMap { Calendar.current.date(byAdding: .day, value: $0, to: today) })
             ProgramCalendarView(startDate: today, numberOfDays: 75, completedDates: completed)
+        }
+        // Missed Day Modal
+        .sheet(isPresented: $showMissedDayModal) {
+            VStack(spacing: 24) {
+                Text("Did you miss yesterday?")
+                    .font(.title.bold())
+                    .foregroundColor(hardRed)
+                Text("It looks like you didn't complete all your tasks before your end of day. Please confirm if you missed the day or want to continue.")
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(.primary)
+                HStack(spacing: 16) {
+                    Button("I Missed It") {
+                        showMissedDayModal = false
+                        // Handle missed day logic here
+                    }
+                    .padding()
+                    .background(Color.red.opacity(0.2))
+                    .cornerRadius(8)
+                    Button("Continue Anyway") {
+                        showMissedDayModal = false
+                        // Handle continue logic here
+                    }
+                    .padding()
+                    .background(hardRed.opacity(0.2))
+                    .cornerRadius(8)
+                }
+            }
+            .padding()
+            .accessibilityIdentifier("MissedDayModal")
         }
     }
 }
