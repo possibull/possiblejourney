@@ -60,6 +60,8 @@ struct DailyChecklistView: View {
 
     var body: some View {
         ZStack {
+            // Move visibleTasks inside the view builder
+            let visibleTasks: [Task] = viewModel.program.tasks.filter { !hideCompletedTasks || !viewModel.completedTaskIDs.contains($0.id) }
             VStack(spacing: 0) {
                 // Header row with logo, DAY XX, and checklist icon
                 HStack(alignment: .center) {
@@ -103,8 +105,6 @@ struct DailyChecklistView: View {
                     RoundedRectangle(cornerRadius: 24)
                         .fill(Color(red: 24/255, green: 24/255, blue: 24/255))
                         .shadow(color: .black.opacity(0.18), radius: 12, x: 0, y: 6)
-                    // Break up filtered tasks for type-checking
-                    let visibleTasks: [Task] = viewModel.program.tasks.filter { !hideCompletedTasks || !viewModel.completedTaskIDs.contains($0.id) }
                     List {
                         ForEach(visibleTasks, id: \.id) { task in
                             let isCompleted = viewModel.completedTaskIDs.contains(task.id)
