@@ -131,8 +131,13 @@ final class PossibleJourneyUITests: XCTestCase {
         let eodMinute = 0
         let now = Date()
         let components = calendar.dateComponents([.year, .month, .day], from: now)
-        let eodDate = calendar.date(from: DateComponents(year: components.year, month: components.month, day: components.day, hour: eodHour, minute: eodMinute))!
-        endOfDayPicker.adjust(toDate: eodDate)
+        // Adjust the picker wheels to set EOD to 8:00 PM
+        let hourWheel = endOfDayPicker.pickerWheels.element(boundBy: 0)
+        let minuteWheel = endOfDayPicker.pickerWheels.element(boundBy: 1)
+        let amPmWheel = endOfDayPicker.pickerWheels.element(boundBy: 2)
+        hourWheel.adjust(toPickerWheelValue: "8")
+        minuteWheel.adjust(toPickerWheelValue: "00")
+        amPmWheel.adjust(toPickerWheelValue: "PM")
         // Set fake 'now' to 9:00 PM (1 hour after EOD)
         let fakeNow = calendar.date(from: DateComponents(year: components.year, month: components.month, day: components.day, hour: 21, minute: 0))!
         let fakeNowTimestamp = Int(fakeNow.timeIntervalSince1970)
