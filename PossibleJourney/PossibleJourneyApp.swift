@@ -34,7 +34,11 @@ struct PossibleJourneyApp: App {
                     let today = Calendar.current.startOfDay(for: Date())
                     let dailyProgress = DailyProgressStorage().load(for: today) ?? DailyProgress(id: UUID(), date: today, completedTaskIDs: [])
                     DailyChecklistView(
-                        viewModel: DailyChecklistViewModel(program: program, dailyProgress: dailyProgress),
+                        viewModel: DailyChecklistViewModel(
+                            program: program,
+                            dailyProgress: dailyProgress,
+                            now: currentTimeOverride ?? Date()
+                        ),
                         onReset: {
                             appState.loadedProgram = nil
                             ProgramStorage().clear()

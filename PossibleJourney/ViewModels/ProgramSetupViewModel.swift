@@ -26,4 +26,20 @@ class ProgramSetupViewModel {
             tasks: tasks
         )
     }
+}
+
+class DailyChecklistViewModel: ObservableObject {
+    @Published var program: Program
+    @Published var dailyProgress: DailyProgress
+    var now: Date
+
+    var isDayMissed: Bool {
+        program.isDayMissed(for: now, completedTaskIDs: Set(dailyProgress.completedTaskIDs))
+    }
+
+    init(program: Program, dailyProgress: DailyProgress, now: Date = Date()) {
+        self.program = program
+        self.dailyProgress = dailyProgress
+        self.now = now
+    }
 } 
