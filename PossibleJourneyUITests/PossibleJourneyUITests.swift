@@ -78,10 +78,11 @@ final class PossibleJourneyUITests: XCTestCase {
         // Print debug completed task IDs before relaunch
         let debugCompletedTaskIDsBefore = app.staticTexts["CompletedTaskIDsDebug"].label
         print("DEBUG: CompletedTaskIDsDebug before relaunch: \(debugCompletedTaskIDsBefore)")
+        // Get the Read task's ID (assume it's the first in the list)
+        let readTaskID = debugTaskIDsBefore.components(separatedBy: ",").first!
         // Mark the first task as complete
         let firstTask = app.staticTexts["Read"]
         XCTAssertTrue(firstTask.exists)
-        // Tap the checkmark button (assume it's the first button in the cell)
         let firstTaskCell = firstTask.coordinate(withNormalizedOffset: CGVector(dx: -0.2, dy: 0.5))
         firstTaskCell.tap()
         // Relaunch app (no reset)
@@ -101,14 +102,14 @@ final class PossibleJourneyUITests: XCTestCase {
         // Print debug completed task IDs after relaunch
         let debugCompletedTaskIDsAfter = app.staticTexts["CompletedTaskIDsDebug"].label
         print("DEBUG: CompletedTaskIDsDebug after relaunch: \(debugCompletedTaskIDsAfter)")
+        // Assert that the Read task's ID is present in the completed IDs after relaunch
+        let completedTaskIDsAfter = debugCompletedTaskIDsAfter.components(separatedBy: ",")
+        XCTAssertTrue(completedTaskIDsAfter.contains(readTaskID), "Read task should be marked as complete after relaunch")
         // Print all images and their accessibility identifiers
         let images = app.images.allElementsBoundByIndex
         for image in images {
             print("DEBUG: Image identifier: \(image.identifier), label: \(image.label)")
         }
-        // Verify the first task is still marked as complete (checkmark exists)
-        let checkmark = app.images["checkmark"]
-        XCTAssertTrue(checkmark.waitForExistence(timeout: 3), "First task should be checked after relaunch")
     }
 
     /*
