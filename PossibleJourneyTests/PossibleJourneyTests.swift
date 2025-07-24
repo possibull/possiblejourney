@@ -207,7 +207,7 @@ final class ProgramModelDayLogicTests: XCTestCase {
         let missedBefore = program.isDayMissed(for: beforeEOD, completedTaskIDs: [])
         XCTAssertFalse(missedBefore, "Should not be missed before AM EOD on next day")
         // After EOD (Jan 2, 2:00 AM)
-        let afterEOD = Calendar.current.date(from: DateComponents(year: 2023, month: 2, day: 2, hour: 2, minute: 0))!
+        let afterEOD = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 2, hour: 2, minute: 0))!
         let missedAfter = program.isDayMissed(for: afterEOD, completedTaskIDs: [])
         XCTAssertTrue(missedAfter, "Should be missed after AM EOD on next day if not complete")
     }
