@@ -5,4 +5,5 @@ struct Program: Codable {
     let startDate: Date
     let numberOfDays: Int
     let tasks: [Task]
+    var endOfDayTime: Date = Calendar.current.startOfDay(for: Date()) // Default 12:00AM
 } 

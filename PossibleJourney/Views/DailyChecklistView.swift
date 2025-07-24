@@ -8,7 +8,7 @@ struct DailyChecklistView: View {
     @State private var showSettingsNav = false
     @State private var showMissedDayModal = false
     @State private var completedTaskIDs: Set<UUID> = []
-    @AppStorage("endOfDayTime") private var endOfDayTime: Date = Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22) // Default 10pm
+    // endOfDayTime is now part of Program
     var onReset: (() -> Void)? = nil
     var currentTimeOverride: Date? = nil // For test injection
     
@@ -30,8 +30,8 @@ struct DailyChecklistView: View {
     // Helper to compute app day start and end based on endOfDayTime
     private func appDayBounds(for date: Date) -> (start: Date, end: Date) {
         let calendar = Calendar.current
-        let endOfDayToday = calendar.date(bySettingHour: calendar.component(.hour, from: endOfDayTime),
-                                          minute: calendar.component(.minute, from: endOfDayTime),
+        let endOfDayToday = calendar.date(bySettingHour: calendar.component(.hour, from: program.endOfDayTime),
+                                          minute: calendar.component(.minute, from: program.endOfDayTime),
                                           second: 0, of: date) ?? date
         let startOfAppDay = calendar.date(byAdding: .second, value: 1, to: endOfDayToday.addingTimeInterval(-86400)) ?? date // 1 second after previous day's endOfDay
         let endOfAppDay = endOfDayToday
@@ -173,7 +173,7 @@ struct DailyChecklistView: View {
                 .padding([.horizontal, .bottom])
             }
             // NavigationLink for SettingsView
-            NavigationLink(destination: SettingsView(onReset: {
+            NavigationLink(destination: SettingsView(endOfDayTime: $program.endOfDayTime, onReset: {
                 showSettingsNav = false
                 onReset?()
             }), isActive: $showSettingsNav) {
@@ -273,6 +273,7 @@ struct DailyChecklistView: View {
         id: UUID(),
         startDate: Date(),
         numberOfDays: 75,
+        endOfDayTime: Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22), // Default 10pm
         tasks: [
             Task(id: UUID(), title: "Drink 1 gallon of water", description: nil),
             Task(id: UUID(), title: "Read 10 pages", description: nil),

@@ -2,7 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     var onReset: (() -> Void)? = nil
-    @AppStorage("endOfDayTime") private var endOfDayTime: Date = Calendar.current.startOfDay(for: Date()) // Default 12:00AM
+    @Binding var endOfDayTime: Date
     // 75 Hard deep red
     let hardRed = Color(red: 183/255, green: 28/255, blue: 28/255)
     @Environment(\.presentationMode) private var presentationMode
