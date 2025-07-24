@@ -9,6 +9,8 @@ struct DailyChecklistView: View {
     @State private var showMissedDayModal = false
     @State private var completedTaskIDs: Set<UUID> = []
     @State private var hideCompletedTasks = false
+    @State private var notesForTask: [UUID: String] = [:]
+    @State private var notesSheetTaskID: UUID? = nil
     // endOfDayTime is now part of Program
     var onReset: (() -> Void)? = nil
     var currentTimeOverride: Date? = nil // For test injection
@@ -117,6 +119,13 @@ struct DailyChecklistView: View {
                             let isCompleted = completedTaskIDs.contains(task.id)
                             @State var showReminderAlert = false
                             HStack(alignment: .center, spacing: 16) {
+                                // Notes icon
+                                Button(action: { notesSheetTaskID = task.id }) {
+                                    Image(systemName: "note.text")
+                                        .foregroundColor(Color.purple)
+                                        .font(.system(size: 20, weight: .medium))
+                                }
+                                .accessibilityIdentifier("NotesButton_\(task.id.uuidString)")
                                 Button(action: {
                                     if isCompleted {
                                         completedTaskIDs.remove(task.id)
@@ -293,6 +302,30 @@ struct DailyChecklistView: View {
             }
             .padding()
             .accessibilityIdentifier("MissedDayModal")
+        }
+        .sheet(item: $notesSheetTaskID) { taskID in
+            VStack(alignment: .leading, spacing: 16) {
+                Text("Notes for Task")
+                    .font(.headline)
+                Text(program.tasks.first(where: { $0.id == taskID })?.title ?? "")
+                    .font(.title3.bold())
+                TextEditor(text: Binding(
+                    get: { notesForTask[taskID, default: ""] },
+                    set: { notesForTask[taskID] = $0 }
+                ))
+                .frame(minHeight: 120)
+                .background(Color(.secondarySystemBackground))
+                .cornerRadius(10)
+                Spacer()
+                Button("Done") { notesSheetTaskID = nil }
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.purple.opacity(0.8))
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+            }
+            .padding()
         }
     }
 }
