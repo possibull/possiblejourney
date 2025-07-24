@@ -75,6 +75,9 @@ final class PossibleJourneyUITests: XCTestCase {
         // Print debug task IDs before relaunch
         let debugTaskIDsBefore = app.staticTexts["TaskIDsDebug"].label
         print("DEBUG: TaskIDsDebug before relaunch: \(debugTaskIDsBefore)")
+        // Print debug completed task IDs before relaunch
+        let debugCompletedTaskIDsBefore = app.staticTexts["CompletedTaskIDsDebug"].label
+        print("DEBUG: CompletedTaskIDsDebug before relaunch: \(debugCompletedTaskIDsBefore)")
         // Mark the first task as complete
         let firstTask = app.staticTexts["Read"]
         XCTAssertTrue(firstTask.exists)
@@ -95,6 +98,9 @@ final class PossibleJourneyUITests: XCTestCase {
         // Print debug task IDs after relaunch
         let debugTaskIDsAfter = app.staticTexts["TaskIDsDebug"].label
         print("DEBUG: TaskIDsDebug after relaunch: \(debugTaskIDsAfter)")
+        // Print debug completed task IDs after relaunch
+        let debugCompletedTaskIDsAfter = app.staticTexts["CompletedTaskIDsDebug"].label
+        print("DEBUG: CompletedTaskIDsDebug after relaunch: \(debugCompletedTaskIDsAfter)")
         // Print all images and their accessibility identifiers
         let images = app.images.allElementsBoundByIndex
         for image in images {
