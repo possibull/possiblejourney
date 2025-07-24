@@ -312,30 +312,17 @@ struct DailyChecklistView: View {
             .padding()
             .accessibilityIdentifier("MissedDayModal")
         }
+        // Dedicated subview for editing notes
         .sheet(item: $notesSheetTaskID) { taskID in
-            let noteBinding = Binding(
-                get: { notesForTask[taskID, default: ""] },
-                set: { notesForTask[taskID] = $0 }
+            let task = program.tasks.first(where: { $0.id == taskID })
+            TaskNotesSheet(
+                title: task?.title ?? "",
+                note: Binding(
+                    get: { notesForTask[taskID, default: ""] },
+                    set: { notesForTask[taskID] = $0 }
+                ),
+                onDone: { notesSheetTaskID = nil }
             )
-            VStack(alignment: .leading, spacing: 16) {
-                Text("Notes for Task")
-                    .font(.headline)
-                Text(program.tasks.first(where: { $0.id == taskID })?.title ?? "")
-                    .font(.title3.bold())
-                TextEditor(text: noteBinding)
-                    .frame(minHeight: 120)
-                    .background(Color(.secondarySystemBackground))
-                    .cornerRadius(10)
-                Spacer()
-                Button("Done") { notesSheetTaskID = nil }
-                    .font(.headline)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.purple.opacity(0.8))
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
-            }
-            .padding()
         }
     }
 }
