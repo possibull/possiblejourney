@@ -153,6 +153,16 @@ struct DailyChecklistView: View {
                 print("DEBUG: Task title: \(task.title), id: \(task.id)")
             }
             print("DEBUG: completedTaskIDs in state: \(completedTaskIDs)")
+            // Write completedTaskIDs to a file for debugging
+            let idsString = completedTaskIDs.map { $0.uuidString }.joined(separator: ",")
+            if let dir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+                let fileURL = dir.appendingPathComponent("completedTaskIDs.txt")
+                do {
+                    try idsString.write(to: fileURL, atomically: true, encoding: .utf8)
+                } catch {
+                    print("DEBUG: Failed to write completedTaskIDs to file: \(error)")
+                }
+            }
         }
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
