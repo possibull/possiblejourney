@@ -73,41 +73,44 @@ struct DailyChecklistView: View {
                 HStack(alignment: .center) {
                     // Circle with total number of days in program (restored)
                     ZStack {
-                        Circle().fill(Color.white).frame(width: 40, height: 40)
+                        Circle().fill(Color.white).frame(width: 48, height: 48)
                         Text("\(program.numberOfDays)")
-                            .font(.system(size: 18, weight: .heavy))
+                            .font(.system(size: 22, weight: .heavy))
                             .foregroundColor(hardRed)
                     }
                     HStack(spacing: 6) {
                         Text("DAY \(currentDay)")
-                            .font(.system(size: 36, weight: .heavy))
+                            .font(.system(size: 40, weight: .black))
                             .foregroundColor(.white)
                         Text("OF \(program.numberOfDays)")
-                            .font(.system(size: 12, weight: .bold))
+                            .font(.system(size: 14, weight: .bold))
                             .foregroundColor(.white)
-                            .baselineOffset(10)
+                            .baselineOffset(12)
                     }
                     .frame(maxWidth: .infinity, alignment: .center)
                     // Checklist icon placeholder
                     Image(systemName: "checklist")
-                        .font(.system(size: 28, weight: .bold))
+                        .font(.system(size: 32, weight: .bold))
                         .foregroundColor(.white)
                 }
-                .padding(.top, 24)
+                .padding(.top, 32)
                 .padding(.horizontal)
                 .accessibilityElement()
                 .accessibilityIdentifier("ChecklistScreenHeader")
                 // Date below header
                 Text(formattedDate)
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding(.bottom, 16)
-                // Movable Task List
-                List {
-                    ForEach(program.tasks.indices, id: \ .self) { idx in
-                        let task = program.tasks[idx]
-                        let isCompleted = completedTaskIDs.contains(task.id)
-                        VStack(spacing: 0) {
+                    .font(.headline.weight(.medium))
+                    .foregroundColor(.white.opacity(0.85))
+                    .padding(.bottom, 24)
+                // Checklist Card
+                ZStack {
+                    RoundedRectangle(cornerRadius: 24)
+                        .fill(Color(red: 24/255, green: 24/255, blue: 24/255))
+                        .shadow(color: .black.opacity(0.18), radius: 12, x: 0, y: 6)
+                    List {
+                        ForEach(program.tasks.indices, id: \ .self) { idx in
+                            let task = program.tasks[idx]
+                            let isCompleted = completedTaskIDs.contains(task.id)
                             HStack(alignment: .center, spacing: 16) {
                                 Button(action: {
                                     if isCompleted {
@@ -115,59 +118,63 @@ struct DailyChecklistView: View {
                                     } else {
                                         completedTaskIDs.insert(task.id)
                                     }
+                                    // Haptic feedback
+                                    let generator = UIImpactFeedbackGenerator(style: .medium)
+                                    generator.impactOccurred()
                                     // Save progress to storage
                                     let progress = DailyProgress(id: UUID(), date: appToday, completedTaskIDs: Array(completedTaskIDs))
                                     DailyProgressStorage().save(progress: progress)
                                 }) {
                                     ZStack {
                                         Circle()
-                                            .strokeBorder(Color.white, lineWidth: 2)
+                                            .strokeBorder(isCompleted ? hardRed : Color.white, lineWidth: 3)
                                             .background(Circle().fill(isCompleted ? hardRed : Color.black))
-                                            .frame(width: 32, height: 32)
+                                            .frame(width: 36, height: 36)
+                                            .shadow(color: isCompleted ? hardRed.opacity(0.3) : .clear, radius: 6, x: 0, y: 2)
                                         if isCompleted {
                                             Image(systemName: "checkmark")
-                                                .font(.system(size: 18, weight: .bold))
+                                                .font(.system(size: 20, weight: .bold))
                                                 .foregroundColor(.white)
+                                                .scaleEffect(isCompleted ? 1.2 : 1.0)
+                                                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isCompleted)
                                                 .accessibilityIdentifier("checkmark")
                                         }
                                     }
                                 }
                                 .buttonStyle(PlainButtonStyle())
                                 Text(task.title)
-                                    .font(.system(size: 20, weight: .bold))
+                                    .font(.system(size: 22, weight: .semibold))
                                     .foregroundColor(.white)
                                     .strikethrough(isCompleted, color: hardRed)
                                 Spacer()
-                                // Optional: right-side icon placeholder (e.g., camera)
+                                Image(systemName: "line.3.horizontal")
+                                    .foregroundColor(Color.white.opacity(0.35))
+                                    .font(.system(size: 20, weight: .medium))
+                                    .padding(.trailing, 4)
+                                    .accessibilityHidden(true)
                             }
-                            .padding(.vertical, 18)
-                            // Add Reminder row
-                            HStack(spacing: 8) {
-                                Image(systemName: "clock.badge.plus")
-                                    .font(.system(size: 16, weight: .regular))
-                                    .foregroundColor(.white.opacity(0.7))
-                                Text("Add Reminder")
-                                    .font(.system(size: 15, weight: .medium))
-                                    .foregroundColor(.white.opacity(0.7))
-                                Spacer()
-                            }
-                            .padding(.bottom, 8)
-                            .padding(.leading, 48)
-                            // Separator
-                            Rectangle()
-                                .fill(Color.white.opacity(0.15))
-                                .frame(height: 1)
+                            .padding(.vertical, 14)
+                            .padding(.horizontal, 8)
+                            .background(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(Color(red: 32/255, green: 32/255, blue: 32/255))
+                                    .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
+                            )
+                            .listRowInsets(EdgeInsets())
+                            .listRowBackground(Color.clear)
                         }
-                        .listRowBackground(Color.black)
+                        .onMove { indices, newOffset in
+                            program.tasks.move(fromOffsets: indices, toOffset: newOffset)
+                            ProgramStorage().save(program)
+                        }
                     }
-                    .onMove { indices, newOffset in
-                        program.tasks.move(fromOffsets: indices, toOffset: newOffset)
-                        ProgramStorage().save(program)
-                    }
+                    .listStyle(PlainListStyle())
+                    .scrollContentBackground(.hidden)
+                    .background(Color.clear)
+                    .padding([.horizontal, .bottom], 8)
                 }
-                .listStyle(PlainListStyle())
-                .scrollContentBackground(.hidden)
-                .background(Color.black)
+                .padding(.horizontal, 8)
+                .padding(.bottom, 16)
             }
             // NavigationLink for SettingsView
             NavigationLink(destination: SettingsView(onReset: {
