@@ -38,7 +38,8 @@ extension Program {
             endOfAppDay = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: appDayStart)!
         }
 
-        let allTasksComplete = Set(tasks.map { $0.id }).isSubset(of: completedTaskIDs)
-        return date >= endOfAppDay && !allTasksComplete
+        // If any task is not in completedTaskIDs, it's missed
+        let missed = tasks.contains { !completedTaskIDs.contains($0.id) }
+        return date >= endOfAppDay && missed
     }
 } 
