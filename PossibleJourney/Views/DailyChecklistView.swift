@@ -128,16 +128,6 @@ struct DailyChecklistView: View {
                         ForEach(visibleTasks, id: \.id) { task in
                             let isCompleted = completedTaskIDs.contains(task.id)
                             HStack(alignment: .center, spacing: 16) {
-                                // Notes icon
-                                Button(action: {
-                                    notesSheetTaskID = TaskIDWrapper(id: task.id)
-                                    notesSheetText = notesForTask[task.id, default: ""]
-                                }) {
-                                    Image(systemName: "note.text")
-                                        .foregroundColor(Color.purple)
-                                        .font(.system(size: 20, weight: .medium))
-                                }
-                                .accessibilityIdentifier("NotesButton_\(task.id.uuidString)")
                                 Button(action: {
                                     if isCompleted {
                                         completedTaskIDs.remove(task.id)
@@ -173,6 +163,16 @@ struct DailyChecklistView: View {
                                     .foregroundColor(.white)
                                     .strikethrough(isCompleted, color: hardRed)
                                 Spacer()
+                                // Notes icon (now on the right, before handle)
+                                Button(action: {
+                                    notesSheetTaskID = TaskIDWrapper(id: task.id)
+                                    notesSheetText = notesForTask[task.id, default: ""]
+                                }) {
+                                    Image(systemName: "note.text")
+                                        .foregroundColor(Color.purple)
+                                        .font(.system(size: 20, weight: .medium))
+                                }
+                                .accessibilityIdentifier("NotesButton_\(task.id.uuidString)")
                                 Image(systemName: "line.3.horizontal")
                                     .foregroundColor(Color.white.opacity(0.35))
                                     .font(.system(size: 20, weight: .medium))
