@@ -89,6 +89,11 @@ final class PossibleJourneyUITests: XCTestCase {
         for cell in taskCellsAfter {
             print("DEBUG: Task cell label: \(cell.label)")
         }
+        // Print all images and their accessibility identifiers
+        let images = app.images.allElementsBoundByIndex
+        for image in images {
+            print("DEBUG: Image identifier: \(image.identifier), label: \(image.label)")
+        }
         // Verify the first task is still marked as complete (checkmark exists)
         let checkmark = app.images["checkmark"]
         XCTAssertTrue(checkmark.waitForExistence(timeout: 3), "First task should be checked after relaunch")
