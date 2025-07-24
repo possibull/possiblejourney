@@ -29,6 +29,9 @@ struct DailyChecklistView: View {
             Text(program.tasks.map { $0.id.uuidString }.joined(separator: ","))
                 .accessibilityIdentifier("TaskIDsDebug")
                 .opacity(0)
+            Text(completedTaskIDs.map { $0.uuidString }.joined(separator: ","))
+                .accessibilityIdentifier("CompletedTaskIDsDebug")
+                .opacity(0)
             VStack(spacing: 0) {
                 // Header row with logo, DAY XX, and checklist icon
                 HStack(alignment: .center) {
