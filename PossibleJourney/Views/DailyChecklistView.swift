@@ -30,11 +30,16 @@ struct DailyChecklistView: View {
     // Helper to compute app day start and end based on endOfDayTime
     private func appDayBounds(for date: Date) -> (start: Date, end: Date) {
         let calendar = Calendar.current
-        let endOfDayToday = calendar.date(bySettingHour: calendar.component(.hour, from: program.endOfDayTime),
-                                          minute: calendar.component(.minute, from: program.endOfDayTime),
-                                          second: 0, of: date) ?? date
-        let startOfAppDay = calendar.date(byAdding: .second, value: 1, to: endOfDayToday.addingTimeInterval(-86400)) ?? date // 1 second after previous day's endOfDay
-        let endOfAppDay = endOfDayToday
+        let endHour = calendar.component(.hour, from: program.endOfDayTime)
+        let endMinute = calendar.component(.minute, from: program.endOfDayTime)
+        var endOfAppDay: Date
+        if endHour < 12 { // AM: end of day is next calendar day at that time
+            let nextDay = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: date))!
+            endOfAppDay = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: nextDay) ?? date
+        } else { // PM: end of day is today at that time
+            endOfAppDay = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: date) ?? date
+        }
+        let startOfAppDay = calendar.date(byAdding: .second, value: 1, to: endOfAppDay.addingTimeInterval(-86400)) ?? date // 1 second after previous day's endOfDay
         return (startOfAppDay, endOfAppDay)
     }
 
