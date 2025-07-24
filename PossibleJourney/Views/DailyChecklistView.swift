@@ -139,7 +139,7 @@ struct DailyChecklistView: View {
             // Hidden debug element for UI tests
             Text(program.tasks.map { $0.id.uuidString }.joined(separator: ","))
                 .accessibilityIdentifier("TaskIDsDebug")
-                .hidden()
+                .opacity(0)
         }
         .accessibilityIdentifier("DailyChecklistScreen")
         .background(Color.black.ignoresSafeArea())
