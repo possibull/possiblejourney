@@ -136,6 +136,10 @@ struct DailyChecklistView: View {
                     .background(Color.black)
             )
             .padding([.horizontal, .bottom])
+            // Hidden debug element for UI tests
+            Text(program.tasks.map { $0.id.uuidString }.joined(separator: ","))
+                .accessibilityIdentifier("TaskIDsDebug")
+                .hidden()
         }
         .accessibilityIdentifier("DailyChecklistScreen")
         .background(Color.black.ignoresSafeArea())
