@@ -26,18 +26,28 @@ struct DailyChecklistView: View {
         formatter.dateStyle = .medium
         return formatter.string(from: today)
     }
-    private var isAfterEndOfDay: Bool {
+    // Helper to compute app day start and end based on endOfDayTime
+    private func appDayBounds(for date: Date) -> (start: Date, end: Date) {
         let calendar = Calendar.current
+        let endOfDayToday = calendar.date(bySettingHour: calendar.component(.hour, from: endOfDayTime),
+                                          minute: calendar.component(.minute, from: endOfDayTime),
+                                          second: 0, of: date) ?? date
+        let startOfAppDay = calendar.date(byAdding: .second, value: 1, to: endOfDayToday.addingTimeInterval(-86400)) ?? date // 1 second after previous day's endOfDay
+        let endOfAppDay = endOfDayToday
+        return (startOfAppDay, endOfAppDay)
+    }
+
+    private var isAfterEndOfDay: Bool {
         let now = Date()
-        let today = calendar.startOfDay(for: now)
-        let endOfDay = calendar.date(bySettingHour: calendar.component(.hour, from: endOfDayTime),
-                                     minute: calendar.component(.minute, from: endOfDayTime),
-                                     second: 0, of: today) ?? today
-        // If endOfDayTime is AM and now is after midnight but before endOfDay, treat as next day
-        if endOfDayTime < today && now < endOfDay {
-            return false
-        }
-        return now >= endOfDay
+        let bounds = appDayBounds(for: now)
+        return now >= bounds.end
+    }
+
+    private var appToday: Date {
+        // Returns the app's logical "today" date (start of app day)
+        let now = Date()
+        let bounds = appDayBounds(for: now)
+        return bounds.start
     }
     var body: some View {
         ZStack {
@@ -96,7 +106,7 @@ struct DailyChecklistView: View {
                                             completedTaskIDs.insert(task.id)
                                         }
                                         // Save progress to storage
-                                        let progress = DailyProgress(id: UUID(), date: Calendar.current.startOfDay(for: Date()), completedTaskIDs: Array(completedTaskIDs))
+                                        let progress = DailyProgress(id: UUID(), date: appToday, completedTaskIDs: Array(completedTaskIDs))
                                         DailyProgressStorage().save(progress: progress)
                                     }) {
                                         ZStack {
@@ -173,8 +183,8 @@ struct DailyChecklistView: View {
         .accessibilityIdentifier("DailyChecklistScreen")
         .background(Color.black.ignoresSafeArea())
         .onAppear {
-            // Load today's progress from storage
-            let today = Calendar.current.startOfDay(for: Date())
+            // Load today's progress from storage using appToday
+            let today = appToday
             if let progress = DailyProgressStorage().load(for: today) {
                 completedTaskIDs = Set(progress.completedTaskIDs)
                 print("DEBUG: Loaded completedTaskIDs from storage: \(progress.completedTaskIDs)")
