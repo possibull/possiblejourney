@@ -8,6 +8,7 @@ struct DailyChecklistView: View {
     @State private var showSettingsNav = false
     @State private var showMissedDayModal = false
     @State private var completedTaskIDs: Set<UUID> = []
+    @State private var hideCompletedTasks = false
     // endOfDayTime is now part of Program
     var onReset: (() -> Void)? = nil
     var currentTimeOverride: Date? = nil // For test injection
@@ -108,7 +109,7 @@ struct DailyChecklistView: View {
                         .fill(Color(red: 24/255, green: 24/255, blue: 24/255))
                         .shadow(color: .black.opacity(0.18), radius: 12, x: 0, y: 6)
                     List {
-                        ForEach(program.tasks, id: \.id) { task in
+                        ForEach(program.tasks.filter { !hideCompletedTasks || !completedTaskIDs.contains($0.id) }, id: \.id) { task in
                             let isCompleted = completedTaskIDs.contains(task.id)
                             @State var showReminderAlert = false
                             HStack(alignment: .center, spacing: 16) {
@@ -242,6 +243,11 @@ struct DailyChecklistView: View {
         }
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
+                Button(action: { hideCompletedTasks.toggle() }) {
+                    Image(systemName: hideCompletedTasks ? "checklist.checked" : "checklist")
+                        .foregroundColor(hardRed)
+                }
+                .accessibilityIdentifier("ChecklistToggleButton")
                 Button(action: { showCalendar = true }) {
                     Image(systemName: "calendar")
                         .foregroundColor(hardRed)
