@@ -110,6 +110,7 @@ struct DailyChecklistView: View {
                     List {
                         ForEach(program.tasks, id: \.id) { task in
                             let isCompleted = completedTaskIDs.contains(task.id)
+                            @State var showReminderAlert = false
                             HStack(alignment: .center, spacing: 16) {
                                 Button(action: {
                                     if isCompleted {
@@ -161,6 +162,17 @@ struct DailyChecklistView: View {
                             )
                             .listRowInsets(EdgeInsets())
                             .listRowBackground(Color.clear)
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                Button {
+                                    showReminderAlert = true
+                                } label: {
+                                    Label("Remind Me", systemImage: "bell")
+                                }
+                                .tint(hardRed)
+                            }
+                            .alert(isPresented: $showReminderAlert) {
+                                Alert(title: Text("Set Reminder"), message: Text("Reminder functionality coming soon!"), dismissButton: .default(Text("OK")))
+                            }
                         }
                         .onMove { indices, newOffset in
                             program.tasks.move(fromOffsets: indices, toOffset: newOffset)
