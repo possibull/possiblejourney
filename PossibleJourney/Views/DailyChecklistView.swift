@@ -5,6 +5,7 @@ struct DailyChecklistView: View {
     let program: Program
     @State private var showSettings = false
     @State private var showCalendar = false
+    @State private var showSettingsNav = false
     @State private var completedTaskIDs: Set<UUID> = []
     @AppStorage("endOfDayTime") private var endOfDayTime: Date = Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22) // Default 10pm
     var onReset: (() -> Void)? = nil
@@ -146,6 +147,13 @@ struct DailyChecklistView: View {
                 )
                 .padding([.horizontal, .bottom])
             }
+            // NavigationLink for SettingsView
+            NavigationLink(destination: SettingsView(onReset: {
+                showSettingsNav = false
+                onReset?()
+            }), isActive: $showSettingsNav) {
+                EmptyView()
+            }
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("DailyChecklistScreen")
@@ -186,7 +194,7 @@ struct DailyChecklistView: View {
                         .foregroundColor(hardRed)
                 }
                 .accessibilityIdentifier("CalendarButton")
-                Button(action: { showSettings = true }) {
+                Button(action: { showSettingsNav = true }) {
                     Image(systemName: "gearshape")
                         .foregroundColor(hardRed)
                 }
@@ -198,12 +206,6 @@ struct DailyChecklistView: View {
             let today = Calendar.current.startOfDay(for: Date())
             let completed = Set([0, 1, 2, 10, 15].compactMap { Calendar.current.date(byAdding: .day, value: $0, to: today) })
             ProgramCalendarView(startDate: today, numberOfDays: 75, completedDates: completed)
-        }
-        .sheet(isPresented: $showSettings) {
-            SettingsView(onReset: {
-                showSettings = false
-                onReset?()
-            })
         }
     }
 }
