@@ -125,13 +125,22 @@ final class PossibleJourneyUITests: XCTestCase {
         settingsButton.tap()
         let endOfDayPicker = app.datePickers["EndOfDayTimePicker"]
         XCTAssertTrue(endOfDayPicker.exists)
-        // Set the picker to a time just before now (simulate after end of day)
-        // (For TDD, this is a placeholder; real implementation may need test injection)
+        // Set the picker to a fixed time: 8:00 PM
+        let calendar = Calendar.current
+        let eodHour = 20 // 8:00 PM
+        let eodMinute = 0
+        let now = Date()
+        let components = calendar.dateComponents([.year, .month, .day], from: now)
+        let eodDate = calendar.date(from: DateComponents(year: components.year, month: components.month, day: components.day, hour: eodHour, minute: eodMinute))!
+        endOfDayPicker.adjust(toDate: eodDate)
+        // Set fake 'now' to 9:00 PM (1 hour after EOD)
+        let fakeNow = calendar.date(from: DateComponents(year: components.year, month: components.month, day: components.day, hour: 21, minute: 0))!
+        let fakeNowTimestamp = Int(fakeNow.timeIntervalSince1970)
         app.buttons["Back"].tap()
         // Do NOT complete all tasks
         // Relaunch checklist (simulate app open after end of day)
         app.terminate()
-        app.launchArguments = ["--uitesting-current-time", String(Date().timeIntervalSince1970)]
+        app.launchArguments = ["--uitesting-current-time", String(fakeNowTimestamp)]
         app.launch()
         app.checkOnScreen(identifier: "DailyChecklistScreen", timeout: 5, message: "Should be on Daily Checklist screen after relaunch")
         // Assert missed day modal appears
