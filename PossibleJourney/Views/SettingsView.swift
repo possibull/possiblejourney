@@ -41,7 +41,7 @@ struct SettingsView: View {
                         .foregroundColor(hardRed)
                     DatePicker("End of Day", selection: $endOfDayTime, displayedComponents: .hourAndMinute)
                         .datePickerStyle(.wheel)
-                        .labelsHidden()
+                        .frame(height: 150)
                         .accessibilityIdentifier("EndOfDayTimePicker")
                         .colorScheme(.dark)
                 }
