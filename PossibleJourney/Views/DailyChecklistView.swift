@@ -208,32 +208,6 @@ struct DailyChecklistView: View {
     }
 }
 
-struct SettingsView: View {
-    var onReset: (() -> Void)? = nil
-    var body: some View {
-        NavigationView {
-            VStack(spacing: 32) {
-                Text("Settings")
-                    .font(.largeTitle.bold())
-                    .padding(.top)
-                Button(action: {
-                    ProgramStorage().clear()
-                    onReset?()
-                }) {
-                    Text("Reset Program")
-                        .foregroundColor(.red)
-                        .font(.headline)
-                        .padding()
-                        .background(Color(.systemGray6))
-                        .cornerRadius(10)
-                }
-                Spacer()
-            }
-            .padding()
-        }
-    }
-}
-
 #Preview {
     DailyChecklistView(program: Program(
         id: UUID(),
