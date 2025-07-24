@@ -225,6 +225,9 @@ struct DailyChecklistView: View {
                 showMissedDayModal = true
             }
         }
+        .onChange(of: program.endOfDayTime) { newValue in
+            ProgramStorage().save(program)
+        }
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button(action: { showCalendar = true }) {
