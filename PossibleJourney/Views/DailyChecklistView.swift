@@ -89,10 +89,14 @@ struct DailyChecklistView: View {
                             .baselineOffset(12)
                     }
                     .frame(maxWidth: .infinity, alignment: .center)
-                    // Checklist icon placeholder
-                    Image(systemName: "checklist")
-                        .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(.white)
+                    // Checklist icon toggle for hiding/showing finished tasks
+                    Button(action: { hideCompletedTasks.toggle() }) {
+                        Image(systemName: hideCompletedTasks ? "checklist.checked" : "checklist")
+                            .font(.system(size: 32, weight: .bold))
+                            .foregroundColor(.white)
+                            .opacity(hideCompletedTasks ? 0.7 : 1.0)
+                    }
+                    .accessibilityIdentifier("ChecklistToggleButton")
                 }
                 .padding(.top, 32)
                 .padding(.horizontal)
@@ -243,11 +247,6 @@ struct DailyChecklistView: View {
         }
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
-                Button(action: { hideCompletedTasks.toggle() }) {
-                    Image(systemName: hideCompletedTasks ? "checklist.checked" : "checklist")
-                        .foregroundColor(hardRed)
-                }
-                .accessibilityIdentifier("ChecklistToggleButton")
                 Button(action: { showCalendar = true }) {
                     Image(systemName: "calendar")
                         .foregroundColor(hardRed)
