@@ -179,7 +179,18 @@ struct DailyChecklistView: View {
                             .listRowBackground(Color.clear)
                             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                 Button {
-                                    reminderAlertTaskID = task.id
+                                    // Request notification permission and schedule a local notification (demo: 5 seconds from now)
+                                    UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, error in
+                                        if granted {
+                                            let content = UNMutableNotificationContent()
+                                            content.title = "Task Reminder"
+                                            content.body = task.title
+                                            content.sound = .default
+                                            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+                                            let request = UNNotificationRequest(identifier: task.id.uuidString, content: content, trigger: trigger)
+                                            UNUserNotificationCenter.current().add(request)
+                                        }
+                                    }
                                 } label: {
                                     Label("Remind Me", systemImage: "bell")
                                 }
@@ -325,13 +336,6 @@ struct DailyChecklistView: View {
                     .cornerRadius(12)
             }
             .padding()
-        }
-        .alert(item: $reminderAlertTaskID) { taskID in
-            Alert(
-                title: Text("Set Reminder"),
-                message: Text("Reminder functionality coming soon!"),
-                dismissButton: .default(Text("OK")) { reminderAlertTaskID = nil }
-            )
         }
     }
 }
