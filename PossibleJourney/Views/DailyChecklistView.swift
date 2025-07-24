@@ -1,6 +1,11 @@
 import SwiftUI
 import Foundation
 
+// Wrapper for Identifiable UUID for sheet
+struct TaskIDWrapper: Identifiable, Equatable {
+    let id: UUID
+}
+
 struct DailyChecklistView: View {
     @State var program: Program
     @State private var showSettings = false
