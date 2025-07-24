@@ -112,6 +112,32 @@ final class PossibleJourneyUITests: XCTestCase {
         }
     }
 
+    func testChecklistShowsMissedDayModalAfterEndOfDayIfTasksIncomplete() throws {
+        let app = launchAppWithReset()
+        // Complete program setup to reach Daily Checklist screen
+        app.addTask(title: "Read", description: "Read 10 pages")
+        app.addTask(title: "Drink Water", description: "Drink 2L of water")
+        app.saveProgram()
+        // Set end of day time to just before now (simulate after end of day)
+        let settingsButton = app.buttons["SettingsButton"]
+        XCTAssertTrue(settingsButton.exists)
+        settingsButton.tap()
+        let endOfDayPicker = app.datePickers["EndOfDayTimePicker"]
+        XCTAssertTrue(endOfDayPicker.exists)
+        // Set the picker to a time just before now (simulate after end of day)
+        // (For TDD, this is a placeholder; real implementation may need test injection)
+        app.navigationBars.buttons["Back"].tap()
+        // Do NOT complete all tasks
+        // Relaunch checklist (simulate app open after end of day)
+        app.terminate()
+        app.launchArguments = []
+        app.launch()
+        app.checkOnScreen(identifier: "DailyChecklistScreen", timeout: 5, message: "Should be on Daily Checklist screen after relaunch")
+        // Assert missed day modal appears
+        let missedDayModal = app.otherElements["MissedDayModal"]
+        XCTAssertTrue(missedDayModal.waitForExistence(timeout: 2), "Missed day modal should appear after end of day if tasks are incomplete")
+    }
+
     func testSettingsViewShowsEndOfDayTimePicker() throws {
         let app = launchAppWithReset()
         // Complete program setup to reach Daily Checklist screen
