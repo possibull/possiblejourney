@@ -20,7 +20,25 @@ extension Program {
         return diff + 1
     }
     func isDayMissed(for date: Date, completedTaskIDs: Set<UUID>) -> Bool {
-        // TODO: Implement logic
-        return false // placeholder to make test fail
+        let calendar = Calendar.current
+        let appDay = self.appDay(for: date)
+        if appDay < 1 || appDay > numberOfDays { return false } // Not in program range
+
+        // Compute the start of this app day
+        let appDayStart = calendar.date(byAdding: .day, value: appDay - 1, to: calendar.startOfDay(for: startDate))!
+        let endHour = calendar.component(.hour, from: endOfDayTime)
+        let endMinute = calendar.component(.minute, from: endOfDayTime)
+        var endOfAppDay: Date
+        if endHour < 12 {
+            // AM: EOD is next calendar day at that time
+            let nextDay = calendar.date(byAdding: .day, value: 1, to: appDayStart)!
+            endOfAppDay = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: nextDay)!
+        } else {
+            // PM: EOD is today at that time
+            endOfAppDay = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: appDayStart)!
+        }
+
+        let allTasksComplete = Set(tasks.map { $0.id }).isSubset(of: completedTaskIDs)
+        return date >= endOfAppDay && !allTasksComplete
     }
 } 
