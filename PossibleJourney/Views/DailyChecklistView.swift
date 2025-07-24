@@ -158,6 +158,7 @@ struct DailyChecklistView: View {
                                 .fill(Color.white.opacity(0.15))
                                 .frame(height: 1)
                         }
+                        .listRowBackground(Color.black)
                     }
                     .onMove { indices, newOffset in
                         program.tasks.move(fromOffsets: indices, toOffset: newOffset)
@@ -165,6 +166,7 @@ struct DailyChecklistView: View {
                     }
                 }
                 .listStyle(PlainListStyle())
+                .scrollContentBackground(.hidden)
                 .background(Color.black)
             }
             // NavigationLink for SettingsView
