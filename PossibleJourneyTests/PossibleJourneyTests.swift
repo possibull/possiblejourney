@@ -137,4 +137,65 @@ final class DailyProgressStorageTests: XCTestCase {
         XCTAssertNotNil(loaded, "Should load saved progress for today")
         XCTAssertEqual(loaded?.completedTaskIDs, [taskID], "Loaded completedTaskIDs should match saved")
     }
+}
+
+final class ProgramModelDayLogicTests: XCTestCase {
+    func testAppDayCalculation_beforeStart() {
+        let startDate = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1))!
+        let program = Program(id: UUID(), startDate: startDate, numberOfDays: 20, tasks: [], endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!)
+        let fakeNow = Calendar.current.date(from: DateComponents(year: 2022, month: 12, day: 31, hour: 23))!
+        let day = program.appDay(for: fakeNow)
+        XCTAssertEqual(day, 0, "Should be day 0 before program starts")
+    }
+    func testAppDayCalculation_onStart() {
+        let startDate = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1))!
+        let program = Program(id: UUID(), startDate: startDate, numberOfDays: 20, tasks: [], endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!)
+        let fakeNow = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1, hour: 10))!
+        let day = program.appDay(for: fakeNow)
+        XCTAssertEqual(day, 1, "Should be day 1 on program start date")
+    }
+    func testAppDayCalculation_laterDay() {
+        let startDate = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1))!
+        let program = Program(id: UUID(), startDate: startDate, numberOfDays: 20, tasks: [], endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!)
+        let fakeNow = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 5, hour: 21))!
+        let day = program.appDay(for: fakeNow)
+        XCTAssertEqual(day, 5, "Should be day 5 on Jan 5th before EOD")
+    }
+    func testIsDayMissed_allTasksComplete() {
+        let startDate = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1))!
+        let task1 = Task(id: UUID(), title: "A", description: nil)
+        let task2 = Task(id: UUID(), title: "B", description: nil)
+        let program = Program(id: UUID(), startDate: startDate, numberOfDays: 20, tasks: [task1, task2], endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!)
+        let fakeNow = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1, hour: 23))!
+        let missed = program.isDayMissed(for: fakeNow, completedTaskIDs: [task1.id, task2.id])
+        XCTAssertFalse(missed, "Should not be missed if all tasks complete before EOD")
+    }
+    func testIsDayMissed_oneTaskIncomplete() {
+        let startDate = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1))!
+        let task1 = Task(id: UUID(), title: "A", description: nil)
+        let task2 = Task(id: UUID(), title: "B", description: nil)
+        let program = Program(id: UUID(), startDate: startDate, numberOfDays: 20, tasks: [task1, task2], endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!)
+        let fakeNow = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1, hour: 23))!
+        let missed = program.isDayMissed(for: fakeNow, completedTaskIDs: [task1.id])
+        XCTAssertTrue(missed, "Should be missed if one task is incomplete after EOD")
+    }
+    func testIsDayMissed_twoTasksIncomplete() {
+        let startDate = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1))!
+        let task1 = Task(id: UUID(), title: "A", description: nil)
+        let task2 = Task(id: UUID(), title: "B", description: nil)
+        let task3 = Task(id: UUID(), title: "C", description: nil)
+        let program = Program(id: UUID(), startDate: startDate, numberOfDays: 20, tasks: [task1, task2, task3], endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!)
+        let fakeNow = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1, hour: 23))!
+        let missed = program.isDayMissed(for: fakeNow, completedTaskIDs: [task1.id])
+        XCTAssertTrue(missed, "Should be missed if two tasks are incomplete after EOD")
+    }
+    func testIsDayMissed_noTasksMissed() {
+        let startDate = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1))!
+        let task1 = Task(id: UUID(), title: "A", description: nil)
+        let task2 = Task(id: UUID(), title: "B", description: nil)
+        let program = Program(id: UUID(), startDate: startDate, numberOfDays: 20, tasks: [task1, task2], endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!)
+        let fakeNow = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1, hour: 23))!
+        let missed = program.isDayMissed(for: fakeNow, completedTaskIDs: [task1.id, task2.id])
+        XCTAssertFalse(missed, "Should not be missed if all tasks are complete after EOD")
+    }
 } 
