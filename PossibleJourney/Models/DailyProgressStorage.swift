@@ -21,6 +21,15 @@ class DailyProgressStorage {
         return progress
     }
     
+    func clearAll() {
+        let defaults = UserDefaults.standard
+        for (key, _) in defaults.dictionaryRepresentation() {
+            if key.hasPrefix(keyPrefix) {
+                defaults.removeObject(forKey: key)
+            }
+        }
+    }
+    
     private static func dateString(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
