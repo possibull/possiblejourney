@@ -5,6 +5,7 @@ struct ProgramStorage {
     
     func save(_ program: Program) {
         print("DEBUG: Saving program: \(program)")
+        print("DEBUG: Task IDs being saved: \(program.tasks.map { $0.id.uuidString })")
         if let data = try? JSONEncoder().encode(program) {
             UserDefaults.standard.set(data, forKey: key)
             print("DEBUG: Program data saved to UserDefaults")
@@ -21,6 +22,9 @@ struct ProgramStorage {
         }
         let program = try? JSONDecoder().decode(Program.self, from: data)
         print("DEBUG: Loaded program: \(String(describing: program))")
+        if let program = program {
+            print("DEBUG: Task IDs loaded: \(program.tasks.map { $0.id.uuidString })")
+        }
         return program
     }
     
