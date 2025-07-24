@@ -2,7 +2,7 @@ import SwiftUI
 import Foundation
 
 struct DailyChecklistView: View {
-    let program: Program
+    @State var program: Program
     @State private var showSettings = false
     @State private var showCalendar = false
     @State private var showSettingsNav = false
