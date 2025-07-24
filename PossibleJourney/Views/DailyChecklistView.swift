@@ -61,7 +61,7 @@ struct DailyChecklistView: View {
     var body: some View {
         ZStack {
             // Move visibleTasks inside the view builder
-            let visibleTasks: [Task] = viewModel.program.tasks.filter { !hideCompletedTasks || !viewModel.completedTaskIDs.contains($0.id) }
+            let visibleTasks: [Task] = viewModel.program.tasks.filter { !hideCompletedTasks || !viewModel.dailyProgress.completedTaskIDs.contains($0.id) }
             VStack(spacing: 0) {
                 // Header row with logo, DAY XX, and checklist icon
                 HStack(alignment: .center) {
@@ -107,19 +107,21 @@ struct DailyChecklistView: View {
                         .shadow(color: .black.opacity(0.18), radius: 12, x: 0, y: 6)
                     List {
                         ForEach(visibleTasks, id: \.id) { task in
-                            let isCompleted = viewModel.completedTaskIDs.contains(task.id)
+                            let isCompleted = viewModel.dailyProgress.completedTaskIDs.contains(task.id)
                             HStack(alignment: .center, spacing: 16) {
                                 Button(action: {
+                                    var completed = Set(viewModel.dailyProgress.completedTaskIDs)
                                     if isCompleted {
-                                        viewModel.completedTaskIDs.remove(task.id)
+                                        completed.remove(task.id)
                                     } else {
-                                        viewModel.completedTaskIDs.insert(task.id)
+                                        completed.insert(task.id)
                                     }
                                     // Haptic feedback
                                     let generator = UIImpactFeedbackGenerator(style: .medium)
                                     generator.impactOccurred()
                                     // Save progress to storage
-                                    let progress = DailyProgress(id: UUID(), date: viewModel.appToday, completedTaskIDs: Array(viewModel.completedTaskIDs))
+                                    let progress = DailyProgress(id: UUID(), date: viewModel.dailyProgress.date, completedTaskIDs: Array(completed))
+                                    viewModel.dailyProgress = progress
                                     DailyProgressStorage().save(progress: progress)
                                 }) {
                                     ZStack {
