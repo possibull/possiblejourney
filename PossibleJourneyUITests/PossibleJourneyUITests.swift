@@ -52,6 +52,11 @@ final class PossibleJourneyUITests: XCTestCase {
         app.launchArguments = []
         app.launch()
         print(app.debugDescription) // Print accessibility hierarchy after relaunch
+        // Print all images and their accessibility identifiers
+        let images = app.images.allElementsBoundByIndex
+        for image in images {
+            print("DEBUG: Image identifier: \(image.identifier), label: \(image.label)")
+        }
         app.checkOnScreen(identifier: "DailyChecklistScreen", timeout: 5, message: "Should be on Daily Checklist screen after relaunch")
     }
 
