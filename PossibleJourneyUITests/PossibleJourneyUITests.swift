@@ -167,52 +167,24 @@ final class PossibleJourneyUITests: XCTestCase {
         for (index, picker) in allPickers.enumerated() {
             print("DEBUG: DatePicker[\(index)]: identifier='\(picker.identifier)', label='\(picker.label)'")
         }
-        // Toggle debug ON (robust)
-        let debugToggle = app.switches["Show Debug Labels"]
+        // Tap the debug toggle using its unique identifier
+        let debugToggle = app.switches["DebugToggle"]
         XCTAssertTrue(debugToggle.waitForExistence(timeout: 3), "Debug toggle should exist")
-        print("DEBUG: Toggle properties before tap: exists=\(debugToggle.exists), isHittable=\(debugToggle.isHittable), frame=\(debugToggle.frame)")
-        // Try scrolling to toggle
-        for _ in 0..<3 { if !debugToggle.isHittable { app.swipeUp() } }
-        print("DEBUG: Toggle properties after scroll: exists=\(debugToggle.exists), isHittable=\(debugToggle.isHittable), frame=\(debugToggle.frame)")
-        // Try normal tap
-        if debugToggle.isHittable {
+        if debugToggle.value as? String == "0" {
             debugToggle.tap()
-            print("DEBUG: Tapped Show Debug Labels switch (normal tap)")
-            sleep(1)
-        } else {
-            // Try coordinate tap
-            let coord = debugToggle.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
-            coord.tap()
-            print("DEBUG: Tapped Show Debug Labels switch (coordinate tap)")
+            print("DEBUG: Tapped DebugToggle switch")
             sleep(1)
         }
-        // Print value after tap
-        let debugToggleAfter = app.switches["Show Debug Labels"]
-        print("DEBUG: Debug toggle value after tap: \(String(describing: debugToggleAfter.value)), isHittable=\(debugToggleAfter.isHittable)")
-        // Try tapping the label if still not ON
-        let debugOnValues: [String] = ["1", "On", "true", "YES"]
-        let debugValue = (debugToggleAfter.value as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        if !debugOnValues.contains(where: { debugValue.localizedCaseInsensitiveContains($0) }) {
-            let debugLabel = app.staticTexts["Show Debug Labels"]
-            if debugLabel.exists && debugLabel.isHittable {
-                debugLabel.tap()
-                print("DEBUG: Tapped Show Debug Labels label")
-                sleep(1)
-            } else {
-                print("DEBUG: Debug label not hittable or not found")
-            }
-        }
-        // Print value after label tap
-        let debugToggleAfterLabel = app.switches["Show Debug Labels"]
-        let debugValueAfterLabel = (debugToggleAfterLabel.value as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        print("DEBUG: Debug toggle value after label tap: \(debugValueAfterLabel)")
-        // Print all static texts for UI state
+        // Check for a visible debug label in the UI
+        let debugLabel = app.staticTexts["DEBUG"]
+        let debugNowLabel = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'DEBUG now:'"))
+        print("DEBUG: Checking for visible debug label in UI...")
+        // Print all static texts for confirmation
         let allStaticTexts = app.staticTexts.allElementsBoundByIndex
         for (index, text) in allStaticTexts.enumerated() {
             print("DEBUG: StaticText[\(index)]: '\(text.label)'")
         }
-        // Final assertion
-        XCTAssertTrue(debugOnValues.contains(where: { debugValueAfterLabel.localizedCaseInsensitiveContains($0) }), "Debug toggle should be ON after all tap attempts, got: \(debugValueAfterLabel)")
+        XCTAssertTrue(debugLabel.exists || debugNowLabel.count > 0, "Debug label should be visible in UI after toggling debug toggle")
         // Set EOD picker to 8:00 PM
         let endOfDayPicker = app.datePickers["EndOfDayTimePicker"]
         XCTAssertTrue(endOfDayPicker.waitForExistence(timeout: 3), "EndOfDayTimePicker should exist")

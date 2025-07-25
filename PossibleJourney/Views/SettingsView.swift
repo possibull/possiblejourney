@@ -50,6 +50,7 @@ struct SettingsView: View {
                     }
                     Section(header: Text("Debug").font(.headline).foregroundColor(hardRed)) {
                         Toggle("Show Debug Labels", isOn: $debug)
+                            .accessibilityIdentifier("DebugToggle")
                     }
                 }
                 .cornerRadius(16)
