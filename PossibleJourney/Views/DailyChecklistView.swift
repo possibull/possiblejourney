@@ -49,19 +49,10 @@ struct DailyChecklistView: View {
                         viewModel.ignoreMissedDayForCurrentSession = true
                     },
                     onMissed: {
-                        print("DEBUG: User clicked 'I Missed It' - resetting to Day 1")
-                        let resetProgram = Program(
-                            id: UUID(),
-                            startDate: Date(),
-                            numberOfDays: viewModel.program.numberOfDays,
-                            tasks: viewModel.program.tasks,
-                            endOfDayTime: viewModel.program.endOfDayTime
-                        )
-                        viewModel.program = resetProgram
-                        viewModel.dailyProgress = DailyProgress(id: UUID(), date: Date(), completedTaskIDs: [])
-                        ProgramStorage().save(resetProgram)
+                        print("DEBUG: User clicked 'I Missed It' - clearing all progress but keeping program unchanged")
+                        // Only clear all progress, do not reset the program
                         DailyProgressStorage().clearAll()
-                        print("DEBUG: Reset to Day 1 - new start date: \(Date())")
+                        viewModel.dailyProgress = DailyProgress(id: UUID(), date: Date(), completedTaskIDs: [])
                     }
                 )
                 .accessibilityIdentifier("MissedDayScreen")
