@@ -111,7 +111,7 @@ struct PossibleJourneyApp: App {
                     } else {
                         return AnyView(EmptyView())
                     }
-                })
+                }).padding(.top, 80)
             }
         }
     }
