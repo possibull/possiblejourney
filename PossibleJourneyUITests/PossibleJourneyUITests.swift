@@ -180,22 +180,8 @@ final class PossibleJourneyUITests: XCTestCase {
         XCTAssertTrue(settingsButton.waitForExistence(timeout: 2))
         settingsButton.tap()
         enableDebugModeByTappingAllSwitchesInSettings(in: app)
-        // Maximize debug window if possible
-        let debugToggle = app.switches["DebugToggle"]
-        if debugToggle.exists && (debugToggle.value as? String == "0") {
-            debugToggle.tap()
-        }
-        // Try to expand debug window if a control exists
-        let expandButton = app.buttons["ExpandDebugWindow"]
-        if expandButton.exists {
-            expandButton.tap()
-            // Check for expanded debug content
-            let programUUIDLabel = app.staticTexts["DebugProgramUUIDLabel"]
-            if !programUUIDLabel.waitForExistence(timeout: 2) {
-                XCTFail("Failed to maximize debug window: DebugProgramUUIDLabel not visible after expand")
-                fatalError("Failed to maximize debug window: DebugProgramUUIDLabel not visible after expand")
-            }
-        }
+        // Maximize debug window using helper
+        expandAndAssertDebugWindow(in: app)
     }
 
     func enableDebugModeByTappingAllSwitchesInSettings(in app: XCUIApplication) {
@@ -212,17 +198,8 @@ final class PossibleJourneyUITests: XCTestCase {
         let debugLabel = app.staticTexts["DEBUG"]
         let debugNowLabel = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'DEBUG now:'"))
         XCTAssertTrue(debugLabel.exists || debugNowLabel.count > 0, "Debug label should be visible in UI after toggling all switches")
-        // Try to expand debug window if a control exists
-        let expandButton = app.buttons["ExpandDebugWindow"]
-        if expandButton.exists {
-            expandButton.tap()
-            // Check for expanded debug content
-            let programUUIDLabel = app.staticTexts["DebugProgramUUIDLabel"]
-            if !programUUIDLabel.waitForExistence(timeout: 2) {
-                XCTFail("Failed to maximize debug window: DebugProgramUUIDLabel not visible after expand")
-                fatalError("Failed to maximize debug window: DebugProgramUUIDLabel not visible after expand")
-            }
-        }
+        // Maximize debug window using helper
+        expandAndAssertDebugWindow(in: app)
     }
 
     func testSettingsDebugToggleAndEODPicker() {
