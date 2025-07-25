@@ -362,6 +362,12 @@ final class PossibleJourneyUITests: XCTestCase {
                 fallbackFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
                 startDate = fallbackFormatter.date(from: programStartDateString)
             }
+            if startDate == nil {
+                let fallbackFormatter = DateFormatter()
+                fallbackFormatter.dateStyle = .medium
+                fallbackFormatter.timeStyle = .none
+                startDate = fallbackFormatter.date(from: programStartDateString)
+            }
             guard let programStart = startDate else {
                 XCTFail("Could not parse program start date for missed day scenario")
                 return
