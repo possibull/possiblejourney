@@ -23,7 +23,7 @@ struct DebugWindow<Content: View>: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
-            .background(Color.black.opacity(0.8))
+            .background(Color.black.opacity(0.5))
             .onTapGesture {
                 withAnimation { isExpanded.toggle() }
             }
@@ -35,7 +35,7 @@ struct DebugWindow<Content: View>: View {
                     .padding(8)
                 }
                 .frame(maxHeight: UIScreen.main.bounds.height * 0.5)
-                .background(Color.black.opacity(0.85))
+                .background(Color.black.opacity(0.6))
                 .transition(.move(edge: .top).combined(with: .opacity))
             }
         }
