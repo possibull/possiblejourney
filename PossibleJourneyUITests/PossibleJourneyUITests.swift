@@ -175,6 +175,11 @@ final class PossibleJourneyUITests: XCTestCase {
             print("DEBUG: Tapped DebugToggle switch")
             sleep(1)
         }
+        // Tap Back to return to checklist
+        let backButton = app.buttons["Back"]
+        XCTAssertTrue(backButton.waitForExistence(timeout: 2), "Back button should exist")
+        backButton.tap()
+        print("DEBUG: Tapped Back button to return to checklist")
         // Check for a visible debug label in the UI
         let debugLabel = app.staticTexts["DEBUG"]
         let debugNowLabel = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'DEBUG now:'"))
