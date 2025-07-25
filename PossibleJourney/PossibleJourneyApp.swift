@@ -58,19 +58,21 @@ struct PossibleJourneyApp: App {
                         let now = currentTimeOverride ?? Date()
                         let activeDay = program.nextActiveDay(currentDate: now) ?? Calendar.current.startOfDay(for: now)
                         let dailyProgress = DailyProgressStorage().load(for: activeDay) ?? DailyProgress(id: UUID(), date: activeDay, completedTaskIDs: [])
-                        DailyChecklistView(
-                            viewModel: DailyChecklistViewModel(
-                                program: program,
-                                dailyProgress: dailyProgress,
-                                now: now
-                            ),
-                            onReset: {
-                                appState.loadedProgram = nil
-                                ProgramStorage().clear()
-                            },
-                            currentTimeOverride: currentTimeOverride
+                        return AnyView(
+                            DailyChecklistView(
+                                viewModel: DailyChecklistViewModel(
+                                    program: program,
+                                    dailyProgress: dailyProgress,
+                                    now: now
+                                ),
+                                onReset: {
+                                    appState.loadedProgram = nil
+                                    ProgramStorage().clear()
+                                },
+                                currentTimeOverride: currentTimeOverride
+                            )
+                            .environmentObject(debugState)
                         )
-                        .environmentObject(debugState)
                     } else {
                         // Show debug info for setup screen
                         let storedProgram = ProgramStorage().load()
