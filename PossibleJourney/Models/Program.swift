@@ -28,6 +28,7 @@ extension Program {
         
         // If we're before the program starts or after it ends, no missed day
         if appDayNumber < 1 || appDayNumber > numberOfDays {
+            print("DEBUG: Program.isDayMissed - appDayNumber \(appDayNumber) out of range [1, \(numberOfDays)], returning false")
             return false
         }
         
@@ -49,14 +50,18 @@ extension Program {
             endOfAppDay = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: appDayStart)!
         }
         
+        print("DEBUG: Program.isDayMissed - appDayNumber: \(appDayNumber), date: \(date), endOfAppDay: \(endOfAppDay), endHour: \(endHour), endMinute: \(endMinute)")
+        
         // Check if we're past the end of the app day
         guard date >= endOfAppDay else {
+            print("DEBUG: Program.isDayMissed - not past EOD yet, returning false")
             return false // Not past EOD yet
         }
         
         // Check if any tasks are incomplete
         let hasIncompleteTasks = tasks.contains { !completedTaskIDs.contains($0.id) }
         
+        print("DEBUG: Program.isDayMissed - past EOD, hasIncompleteTasks: \(hasIncompleteTasks), returning \(hasIncompleteTasks)")
         return hasIncompleteTasks
     }
 } 

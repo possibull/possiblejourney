@@ -34,7 +34,9 @@ class DailyChecklistViewModel: ObservableObject {
     @Published var now: Date
 
     var isDayMissed: Bool {
-        program.isDayMissed(for: now, completedTaskIDs: Set(dailyProgress.completedTaskIDs))
+        let result = program.isDayMissed(for: now, completedTaskIDs: Set(dailyProgress.completedTaskIDs))
+        print("DEBUG: DailyChecklistViewModel.isDayMissed - now: \(now), completedTaskIDs: \(dailyProgress.completedTaskIDs), result: \(result)")
+        return result
     }
 
     init(program: Program, dailyProgress: DailyProgress, now: Date = Date()) {
