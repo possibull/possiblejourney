@@ -21,10 +21,20 @@ final class PossibleJourneyUITests: XCTestCase {
         XCTAssertTrue(taskCell.waitForExistence(timeout: 1))
     }
 
+    func setupProgram(app: XCUIApplication, tasks: [(title: String, description: String)] = [("Read", "Read 10 pages"), ("Drink Water", "Drink 2L of water")], checkChecklist: Bool = true) {
+        app.checkOnScreen(identifier: "ProgramSetupScreen", message: "Should start on Program Setup screen")
+        for task in tasks {
+            app.addTask(title: task.title, description: task.description)
+        }
+        app.saveProgram()
+        if checkChecklist {
+            app.checkOnScreen(identifier: "DailyChecklistScreen", message: "Should navigate to checklist after saving program")
+        }
+    }
+
     func testSaveProgramButtonExistsAndCanBeTapped() throws {
         let app = launchAppWithReset()
-        app.addTask(title: "Read", description: "Read 10 pages")
-        app.saveProgram()
+        setupProgram(app: app, tasks: [("Read", "Read 10 pages")])
         app.checkOnScreen(identifier: "DailyChecklistScreen", message: "Should navigate to checklist after saving program")
     }
 
@@ -37,7 +47,7 @@ final class PossibleJourneyUITests: XCTestCase {
 
     func testSaveProgramNavigatesToDailyChecklist() throws {
         let app = launchAppWithReset()
-        app.addProgramAndNavigateToChecklist()
+        setupProgram(app: app)
     }
 
     func testProgramPersistsAndChecklistAppearsOnRelaunch() throws {
@@ -201,9 +211,7 @@ final class PossibleJourneyUITests: XCTestCase {
     }
 
     func setupMissedDayScenario(app: XCUIApplication, eodHour: String = "8", missedTime: String = "2025-07-24T21:00:00Z") {
-        app.addTask(title: "Read", description: "Read 10 pages")
-        app.addTask(title: "Drink Water", description: "Drink 2L of water")
-        app.saveProgram()
+        setupProgram(app: app)
         // Set end of day time to just before now (simulate after end of day)
         let settingsButton = app.buttons["SettingsButton"]
         XCTAssertTrue(settingsButton.exists)
