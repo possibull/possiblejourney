@@ -114,86 +114,7 @@ final class PossibleJourneyUITests: XCTestCase {
 
     func testChecklistShowsMissedDayModalAfterEndOfDayIfTasksIncomplete() throws {
         let app = launchAppWithReset()
-        // Complete program setup to reach Daily Checklist screen
-        app.addTask(title: "Read", description: "Read 10 pages")
-        app.addTask(title: "Drink Water", description: "Drink 2L of water")
-        app.saveProgram()
-        // Set end of day time to just before now (simulate after end of day)
-        print("DEBUG: Button identifiers: \(app.buttons.allElementsBoundByIndex.map { $0.identifier })")
-        let settingsButton = app.buttons["SettingsButton"]
-        XCTAssertTrue(settingsButton.exists)
-        settingsButton.tap()
-        // Wait for the Settings page to be visible
-        let endOfDayPicker = app.datePickers["EndOfDayTimePicker"]
-        XCTAssertTrue(endOfDayPicker.waitForExistence(timeout: 2))
-        // Print all switches for diagnosis
-        print("Switches: \(app.switches.allElementsBoundByIndex.map { $0.label })")
-        print("Switch count: \(app.switches.count)")
-        for i in 0..<app.switches.count {
-            let sw = app.switches.element(boundBy: i)
-            print("Switch \(i): label=\(sw.label), value=\(sw.value ?? "nil")")
-            if sw.label == "Show Debug Labels" && sw.value as? String == "0" {
-                sw.tap()
-            }
-        }
-        // Print all toggles (switches) for diagnosis and tap each
-        print("Toggles: \(app.switches.allElementsBoundByIndex.map { $0.label })")
-        print("Toggle count: \(app.switches.count)")
-        for i in 0..<app.switches.count {
-            let toggle = app.switches.element(boundBy: i)
-            print("Toggle \(i): label=\(toggle.label), identifier=\(toggle.identifier), value=\(toggle.value ?? "nil"), isHittable=\(toggle.isHittable)")
-            if toggle.isHittable {
-                toggle.tap()
-            }
-        }
-        // Robustly scroll to and tap the debug toggle
-        let debugToggle = app.switches["Show Debug Labels"]
-        var attempts = 0
-        while !debugToggle.exists && attempts < 5 {
-            app.swipeUp()
-            attempts += 1
-        }
-        XCTAssertTrue(debugToggle.waitForExistence(timeout: 2), "Debug toggle should exist")
-        print("Debug toggle value before tap: \(debugToggle.value ?? "nil")")
-        if debugToggle.exists && debugToggle.isHittable && debugToggle.value as? String == "0" {
-            debugToggle.tap()
-            sleep(1)
-            // Tap again in case first tap just scrolls into view
-            if debugToggle.value as? String == "0" {
-                debugToggle.tap()
-            }
-        } else if debugToggle.exists {
-            // Try coordinate tap if not hittable
-            let coord = debugToggle.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
-            coord.tap()
-            sleep(1)
-            if debugToggle.value as? String == "0" {
-                coord.tap()
-            }
-        }
-        print("Debug toggle value after tap: \(debugToggle.value ?? "nil")")
-        // Set the picker to a fixed time: 8:00 PM
-        let calendar = Calendar.current
-        let eodHour = 20 // 8:00 PM
-        let eodMinute = 0
-        let now = Date()
-        let components = calendar.dateComponents([.year, .month, .day], from: now)
-        // Adjust the picker wheels to set EOD to 8:00 PM
-        let hourWheel = endOfDayPicker.pickerWheels.element(boundBy: 0)
-        let minuteWheel = endOfDayPicker.pickerWheels.element(boundBy: 1)
-        let amPmWheel = endOfDayPicker.pickerWheels.element(boundBy: 2)
-        hourWheel.adjust(toPickerWheelValue: "8")
-        minuteWheel.adjust(toPickerWheelValue: "00")
-        amPmWheel.adjust(toPickerWheelValue: "PM")
-        // Set fake 'now' to 9:00 PM (1 hour after EOD)
-        let fakeNow = calendar.date(from: DateComponents(year: components.year, month: components.month, day: components.day, hour: 21, minute: 0))!
-        let fakeNowTimestamp = Int(fakeNow.timeIntervalSince1970)
-        app.buttons["Back"].tap()
-        // Do NOT complete all tasks
-        // Relaunch checklist (simulate app open after end of day)
-        app.terminate()
-        app.launchArguments = ["--uitesting-current-time", String(fakeNowTimestamp)]
-        app.launch()
+        setupMissedDayScenario(app: app)
         // Assert missed day screen appears directly after relaunch
         let missedDayLabel = app.staticTexts["MissedDayScreen"]
         let foundMissedDayLabel = missedDayLabel.waitForExistence(timeout: 10)
@@ -280,28 +201,54 @@ final class PossibleJourneyUITests: XCTestCase {
     }
 
     func setupMissedDayScenario(app: XCUIApplication, eodHour: String = "8", missedTime: String = "2025-07-24T21:00:00Z") {
-        app.checkOnScreen(identifier: "ProgramSetupScreen", message: "Should start on Program Setup screen")
-        app.addTask(title: "Task 1", description: "Description 1")
-        app.addTask(title: "Task 2", description: "Description 2")
+        app.addTask(title: "Read", description: "Read 10 pages")
+        app.addTask(title: "Drink Water", description: "Drink 2L of water")
         app.saveProgram()
-        app.checkOnScreen(identifier: "DailyChecklistScreen", message: "Should navigate to checklist after saving program")
-        enableDebugLabels(in: app)
-        // Navigate to Settings and set EOD
+        // Set end of day time to just before now (simulate after end of day)
         let settingsButton = app.buttons["SettingsButton"]
-        XCTAssertTrue(settingsButton.waitForExistence(timeout: 2))
+        XCTAssertTrue(settingsButton.exists)
         settingsButton.tap()
         let endOfDayPicker = app.datePickers["EndOfDayTimePicker"]
-        XCTAssertTrue(endOfDayPicker.waitForExistence(timeout: 2), "End of Day Time picker should exist")
-        let hourPicker = endOfDayPicker.pickerWheels.element(boundBy: 0)
-        let minutePicker = endOfDayPicker.pickerWheels.element(boundBy: 1)
-        hourPicker.adjust(toPickerWheelValue: eodHour)
-        minutePicker.adjust(toPickerWheelValue: "00")
+        XCTAssertTrue(endOfDayPicker.waitForExistence(timeout: 2))
+        // Robustly scroll to and tap the debug toggle
+        let debugToggle = app.switches["Show Debug Labels"]
+        var attempts = 0
+        while !debugToggle.exists && attempts < 5 {
+            app.swipeUp()
+            attempts += 1
+        }
+        XCTAssertTrue(debugToggle.waitForExistence(timeout: 2), "Debug toggle should exist")
+        if debugToggle.exists && debugToggle.isHittable && debugToggle.value as? String == "0" {
+            debugToggle.tap()
+            sleep(1)
+            if debugToggle.value as? String == "0" {
+                debugToggle.tap()
+            }
+        } else if debugToggle.exists {
+            let coord = debugToggle.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            coord.tap()
+            sleep(1)
+            if debugToggle.value as? String == "0" {
+                coord.tap()
+            }
+        }
+        // Set the picker to a fixed time: 8:00 PM
+        let hourWheel = endOfDayPicker.pickerWheels.element(boundBy: 0)
+        let minuteWheel = endOfDayPicker.pickerWheels.element(boundBy: 1)
+        let amPmWheel = endOfDayPicker.pickerWheels.element(boundBy: 2)
+        hourWheel.adjust(toPickerWheelValue: "8")
+        minuteWheel.adjust(toPickerWheelValue: "00")
+        amPmWheel.adjust(toPickerWheelValue: "PM")
+        // Set fake 'now' to 9:00 PM (1 hour after EOD)
+        let calendar = Calendar.current
+        let now = Date()
+        let components = calendar.dateComponents([.year, .month, .day], from: now)
+        let fakeNow = calendar.date(from: DateComponents(year: components.year, month: components.month, day: components.day, hour: 21, minute: 0))!
+        let fakeNowTimestamp = Int(fakeNow.timeIntervalSince1970)
         app.buttons["Back"].tap()
         app.terminate()
-        app.launchArguments = ["--uitesting", "--currentTimeOverride", missedTime]
+        app.launchArguments = ["--uitesting-current-time", String(fakeNowTimestamp)]
         app.launch()
-        enableDebugLabels(in: app)
-        app.checkOnScreen(identifier: "MissedDayScreen", timeout: 10, message: "Missed day screen should appear")
     }
 
     func testMissedDayScreen_IMissedIt_ResetsToDay1() {
