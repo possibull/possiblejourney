@@ -78,6 +78,11 @@ final class PossibleJourneyUITests: XCTestCase {
             (title: "Drink Water", description: "Drink 2L of water")
         ], checkChecklist: true)
         enableDebugModeByTappingAllSwitches(in: app)
+        // Tap Back button to return to checklist (before first debug prints)
+        let backButton1 = app.buttons["Back"]
+        if backButton1.exists {
+            backButton1.tap()
+        }
         // Print task IDs before relaunch
         print("DEBUG: Task IDs before relaunch:")
         let taskCells = app.staticTexts.allElementsBoundByIndex
