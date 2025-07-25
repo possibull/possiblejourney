@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     var onReset: (() -> Void)? = nil
     @Binding var endOfDayTime: Date
+    @Binding var debug: Bool
     // 75 Hard deep red
     let hardRed = Color(red: 183/255, green: 28/255, blue: 28/255)
     @Environment(\.presentationMode) private var presentationMode
@@ -47,8 +48,10 @@ struct SettingsView: View {
                                 endOfDayTime = calendar.date(bySettingHour: comps.hour ?? 0, minute: comps.minute ?? 0, second: 0, of: Date()) ?? newValue
                             }
                     }
+                    Section(header: Text("Debug").font(.headline).foregroundColor(hardRed)) {
+                        Toggle("Show Debug Labels", isOn: $debug)
+                    }
                 }
-                .frame(height: 180)
                 .cornerRadius(16)
                 .padding(.horizontal)
                 // Reset Button

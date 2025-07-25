@@ -211,4 +211,16 @@ final class ProgramModelDayLogicTests: XCTestCase {
         let missedAtEOD = program.isDayMissed(for: atEOD, completedTaskIDs: [])
         XCTAssertTrue(missedAtEOD, "Should be missed at or after AM EOD on next day if not complete")
     }
+    func testIsDayMissed_PMEndOfDay_afterEOD_incompleteTasks() {
+        let calendar = Calendar.current
+        let startDate = calendar.startOfDay(for: Date())
+        let task1 = Task(id: UUID(), title: "A", description: nil)
+        let task2 = Task(id: UUID(), title: "B", description: nil)
+        let eod = calendar.date(bySettingHour: 20, minute: 0, second: 0, of: startDate)!
+        let program = Program(id: UUID(), startDate: startDate, numberOfDays: 20, tasks: [task1, task2], endOfDayTime: eod)
+        // Now is 9:00 PM (after EOD)
+        let afterEOD = calendar.date(bySettingHour: 21, minute: 0, second: 0, of: startDate)!
+        let missed = program.isDayMissed(for: afterEOD, completedTaskIDs: [task1.id])
+        XCTAssertTrue(missed, "Should be missed if after PM EOD and not all tasks complete")
+    }
 } 

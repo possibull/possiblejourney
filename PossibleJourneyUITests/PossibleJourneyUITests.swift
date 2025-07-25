@@ -123,6 +123,12 @@ final class PossibleJourneyUITests: XCTestCase {
         let settingsButton = app.buttons["SettingsButton"]
         XCTAssertTrue(settingsButton.exists)
         settingsButton.tap()
+        // Enable debug mode
+        let debugToggle = app.switches["Show Debug Labels"]
+        XCTAssertTrue(debugToggle.waitForExistence(timeout: 2))
+        if debugToggle.value as? String == "0" {
+            debugToggle.tap()
+        }
         let endOfDayPicker = app.datePickers["EndOfDayTimePicker"]
         XCTAssertTrue(endOfDayPicker.exists)
         // Set the picker to a fixed time: 8:00 PM
@@ -147,10 +153,9 @@ final class PossibleJourneyUITests: XCTestCase {
         app.terminate()
         app.launchArguments = ["--uitesting-current-time", String(fakeNowTimestamp)]
         app.launch()
-        app.checkOnScreen(identifier: "DailyChecklistScreen", timeout: 5, message: "Should be on Daily Checklist screen after relaunch")
-        // Assert missed day modal appears
-        let missedDayModal = app.otherElements["MissedDayModal"]
-        XCTAssertTrue(missedDayModal.waitForExistence(timeout: 2), "Missed day modal should appear after end of day if tasks are incomplete")
+        // Assert missed day screen appears directly after relaunch
+        let missedDayScreen = app.otherElements["MissedDayScreen"]
+        XCTAssertTrue(missedDayScreen.waitForExistence(timeout: 5), "Missed day screen should appear after end of day if tasks are incomplete")
     }
 
     func testSettingsViewShowsEndOfDayTimePicker() throws {

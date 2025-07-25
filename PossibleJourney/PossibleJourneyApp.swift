@@ -10,12 +10,14 @@ import SwiftUI
 func resetForUITestingIfNeeded() {
     if CommandLine.arguments.contains("--uitesting-reset") {
         ProgramStorage().clear()
+        DailyProgressStorage().clearAll()
     }
 }
 
 @main
 struct PossibleJourneyApp: App {
     init() {
+        print("DEBUG: PossibleJourneyApp init")
         resetForUITestingIfNeeded()
     }
     @StateObject private var appState = ProgramAppState()
@@ -28,7 +30,8 @@ struct PossibleJourneyApp: App {
         return nil
     }
     var body: some Scene {
-        WindowGroup {
+        print("DEBUG: Launching DailyChecklistView with now = \(currentTimeOverride ?? Date())")
+        return WindowGroup {
             NavigationStack {
                 if let program = appState.loadedProgram {
                     let today = Calendar.current.startOfDay(for: Date())
