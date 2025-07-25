@@ -136,6 +136,17 @@ final class PossibleJourneyUITests: XCTestCase {
                 sw.tap()
             }
         }
+        // Robustly scroll to and tap the debug toggle
+        let debugToggle = app.switches["Show Debug Labels"]
+        var attempts = 0
+        while !debugToggle.exists && attempts < 5 {
+            app.swipeUp()
+            attempts += 1
+        }
+        XCTAssertTrue(debugToggle.waitForExistence(timeout: 2), "Debug toggle should exist")
+        if debugToggle.value as? String == "0" {
+            debugToggle.tap()
+        }
         // Set the picker to a fixed time: 8:00 PM
         let calendar = Calendar.current
         let eodHour = 20 // 8:00 PM
