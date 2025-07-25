@@ -37,13 +37,6 @@ struct SettingsView: View {
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal)
-                // Debug Toggle moved outside Form for testing
-                Toggle("Show Debug Labels", isOn: $debug)
-                    .accessibilityIdentifier("DebugToggle")
-                    .onChange(of: debug) { newValue in
-                        print("DEBUG TOGGLE: \(newValue)")
-                    }
-                    .padding(.horizontal)
                 // End of Day Time Picker Section in Form
                 Form {
                     Section(header: Text("End of Day Time").font(.headline).foregroundColor(hardRed)) {
