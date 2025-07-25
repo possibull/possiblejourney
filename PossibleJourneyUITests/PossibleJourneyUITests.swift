@@ -110,25 +110,7 @@ final class PossibleJourneyUITests: XCTestCase {
         app.terminate()
         app.launchArguments = []
         app.launch()
-        enableDebugModeByTappingAllSwitches(in: app)
-        // Tap Back button to return to checklist
-        let backButton = app.buttons["Back"]
-        if backButton.exists {
-            backButton.tap()
-        }
-        app.checkOnScreen(identifier: "DailyChecklistScreen", timeout: 5, message: "Should be on Daily Checklist screen after relaunch")
-        // Print task IDs after relaunch (now on checklist)
-        print("DEBUG: Task IDs after relaunch:")
-        let taskCellsAfter = app.staticTexts.allElementsBoundByIndex
-        for cell in taskCellsAfter {
-            print("DEBUG: Task cell label: \(cell.label)")
-        }
-        // Print debug task IDs after relaunch
-        let debugTaskIDsAfter = app.staticTexts["TaskIDsDebug"].label
-        print("DEBUG: TaskIDsDebug after relaunch: \(debugTaskIDsAfter)")
-        // Print debug completed task IDs after relaunch
-        let debugCompletedTaskIDsAfter = app.staticTexts["DebugCompletedTaskIDsLabel"].label
-        print("DEBUG: CompletedTaskIDsDebug after relaunch: \(debugCompletedTaskIDsAfter)")
+
         // Wait for checklist screen after relaunch
         let checklistScreen = app.otherElements["DailyChecklistScreen"]
         XCTAssertTrue(checklistScreen.waitForExistence(timeout: 5), "Checklist screen should appear after relaunch")
