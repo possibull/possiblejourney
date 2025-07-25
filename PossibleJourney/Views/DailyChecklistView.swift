@@ -104,6 +104,59 @@ struct DailyChecklistView: View {
         .frame(maxWidth: .infinity, alignment: .center)
     }
 
+    private func ChecklistTaskRow(
+        task: Task,
+        isCompleted: Bool,
+        onToggle: @escaping () -> Void,
+        onNotes: @escaping () -> Void
+    ) -> some View {
+        HStack(alignment: .center, spacing: 16) {
+            Button(action: onToggle) {
+                ZStack {
+                    Circle()
+                        .strokeBorder(isCompleted ? hardRed : Color.white, lineWidth: 3)
+                        .background(Circle().fill(isCompleted ? hardRed : Color.black))
+                        .frame(width: 36, height: 36)
+                        .shadow(color: isCompleted ? hardRed.opacity(0.3) : .clear, radius: 6, x: 0, y: 2)
+                    if isCompleted {
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 20, weight: .bold))
+                            .foregroundColor(.white)
+                            .scaleEffect(isCompleted ? 1.2 : 1.0)
+                            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isCompleted)
+                            .accessibilityIdentifier("checkmark")
+                    }
+                }
+            }
+            .buttonStyle(PlainButtonStyle())
+            Text(task.title)
+                .font(.system(size: 22, weight: .semibold))
+                .foregroundColor(.white)
+                .strikethrough(isCompleted, color: hardRed)
+            Spacer()
+            Button(action: onNotes) {
+                Image(systemName: "note.text")
+                    .foregroundColor(Color.purple)
+                    .font(.system(size: 20, weight: .medium))
+            }
+            .accessibilityIdentifier("NotesButton_\(task.id.uuidString)")
+            Image(systemName: "line.3.horizontal")
+                .foregroundColor(Color.white.opacity(0.35))
+                .font(.system(size: 20, weight: .medium))
+                .padding(.trailing, 4)
+                .accessibilityHidden(true)
+        }
+        .padding(.vertical, 14)
+        .padding(.horizontal, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(red: 32/255, green: 32/255, blue: 32/255))
+                .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
+        )
+        .listRowInsets(EdgeInsets())
+        .listRowBackground(Color.clear)
+    }
+
     var body: some View {
         ZStack(alignment: .top) {
             if viewModel.isDayMissed {
@@ -152,8 +205,10 @@ struct DailyChecklistView: View {
                         List {
                             ForEach(visibleTasks, id: \.id) { task in
                                 let isCompleted = viewModel.dailyProgress.completedTaskIDs.contains(task.id)
-                                HStack(alignment: .center, spacing: 16) {
-                                    Button(action: {
+                                ChecklistTaskRow(
+                                    task: task,
+                                    isCompleted: isCompleted,
+                                    onToggle: {
                                         var completed = Set(viewModel.dailyProgress.completedTaskIDs)
                                         if isCompleted {
                                             completed.remove(task.id)
@@ -171,54 +226,12 @@ struct DailyChecklistView: View {
                                         if viewModel.program.tasks.allSatisfy({ completed.contains($0.id) }) {
                                             viewModel.completeCurrentDay()
                                         }
-                                    }) {
-                                        ZStack {
-                                            Circle()
-                                                .strokeBorder(isCompleted ? hardRed : Color.white, lineWidth: 3)
-                                                .background(Circle().fill(isCompleted ? hardRed : Color.black))
-                                                .frame(width: 36, height: 36)
-                                                .shadow(color: isCompleted ? hardRed.opacity(0.3) : .clear, radius: 6, x: 0, y: 2)
-                                            if isCompleted {
-                                                Image(systemName: "checkmark")
-                                                    .font(.system(size: 20, weight: .bold))
-                                                    .foregroundColor(.white)
-                                                    .scaleEffect(isCompleted ? 1.2 : 1.0)
-                                                    .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isCompleted)
-                                                    .accessibilityIdentifier("checkmark")
-                                            }
-                                        }
-                                    }
-                                    .buttonStyle(PlainButtonStyle())
-                                    Text(task.title)
-                                        .font(.system(size: 22, weight: .semibold))
-                                        .foregroundColor(.white)
-                                        .strikethrough(isCompleted, color: hardRed)
-                                    Spacer()
-                                    // Notes icon (now on the right, before handle)
-                                    Button(action: {
+                                    },
+                                    onNotes: {
                                         notesSheetTaskID = TaskIDWrapper(id: task.id)
                                         notesSheetText = notesForTask[task.id, default: ""]
-                                    }) {
-                                        Image(systemName: "note.text")
-                                            .foregroundColor(Color.purple)
-                                            .font(.system(size: 20, weight: .medium))
                                     }
-                                    .accessibilityIdentifier("NotesButton_\(task.id.uuidString)")
-                                    Image(systemName: "line.3.horizontal")
-                                        .foregroundColor(Color.white.opacity(0.35))
-                                        .font(.system(size: 20, weight: .medium))
-                                        .padding(.trailing, 4)
-                                        .accessibilityHidden(true)
-                                }
-                                .padding(.vertical, 14)
-                                .padding(.horizontal, 8)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 16)
-                                        .fill(Color(red: 32/255, green: 32/255, blue: 32/255))
-                                        .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
                                 )
-                                .listRowInsets(EdgeInsets())
-                                .listRowBackground(Color.clear)
                                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                     Button {
                                         // Request notification permission and schedule a local notification (demo: 5 seconds from now)
