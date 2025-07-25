@@ -124,7 +124,7 @@ struct PossibleJourneyApp: App {
                         // Show debug info for setup screen in the debug window
                         let storedProgram = ProgramStorage().load()
                         return AnyView(
-                            Group {
+                            VStack(alignment: .leading, spacing: 4) {
                                 Text("DEBUG: Program Setup Screen")
                                     .font(.caption)
                                     .foregroundColor(.yellow)
@@ -152,6 +152,8 @@ struct PossibleJourneyApp: App {
                                         .foregroundColor(.gray)
                                 }
                             }
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                            .padding()
                         )
                     }
                 }).padding(.top, 80)
