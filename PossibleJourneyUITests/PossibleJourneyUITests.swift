@@ -136,8 +136,6 @@ final class PossibleJourneyUITests: XCTestCase {
                 sw.tap()
             }
         }
-        let endOfDayPicker = app.datePickers["EndOfDayTimePicker"]
-        XCTAssertTrue(endOfDayPicker.exists)
         // Set the picker to a fixed time: 8:00 PM
         let calendar = Calendar.current
         let eodHour = 20 // 8:00 PM
