@@ -91,6 +91,10 @@ struct PossibleJourneyApp: App {
                         let dailyProgress = DailyProgressStorage().load(for: activeDay) ?? DailyProgress(id: UUID(), date: activeDay, completedTaskIDs: [])
                         let viewModel = DailyChecklistViewModel(program: program, dailyProgress: dailyProgress, now: now)
                         return AnyView(Group {
+                            Text("DEBUG Current Time: \(Date())")
+                                .font(.caption)
+                                .foregroundColor(.orange)
+                                .accessibilityIdentifier("DebugCurrentTimeLabel")
                             Text("DEBUG Program UUID: \(viewModel.program.id.uuidString)")
                                 .font(.caption)
                                 .foregroundColor(.pink)
@@ -125,6 +129,10 @@ struct PossibleJourneyApp: App {
                         let storedProgram = ProgramStorage().load()
                         return AnyView(
                             VStack(alignment: .leading, spacing: 4) {
+                                Text("DEBUG Current Time: \(Date())")
+                                    .font(.caption)
+                                    .foregroundColor(.orange)
+                                    .accessibilityIdentifier("DebugCurrentTimeLabel")
                                 Text("DEBUG: Program Setup Screen")
                                     .font(.caption)
                                     .foregroundColor(.yellow)
