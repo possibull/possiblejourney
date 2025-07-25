@@ -180,6 +180,16 @@ final class PossibleJourneyUITests: XCTestCase {
         XCTAssertTrue(settingsButton.waitForExistence(timeout: 2))
         settingsButton.tap()
         enableDebugModeByTappingAllSwitchesInSettings(in: app)
+        // Maximize debug window if possible
+        let debugToggle = app.switches["DebugToggle"]
+        if debugToggle.exists && (debugToggle.value as? String == "0") {
+            debugToggle.tap()
+        }
+        // Try to expand debug window if a control exists
+        let expandButton = app.buttons["ExpandDebugWindow"]
+        if expandButton.exists {
+            expandButton.tap()
+        }
     }
 
     func enableDebugModeByTappingAllSwitchesInSettings(in app: XCUIApplication) {
@@ -196,9 +206,11 @@ final class PossibleJourneyUITests: XCTestCase {
         let debugLabel = app.staticTexts["DEBUG"]
         let debugNowLabel = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'DEBUG now:'"))
         XCTAssertTrue(debugLabel.exists || debugNowLabel.count > 0, "Debug label should be visible in UI after toggling all switches")
-        // Removed: Go back to checklist
-        // let backButton = app.buttons["Back"]
-        // if backButton.exists { backButton.tap() }
+        // Try to expand debug window if a control exists
+        let expandButton = app.buttons["ExpandDebugWindow"]
+        if expandButton.exists {
+            expandButton.tap()
+        }
     }
 
     func testSettingsDebugToggleAndEODPicker() {
