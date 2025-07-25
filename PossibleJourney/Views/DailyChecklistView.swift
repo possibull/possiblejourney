@@ -111,22 +111,15 @@ struct DailyChecklistView: View {
     ) -> some View {
         HStack(alignment: .center, spacing: 16) {
             Button(action: onToggle) {
-                ZStack {
-                    Circle()
-                        .strokeBorder(isCompleted ? hardRed : Color.white, lineWidth: 3)
-                        .background(Circle().fill(isCompleted ? hardRed : Color.black))
-                        .frame(width: 36, height: 36)
-                        .shadow(color: isCompleted ? hardRed.opacity(0.3) : .clear, radius: 6, x: 0, y: 2)
-                    if isCompleted {
-                        Image(systemName: "checkmark")
-                            .font(.system(size: 20, weight: .bold))
-                            .foregroundColor(.white)
-                            .scaleEffect(isCompleted ? 1.2 : 1.0)
-                            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isCompleted)
-                            .accessibilityIdentifier("checkmark_\(task.id.uuidString)")
-                    }
-                }
+                Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
+                    .foregroundColor(isCompleted ? hardRed : .white)
+                    .font(.system(size: 32, weight: .bold))
+                    .scaleEffect(isCompleted ? 1.2 : 1.0)
+                    .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isCompleted)
             }
+            .accessibilityIdentifier("checkmark_\(task.id.uuidString)")
+            .accessibilityLabel(task.title)
+            .accessibilityElement()
             .buttonStyle(PlainButtonStyle())
             Text(task.title)
                 .font(.system(size: 22, weight: .semibold))

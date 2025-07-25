@@ -100,7 +100,10 @@ final class PossibleJourneyUITests: XCTestCase {
         let readTaskCell = app.staticTexts["TaskCell_\(readTaskID)"]
         XCTAssertTrue(readTaskCell.exists, "Read task cell should exist")
         // Tap the checkmark button for the Read task
-        let checkmark = app.buttons["checkmark_\(readTaskID)"]
+        var checkmark = app.buttons["checkmark_\(readTaskID)"]
+        if !checkmark.exists {
+            checkmark = app.otherElements["checkmark_\(readTaskID)"]
+        }
         XCTAssertTrue(checkmark.exists, "Checkmark for Read task should exist")
         checkmark.tap()
         // Relaunch app (no reset)
