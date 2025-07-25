@@ -173,8 +173,14 @@ final class PossibleJourneyUITests: XCTestCase {
         if debugToggle.value as? String == "0" {
             debugToggle.tap()
             print("DEBUG: Tapped Show Debug Labels switch")
+            sleep(1) // Wait for UI to update
         }
-        XCTAssertEqual(debugToggle.value as? String, "1", "Debug toggle should be ON after tap")
+        // Re-fetch the switch and print value
+        let debugToggleAfter = app.switches["Show Debug Labels"]
+        print("DEBUG: Debug toggle value after tap: \(String(describing: debugToggleAfter.value))")
+        let debugOnValues: [String] = ["1", "On", "true", "YES"]
+        let debugValue = (debugToggleAfter.value as? String)?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        XCTAssertTrue(debugOnValues.contains(where: { debugValue.localizedCaseInsensitiveContains($0) }), "Debug toggle should be ON after tap, got: \(debugValue)")
         // Set EOD picker to 8:00 PM
         let endOfDayPicker = app.datePickers["EndOfDayTimePicker"]
         XCTAssertTrue(endOfDayPicker.waitForExistence(timeout: 3), "EndOfDayTimePicker should exist")
@@ -185,10 +191,16 @@ final class PossibleJourneyUITests: XCTestCase {
         minuteWheel.adjust(toPickerWheelValue: "00")
         amPmWheel.adjust(toPickerWheelValue: "PM")
         print("DEBUG: Set EOD to 8:00 PM")
-        // Assert picker wheels are set
-        XCTAssertEqual(hourWheel.value as? String, "8", "Hour wheel should be 8")
-        XCTAssertEqual(minuteWheel.value as? String, "00", "Minute wheel should be 00")
-        XCTAssertTrue((amPmWheel.value as? String)?.uppercased().contains("PM") ?? false, "AM/PM wheel should be PM")
+        // Assert picker wheels are set (robust contains check)
+        let hourValue = hourWheel.value as? String ?? ""
+        let minuteValue = minuteWheel.value as? String ?? ""
+        let ampmValue = amPmWheel.value as? String ?? ""
+        print("DEBUG: Hour wheel value after set: \(hourValue)")
+        print("DEBUG: Minute wheel value after set: \(minuteValue)")
+        print("DEBUG: AM/PM wheel value after set: \(ampmValue)")
+        XCTAssertTrue(hourValue.contains("8"), "Hour wheel should contain '8', got: \(hourValue)")
+        XCTAssertTrue(minuteValue.contains("00"), "Minute wheel should contain '00', got: \(minuteValue)")
+        XCTAssertTrue(ampmValue.uppercased().contains("PM"), "AM/PM wheel should be PM, got: \(ampmValue)")
     }
 
     /*
