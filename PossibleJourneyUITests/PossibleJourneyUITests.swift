@@ -93,7 +93,7 @@ final class PossibleJourneyUITests: XCTestCase {
         let debugTaskIDsBefore = app.staticTexts["TaskIDsDebug"].label
         print("DEBUG: TaskIDsDebug before relaunch: \(debugTaskIDsBefore)")
         // Print debug completed task IDs before relaunch
-        let debugCompletedTaskIDsBefore = app.staticTexts["CompletedTaskIDsDebug"].label
+        let debugCompletedTaskIDsBefore = app.staticTexts["DebugCompletedTaskIDsLabel"].label
         print("DEBUG: CompletedTaskIDsDebug before relaunch: \(debugCompletedTaskIDsBefore)")
         // Get the Read task's ID (assume it's the first in the list)
         let readTaskID = debugTaskIDsBefore.components(separatedBy: ",").first!
@@ -123,7 +123,7 @@ final class PossibleJourneyUITests: XCTestCase {
         let debugTaskIDsAfter = app.staticTexts["TaskIDsDebug"].label
         print("DEBUG: TaskIDsDebug after relaunch: \(debugTaskIDsAfter)")
         // Print debug completed task IDs after relaunch
-        let debugCompletedTaskIDsAfter = app.staticTexts["CompletedTaskIDsDebug"].label
+        let debugCompletedTaskIDsAfter = app.staticTexts["DebugCompletedTaskIDsLabel"].label
         print("DEBUG: CompletedTaskIDsDebug after relaunch: \(debugCompletedTaskIDsAfter)")
         // Assert that the Read task's ID is present in the completed IDs after relaunch
         let completedTaskIDsAfter = debugCompletedTaskIDsAfter.components(separatedBy: ",")
