@@ -169,9 +169,9 @@ final class PossibleJourneyUITests: XCTestCase {
         let debugLabel = app.staticTexts["DEBUG"]
         let debugNowLabel = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'DEBUG now:'"))
         XCTAssertTrue(debugLabel.exists || debugNowLabel.count > 0, "Debug label should be visible in UI after toggling all switches")
-        // Go back to checklist
-        let backButton = app.buttons["Back"]
-        if backButton.exists { backButton.tap() }
+        // Removed: Go back to checklist
+        // let backButton = app.buttons["Back"]
+        // if backButton.exists { backButton.tap() }
     }
 
     func testSettingsDebugToggleAndEODPicker() {
