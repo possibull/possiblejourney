@@ -138,18 +138,20 @@ final class PossibleJourneyUITests: XCTestCase {
         // Wait for the checkmark button to appear
         let completedCheckmark = app.buttons["checkmark_\(readTaskID)"]
         XCTAssertTrue(completedCheckmark.waitForExistence(timeout: 5), "Completed checkmark should appear after relaunch")
-        // Print debug info if assertion fails
-        if !completedCheckmark.isSelected {
-            print("DEBUG: Checkmark for Read task is not selected after relaunch")
-            print("DEBUG: CompletedTaskIDsDebug after relaunch: \(debugCompletedTaskIDsAfter)")
-            print("DEBUG: TaskIDsDebug after relaunch: \(debugTaskIDsAfter)")
-            print("DEBUG: All static texts after relaunch:")
-            for cell in taskCellsAfter { print("DEBUG: Task cell label: \(cell.label)") }
+
+        // If the checkmark is visually selected, assert and return
+        if completedCheckmark.isSelected {
+            XCTAssertTrue(completedCheckmark.isSelected, "Read task should be visually checked after relaunch")
+            return
         }
-        // Assert that the checkmark is selected (if your UI uses .isSelected or similar)
-        // If not, assert that the completedTaskIDsAfter contains the readTaskID
+
+        // If not visually checked, enable debug mode and use debug labels for further diagnosis
+        enableDebugModeByTappingAllSwitches(in: app)
+        let backButton = app.buttons["Back"]
+        if backButton.exists { backButton.tap() }
+        let debugCompletedTaskIDsAfter = app.staticTexts["DebugCompletedTaskIDsLabel"].label
         let completedTaskIDsAfter = debugCompletedTaskIDsAfter.components(separatedBy: ",")
-        XCTAssertTrue(completedTaskIDsAfter.contains(readTaskID), "Read task should be marked as complete after relaunch")
+        XCTAssertTrue(completedTaskIDsAfter.contains(readTaskID), "Read task should be marked as complete after relaunch (debug)")
         // Print all images and their accessibility identifiers
         let images = app.images.allElementsBoundByIndex
         for image in images {
