@@ -44,34 +44,12 @@ struct DailyChecklistView: View {
             if viewModel.isDayMissed {
                 MissedDayScreen(
                     onContinue: {
-                        print("DEBUG: User clicked 'Continue Anyway' - advancing to next day")
-                        // Continue anyway - advance to next day
-                        let calendar = Calendar.current
-                        let currentAppDay = viewModel.program.appDay(for: viewModel.now)
-                        
-                        // Calculate the new start date to make today the next app day
-                        let newStartDate = calendar.date(byAdding: .day, value: -(currentAppDay - 1), to: calendar.startOfDay(for: viewModel.now))!
-                        
-                        let updatedProgram = Program(
-                            id: UUID(),
-                            startDate: newStartDate,
-                            numberOfDays: viewModel.program.numberOfDays,
-                            tasks: viewModel.program.tasks,
-                            endOfDayTime: viewModel.program.endOfDayTime
-                        )
-                        
-                        // Update the view model with the new program and clear current day's progress
-                        viewModel.program = updatedProgram
-                        viewModel.dailyProgress = DailyProgress(id: UUID(), date: Date(), completedTaskIDs: [])
-                        
-                        // Save the updated program and clear current day's progress
-                        ProgramStorage().save(updatedProgram)
-                        DailyProgressStorage().clearAll()
-                        print("DEBUG: Advanced to next day - new start date: \(newStartDate)")
+                        print("DEBUG: User clicked 'Continue Anyway' - dismissing Missed Day screen and returning to checklist")
+                        // Set a flag in the view model to temporarily ignore isDayMissed until the next app launch or checklist completion
+                        viewModel.ignoreMissedDayForCurrentSession = true
                     },
                     onMissed: {
                         print("DEBUG: User clicked 'I Missed It' - resetting to Day 1")
-                        // Reset program to Day 1 and clear all progress
                         let resetProgram = Program(
                             id: UUID(),
                             startDate: Date(),
@@ -81,8 +59,6 @@ struct DailyChecklistView: View {
                         )
                         viewModel.program = resetProgram
                         viewModel.dailyProgress = DailyProgress(id: UUID(), date: Date(), completedTaskIDs: [])
-                        
-                        // Save the reset program and clear all progress
                         ProgramStorage().save(resetProgram)
                         DailyProgressStorage().clearAll()
                         print("DEBUG: Reset to Day 1 - new start date: \(Date())")

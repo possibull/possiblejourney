@@ -32,8 +32,12 @@ class DailyChecklistViewModel: ObservableObject {
     @Published var program: Program
     @Published var dailyProgress: DailyProgress
     @Published var now: Date
+    @Published var ignoreMissedDayForCurrentSession: Bool = false
 
     var isDayMissed: Bool {
+        if ignoreMissedDayForCurrentSession {
+            return false
+        }
         let result = program.isDayMissed(for: now, completedTaskIDs: Set(dailyProgress.completedTaskIDs))
         print("DEBUG: DailyChecklistViewModel.isDayMissed - now: \(now), completedTaskIDs: \(dailyProgress.completedTaskIDs), result: \(result)")
         return result
