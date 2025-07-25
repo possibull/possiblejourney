@@ -61,7 +61,7 @@ struct DailyChecklistView: View {
     var onReset: (() -> Void)? = nil
     var currentTimeOverride: Date? = nil // For test injection
     @State private var debug = false
-    // DebugWindow state now managed globally
+    @State private var debugWindowExpanded = true // Not persistent
     
     // 75 Hard deep red
     let hardRed = Color(red: 183/255, green: 28/255, blue: 28/255)

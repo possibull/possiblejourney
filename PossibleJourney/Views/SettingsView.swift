@@ -4,8 +4,8 @@ import Foundation
 struct SettingsView: View {
     var onReset: (() -> Void)? = nil
     @Binding var endOfDayTime: Date
-    @AppStorage("debug") var debug: Bool = false
-    @AppStorage("debugWindowExpanded") var debugWindowExpanded: Bool = true
+    @State private var debug: Bool = false
+    @State private var debugWindowExpanded: Bool = true
     // Minimal test-only toggle for UI test isolation
     @State private var testDebug = false
     // 75 Hard deep red

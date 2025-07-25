@@ -12,8 +12,8 @@ import Foundation
 import SwiftUI
 
 struct GlobalDebugWindow: View {
-    @AppStorage("debug") var debug: Bool = false
-    @AppStorage("debugWindowExpanded") var debugWindowExpanded: Bool = true
+    @State private var debug: Bool = false
+    @State private var debugWindowExpanded: Bool = true
     @EnvironmentObject var appState: ProgramAppState
     var checklistDebugContent: () -> AnyView
     var body: some View {
