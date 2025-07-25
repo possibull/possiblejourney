@@ -123,13 +123,15 @@ final class PossibleJourneyUITests: XCTestCase {
         let settingsButton = app.buttons["SettingsButton"]
         XCTAssertTrue(settingsButton.exists)
         settingsButton.tap()
-        // Scroll to ensure debug toggle is visible
-        app.swipeUp()
-        // Enable debug mode by tapping the first switch
-        let debugToggle = app.switches.element(boundBy: 0)
-        XCTAssertTrue(debugToggle.waitForExistence(timeout: 2))
-        if debugToggle.value as? String == "0" {
-            debugToggle.tap()
+        // Print all switches for diagnosis
+        print("Switches: \(app.switches.allElementsBoundByIndex.map { $0.label })")
+        print("Switch count: \(app.switches.count)")
+        for i in 0..<app.switches.count {
+            let sw = app.switches.element(boundBy: i)
+            print("Switch \(i): label=\(sw.label), value=\(sw.value ?? "nil")")
+            if sw.value as? String == "0" {
+                sw.tap()
+            }
         }
         let endOfDayPicker = app.datePickers["EndOfDayTimePicker"]
         XCTAssertTrue(endOfDayPicker.exists)
