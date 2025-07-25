@@ -72,10 +72,12 @@ final class PossibleJourneyUITests: XCTestCase {
 
     func testChecklistTaskCompletionPersistsAfterRelaunch() throws {
         let app = launchAppWithReset()
-        // Add two tasks and save program
-        app.addTask(title: "Read", description: "Read 10 pages")
-        app.addTask(title: "Drink Water", description: "Drink 2L of water")
-        app.saveProgram()
+        // Use helper to set up program and tasks
+        setupProgram(app: app, tasks: [
+            (title: "Read", description: "Read 10 pages"),
+            (title: "Drink Water", description: "Drink 2L of water")
+        ], checkChecklist: true)
+        enableDebugModeByTappingAllSwitches(in: app)
         // Print task IDs before relaunch
         print("DEBUG: Task IDs before relaunch:")
         let taskCells = app.staticTexts.allElementsBoundByIndex
@@ -99,6 +101,7 @@ final class PossibleJourneyUITests: XCTestCase {
         app.terminate()
         app.launchArguments = []
         app.launch()
+        enableDebugModeByTappingAllSwitches(in: app)
         app.checkOnScreen(identifier: "DailyChecklistScreen", timeout: 5, message: "Should be on Daily Checklist screen after relaunch")
         // Print task IDs after relaunch
         print("DEBUG: Task IDs after relaunch:")
