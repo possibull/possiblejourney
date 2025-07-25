@@ -15,17 +15,11 @@ struct GlobalDebugWindow: View {
     @AppStorage("debug") var debug: Bool = false
     @AppStorage("debugWindowExpanded") var debugWindowExpanded: Bool = true
     @EnvironmentObject var appState: ProgramAppState
-    var checklistDebugContent: (() -> AnyView)?
+    var checklistDebugContent: () -> AnyView
     var body: some View {
         if debug {
             DebugWindow(isExpanded: $debugWindowExpanded) {
-                if let content = checklistDebugContent {
-                    content()
-                } else {
-                    Text("No debug info for this screen.")
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                }
+                checklistDebugContent()
             }
         }
     }
@@ -114,8 +108,9 @@ struct PossibleJourneyApp: App {
                                 .foregroundColor(.purple)
                                 .accessibilityIdentifier("TaskIDsDebug")
                         })
+                    } else {
+                        return AnyView(EmptyView())
                     }
-                    return AnyView(EmptyView())
                 })
             }
         }
