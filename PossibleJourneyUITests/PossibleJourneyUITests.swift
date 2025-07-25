@@ -152,6 +152,10 @@ final class PossibleJourneyUITests: XCTestCase {
         let settingsButton = app.buttons["SettingsButton"]
         XCTAssertTrue(settingsButton.waitForExistence(timeout: 2))
         settingsButton.tap()
+        enableDebugModeByTappingAllSwitchesInSettings(in: app)
+    }
+
+    func enableDebugModeByTappingAllSwitchesInSettings(in app: XCUIApplication) {
         let allSwitches = app.switches.allElementsBoundByIndex
         for (index, sw) in allSwitches.enumerated() {
             print("DEBUG: Switch[\(index)]: label='\(sw.label)', value='\(sw.value ?? "nil")'")
@@ -245,12 +249,13 @@ final class PossibleJourneyUITests: XCTestCase {
     func setupMissedDayScenario(app: XCUIApplication, eodHour: String = "8", missedTime: String = "2025-07-24T21:00:00Z") {
         // Setup program
         setupProgram(app: app)
-        // Enable debug mode using the robust helper
-        enableDebugModeByTappingAllSwitches(in: app)
-        // Set EOD picker
+        // Go to Settings
         let settingsButton = app.buttons["SettingsButton"]
         XCTAssertTrue(settingsButton.waitForExistence(timeout: 2))
         settingsButton.tap()
+        // Enable debug mode (assume already in Settings)
+        enableDebugModeByTappingAllSwitchesInSettings(in: app)
+        // Set EOD picker
         let endOfDayPicker = app.datePickers["EndOfDayTimePicker"]
         XCTAssertTrue(endOfDayPicker.waitForExistence(timeout: 3), "EndOfDayTimePicker should exist")
         let hourWheel = endOfDayPicker.pickerWheels.element(boundBy: 0)
