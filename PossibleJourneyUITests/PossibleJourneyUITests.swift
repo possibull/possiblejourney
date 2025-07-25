@@ -123,7 +123,10 @@ final class PossibleJourneyUITests: XCTestCase {
         let settingsButton = app.buttons["SettingsButton"]
         XCTAssertTrue(settingsButton.exists)
         settingsButton.tap()
-        // Print all switches for diagnosis
+        // Wait for the Settings page to be visible
+        let endOfDayPicker = app.datePickers["EndOfDayTimePicker"]
+        XCTAssertTrue(endOfDayPicker.waitForExistence(timeout: 2))
+        // Print all switches for diagnosis and tap each
         print("Switches: \(app.switches.allElementsBoundByIndex.map { $0.label })")
         print("Switch count: \(app.switches.count)")
         for i in 0..<app.switches.count {
