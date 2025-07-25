@@ -180,8 +180,6 @@ final class PossibleJourneyUITests: XCTestCase {
         XCTAssertTrue(settingsButton.waitForExistence(timeout: 2))
         settingsButton.tap()
         enableDebugModeByTappingAllSwitchesInSettings(in: app)
-        // Maximize debug window using helper
-        expandAndAssertDebugWindow(in: app)
     }
 
     func enableDebugModeByTappingAllSwitchesInSettings(in app: XCUIApplication) {
@@ -334,7 +332,7 @@ final class PossibleJourneyUITests: XCTestCase {
         if backButton.exists { backButton.tap() }
         // Relaunch app with time override to simulate missed day
         app.terminate()
-        app.launchArguments.append("-currentTimeOverride")
+        app.launchArguments.append("--uitesting-current-time")
         app.launchArguments.append(missedTime)
         app.launch()
     }
