@@ -262,10 +262,26 @@ final class PossibleJourneyUITests: XCTestCase {
         settingsButton.tap()
         // Enable and maximize debug
         enableDebugModeByTappingAllSwitchesInSettings(in: app)
-        // Tap the expand debug window icon
-        let expandButton = app.otherElements["ExpandDebugWindow"]
-        XCTAssertTrue(expandButton.waitForExistence(timeout: 2), "Expand debug window icon should exist")
-        expandButton.tap()
+        // Tap the expand debug window icon (try multiple element types)
+        var didTapExpand = false
+        let expandButton = app.buttons["ExpandDebugWindow"]
+        if expandButton.exists {
+            expandButton.tap()
+            didTapExpand = true
+        } else {
+            let expandOther = app.otherElements["ExpandDebugWindow"]
+            if expandOther.exists {
+                expandOther.tap()
+                didTapExpand = true
+            } else {
+                let expandImage = app.images["ExpandDebugWindow"]
+                if expandImage.exists {
+                    expandImage.tap()
+                    didTapExpand = true
+                }
+            }
+        }
+        XCTAssertTrue(didTapExpand, "Expand debug window icon should exist and be tappable (button, other, or image)")
         // Assert debug window is maximized
         let programUUIDLabel = app.staticTexts["DebugProgramUUIDLabel"]
         XCTAssertTrue(programUUIDLabel.waitForExistence(timeout: 2), "Debug window should be maximized and show Program UUID label")
