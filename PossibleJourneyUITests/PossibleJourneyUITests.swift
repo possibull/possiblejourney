@@ -318,6 +318,26 @@ final class PossibleJourneyUITests: XCTestCase {
                 }
             }
         }
+        // Tap all switches with value '0' to ensure debug is ON
+        let allSwitchesAfter = app.switches.allElementsBoundByIndex
+        for (index, sw) in allSwitchesAfter.enumerated() {
+            print("DEBUG: Switch[\(index)]: label='\(sw.label)', value='\(sw.value ?? "nil")'")
+            if sw.value as? String == "0" {
+                sw.tap()
+                print("DEBUG: Tapped switch[\(index)] with label '\(sw.label)'")
+                sleep(1)
+            }
+        }
+        // Check for a visible debug label in the UI
+        let debugLabel = app.staticTexts["DEBUG"]
+        let debugNowLabel = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'DEBUG now:'"))
+        print("DEBUG: Checking for visible debug label in UI...")
+        // Print all static texts for confirmation
+        let allStaticTexts = app.staticTexts.allElementsBoundByIndex
+        for (index, text) in allStaticTexts.enumerated() {
+            print("DEBUG: StaticText[\(index)]: '\(text.label)'")
+        }
+        XCTAssertTrue(debugLabel.exists || debugNowLabel.count > 0, "Debug label should be visible in UI after toggling switches")
     }
 
     func setupMissedDayScenario(app: XCUIApplication, eodHour: String = "8", missedTime: String = "2025-07-24T21:00:00Z") {
