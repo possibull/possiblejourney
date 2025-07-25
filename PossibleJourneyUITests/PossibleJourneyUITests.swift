@@ -325,7 +325,7 @@ final class PossibleJourneyUITests: XCTestCase {
         XCTAssertTrue(overriddenTime >= programStartDate, message + " (overridden: \(overriddenTime), start: \(programStartDate))")
     }
 
-    func setupMissedDayScenario(app: XCUIApplication, eodHour: String = "8", missedTime: String = "2025-07-24T21:00:00Z") {
+    func setupMissedDayScenario(app: XCUIApplication, eodHour: String = "8", missedTime: String? = nil) {
         // Setup program
         setupProgram(app: app)
         // Go to Settings
@@ -347,10 +347,39 @@ final class PossibleJourneyUITests: XCTestCase {
         // Go back to checklist
         let backButton = app.buttons["Back"]
         if backButton.exists { backButton.tap() }
+        // Compute missedTime within program's range if not provided
+        var missedTimeToUse = missedTime
+        if missedTimeToUse == nil {
+            // Wait for debug overlay to appear
+            let programStartDateLabel = app.staticTexts["DebugProgramStartDateLabel"]
+            XCTAssertTrue(programStartDateLabel.waitForExistence(timeout: 2), "Program start date label should exist")
+            let programStartDateString = programStartDateLabel.label.replacingOccurrences(of: "DEBUG Program Start Date: ", with: "")
+            // Try to parse as ISO8601, fallback to DateFormatter
+            let isoFormatter = ISO8601DateFormatter()
+            var startDate: Date? = isoFormatter.date(from: programStartDateString)
+            if startDate == nil {
+                let fallbackFormatter = DateFormatter()
+                fallbackFormatter.dateStyle = .medium
+                fallbackFormatter.timeStyle = .medium
+                startDate = fallbackFormatter.date(from: programStartDateString)
+            }
+            guard let programStart = startDate else {
+                XCTFail("Could not parse program start date for missed day scenario")
+                return
+            }
+            // Add 1 day and set time to 9PM
+            var comps = Calendar.current.dateComponents([.year, .month, .day], from: programStart)
+            comps.day = (comps.day ?? 0) + 1
+            comps.hour = 21
+            comps.minute = 0
+            comps.second = 0
+            let missedDate = Calendar.current.date(from: comps) ?? programStart.addingTimeInterval(60*60*24 + 60*60*21)
+            missedTimeToUse = String(Int(missedDate.timeIntervalSince1970))
+        }
         // Relaunch app with time override to simulate missed day
         app.terminate()
         app.launchArguments.append("--uitesting-current-time")
-        app.launchArguments.append(missedTime)
+        app.launchArguments.append(missedTimeToUse!)
         app.launch()
         // Assert overridden time is within program's range
         assertOverriddenTimeWithinProgramRange(app: app)
