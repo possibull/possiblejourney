@@ -244,15 +244,28 @@ final class PossibleJourneyUITests: XCTestCase {
         app.buttons["I Missed It"].tap()
         app.checkOnScreen(identifier: "DailyChecklistScreen", message: "Should return to checklist screen")
         
-        // Re-enable debug labels after reset
-        enableDebugLabels(in: app)
-        
-        // Debug: Print all static text to see what's actually displayed
+        // Print all buttons and static texts after reset
+        print("DEBUG: All buttons after 'I Missed It' reset:")
+        let allButtons = app.buttons.allElementsBoundByIndex
+        for (index, button) in allButtons.enumerated() {
+            print("DEBUG: Button[\(index)]: label='\(button.label)', identifier='\(button.identifier)'")
+        }
         print("DEBUG: All static text after 'I Missed It' reset:")
         let allStaticTexts = app.staticTexts.allElementsBoundByIndex
         for (index, text) in allStaticTexts.enumerated() {
             print("DEBUG: StaticText[\(index)]: '\(text.label)'")
         }
+        
+        // If SettingsButton is not found but Back is, tap Back
+        let settingsButton = app.buttons["SettingsButton"]
+        let backButton = app.buttons["Back"]
+        if !settingsButton.exists && backButton.exists {
+            print("DEBUG: SettingsButton not found, tapping Back to return to checklist")
+            backButton.tap()
+        }
+        
+        // Re-enable debug labels after reset
+        enableDebugLabels(in: app)
         
         // Check for DAY 1 or any day number
         let dayLabel = app.staticTexts["DAY 1"]
