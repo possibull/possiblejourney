@@ -265,10 +265,13 @@ struct DailyChecklistView: View {
                     .padding(.bottom, 16)
                 }
                 // NavigationLink for SettingsView
-                NavigationLink(destination: SettingsView(onReset: {
-                    showSettingsNav = false
-                    onReset?()
-                }, endOfDayTime: $viewModel.program.endOfDayTime), isActive: $showSettingsNav) {
+                NavigationLink(destination:
+                    SettingsView(onReset: {
+                        showSettingsNav = false
+                        onReset?()
+                    }, endOfDayTime: $viewModel.program.endOfDayTime)
+                        .environmentObject(debugState)
+                , isActive: $showSettingsNav) {
                     EmptyView()
                 }
             }
