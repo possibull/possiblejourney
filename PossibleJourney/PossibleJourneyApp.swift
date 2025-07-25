@@ -85,13 +85,14 @@ struct PossibleJourneyApp: App {
                 }
                 // Global DebugWindow always visible at top
                 GlobalDebugWindow(checklistDebugContent: {
+                    let debugTime = currentTimeOverride ?? Date()
                     if let program = appState.loadedProgram {
                         let now = currentTimeOverride ?? Date()
                         let activeDay = program.nextActiveDay(currentDate: now) ?? Calendar.current.startOfDay(for: now)
                         let dailyProgress = DailyProgressStorage().load(for: activeDay) ?? DailyProgress(id: UUID(), date: activeDay, completedTaskIDs: [])
                         let viewModel = DailyChecklistViewModel(program: program, dailyProgress: dailyProgress, now: now)
                         return AnyView(Group {
-                            Text("DEBUG Current Time: \(Date())")
+                            Text("DEBUG Overridden Time: \(debugTime)")
                                 .font(.caption)
                                 .foregroundColor(.orange)
                                 .accessibilityIdentifier("DebugCurrentTimeLabel")
@@ -129,7 +130,7 @@ struct PossibleJourneyApp: App {
                         let storedProgram = ProgramStorage().load()
                         return AnyView(
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("DEBUG Current Time: \(Date())")
+                                Text("DEBUG Overridden Time: \(debugTime)")
                                     .font(.caption)
                                     .foregroundColor(.orange)
                                     .accessibilityIdentifier("DebugCurrentTimeLabel")
