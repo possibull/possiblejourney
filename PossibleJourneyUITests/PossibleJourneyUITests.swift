@@ -189,11 +189,11 @@ final class PossibleJourneyUITests: XCTestCase {
         let expandButton = app.buttons["ExpandDebugWindow"]
         if expandButton.exists {
             expandButton.tap()
-            // Check if window is expanded (optionally, check for a label or state)
-            // If not expanded, fail immediately
-            if expandButton.exists { // If still exists, assume not expanded
-                XCTFail("Failed to expand debug window via ExpandDebugWindow button")
-                fatalError("Failed to expand debug window via ExpandDebugWindow button")
+            // Check for expanded debug content
+            let programUUIDLabel = app.staticTexts["DebugProgramUUIDLabel"]
+            if !programUUIDLabel.waitForExistence(timeout: 2) {
+                XCTFail("Failed to maximize debug window: DebugProgramUUIDLabel not visible after expand")
+                fatalError("Failed to maximize debug window: DebugProgramUUIDLabel not visible after expand")
             }
         }
     }
@@ -216,11 +216,11 @@ final class PossibleJourneyUITests: XCTestCase {
         let expandButton = app.buttons["ExpandDebugWindow"]
         if expandButton.exists {
             expandButton.tap()
-            // Check if window is expanded (optionally, check for a label or state)
-            // If not expanded, fail immediately
-            if expandButton.exists { // If still exists, assume not expanded
-                XCTFail("Failed to expand debug window via ExpandDebugWindow button")
-                fatalError("Failed to expand debug window via ExpandDebugWindow button")
+            // Check for expanded debug content
+            let programUUIDLabel = app.staticTexts["DebugProgramUUIDLabel"]
+            if !programUUIDLabel.waitForExistence(timeout: 2) {
+                XCTFail("Failed to maximize debug window: DebugProgramUUIDLabel not visible after expand")
+                fatalError("Failed to maximize debug window: DebugProgramUUIDLabel not visible after expand")
             }
         }
     }
@@ -230,9 +230,6 @@ final class PossibleJourneyUITests: XCTestCase {
         setupProgram(app: app)
         enableDebugModeByTappingAllSwitches(in: app)
         // Set EOD picker to 8:00 PM
-        let settingsButton = app.buttons["SettingsButton"]
-        XCTAssertTrue(settingsButton.waitForExistence(timeout: 2))
-        settingsButton.tap()
         let endOfDayPicker = app.datePickers["EndOfDayTimePicker"]
         XCTAssertTrue(endOfDayPicker.waitForExistence(timeout: 3), "EndOfDayTimePicker should exist")
         let hourWheel = endOfDayPicker.pickerWheels.element(boundBy: 0)
