@@ -154,9 +154,24 @@ final class PossibleJourneyUITests: XCTestCase {
             attempts += 1
         }
         XCTAssertTrue(debugToggle.waitForExistence(timeout: 2), "Debug toggle should exist")
-        if debugToggle.value as? String == "0" {
+        print("Debug toggle value before tap: \(debugToggle.value ?? "nil")")
+        if debugToggle.exists && debugToggle.isHittable && debugToggle.value as? String == "0" {
             debugToggle.tap()
+            sleep(1)
+            // Tap again in case first tap just scrolls into view
+            if debugToggle.value as? String == "0" {
+                debugToggle.tap()
+            }
+        } else if debugToggle.exists {
+            // Try coordinate tap if not hittable
+            let coord = debugToggle.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+            coord.tap()
+            sleep(1)
+            if debugToggle.value as? String == "0" {
+                coord.tap()
+            }
         }
+        print("Debug toggle value after tap: \(debugToggle.value ?? "nil")")
         // Set the picker to a fixed time: 8:00 PM
         let calendar = Calendar.current
         let eodHour = 20 // 8:00 PM
