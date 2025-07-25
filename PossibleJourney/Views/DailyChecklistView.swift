@@ -18,9 +18,7 @@ struct DebugWindow<Content: View>: View {
             HStack {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(.white)
-                Text(isExpanded ? "Debug (tap to minimize)" : "Debug (tap to expand)")
-                    .font(.caption.bold())
-                    .foregroundColor(.white)
+                // Removed the Debug (tap to expand/minimize) text
                 Spacer()
             }
             .padding(.horizontal, 12)
