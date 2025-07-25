@@ -108,7 +108,7 @@ final class PossibleJourneyUITests: XCTestCase {
             backButton.tap()
         }
         app.checkOnScreen(identifier: "DailyChecklistScreen", timeout: 5, message: "Should be on Daily Checklist screen after relaunch")
-        // Print task IDs after relaunch
+        // Print task IDs after relaunch (now on checklist)
         print("DEBUG: Task IDs after relaunch:")
         let taskCellsAfter = app.staticTexts.allElementsBoundByIndex
         for cell in taskCellsAfter {
