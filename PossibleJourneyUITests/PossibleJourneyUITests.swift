@@ -212,6 +212,23 @@ final class PossibleJourneyUITests: XCTestCase {
         XCTAssertTrue(ampmValue.uppercased().contains("PM"), "AM/PM wheel should be PM, got: \(ampmValue)")
     }
 
+    func testMinimalTestDebugToggleWorks() {
+        let app = launchAppWithReset()
+        setupProgram(app: app)
+        let settingsButton = app.buttons["SettingsButton"]
+        XCTAssertTrue(settingsButton.waitForExistence(timeout: 2))
+        settingsButton.tap()
+        let testDebugToggle = app.switches["TestDebugToggle"]
+        XCTAssertTrue(testDebugToggle.waitForExistence(timeout: 2), "TestDebugToggle should exist")
+        if testDebugToggle.value as? String == "0" {
+            testDebugToggle.tap()
+            print("DEBUG: Tapped TestDebugToggle switch")
+            sleep(1)
+        }
+        let testDebugLabel = app.staticTexts["TestDebugLabel"]
+        XCTAssertTrue(testDebugLabel.waitForExistence(timeout: 2), "TEST DEBUG ON label should appear after toggling TestDebugToggle")
+    }
+
     /*
     func testResetProgramReturnsToSetupScreen() throws {
         let app = XCUIApplication()

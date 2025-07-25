@@ -4,6 +4,8 @@ struct SettingsView: View {
     var onReset: (() -> Void)? = nil
     @Binding var endOfDayTime: Date
     @Binding var debug: Bool
+    // Minimal test-only toggle for UI test isolation
+    @State private var testDebug = false
     // 75 Hard deep red
     let hardRed = Color(red: 183/255, green: 28/255, blue: 28/255)
     @Environment(\.presentationMode) private var presentationMode
@@ -42,6 +44,15 @@ struct SettingsView: View {
                         print("DEBUG TOGGLE: \(newValue)")
                     }
                     .padding(.horizontal)
+                // Minimal test toggle
+                Toggle("Test Debug Toggle", isOn: $testDebug)
+                    .accessibilityIdentifier("TestDebugToggle")
+                    .padding(.horizontal)
+                if testDebug {
+                    Text("TEST DEBUG ON")
+                        .foregroundColor(.green)
+                        .accessibilityIdentifier("TestDebugLabel")
+                }
                 // End of Day Time Picker Section in Form
                 Form {
                     Section(header: Text("End of Day Time").font(.headline).foregroundColor(hardRed)) {
