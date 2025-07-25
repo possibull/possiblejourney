@@ -19,28 +19,44 @@ extension Program {
         }
         return diff + 1
     }
+    
     func isDayMissed(for date: Date, completedTaskIDs: Set<UUID>) -> Bool {
         let calendar = Calendar.current
+        
+        // Get the app day for the given date
+        let appDayNumber = appDay(for: date)
+        
+        // If we're before the program starts or after it ends, no missed day
+        if appDayNumber < 1 || appDayNumber > numberOfDays {
+            return false
+        }
+        
+        // Calculate the end of the app day
         let endHour = calendar.component(.hour, from: endOfDayTime)
         let endMinute = calendar.component(.minute, from: endOfDayTime)
-        var appDayToCheck = self.appDay(for: date)
-        var appDayStart = calendar.date(byAdding: .day, value: appDayToCheck - 1, to: calendar.startOfDay(for: startDate))!
-        var endOfAppDay: Date
+        
+        // Calculate the start of the app day (calendar day)
+        let appDayStart = calendar.date(byAdding: .day, value: appDayNumber - 1, to: calendar.startOfDay(for: startDate))!
+        
+        // Calculate the end of the app day based on EOD time
+        let endOfAppDay: Date
         if endHour < 12 {
-            // AM: EOD is next calendar day at that time
-            let eod = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: calendar.date(byAdding: .day, value: 1, to: appDayStart)!)!
-            if date < eod {
-                appDayToCheck -= 1
-                if appDayToCheck < 1 || appDayToCheck > numberOfDays { return false }
-                appDayStart = calendar.date(byAdding: .day, value: appDayToCheck - 1, to: calendar.startOfDay(for: startDate))!
-            }
-            endOfAppDay = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: calendar.date(byAdding: .day, value: 1, to: appDayStart)!)!
+            // AM EOD: end of day is next calendar day at that time
+            let nextDay = calendar.date(byAdding: .day, value: 1, to: appDayStart)!
+            endOfAppDay = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: nextDay)!
         } else {
-            // PM: EOD is today at that time
+            // PM EOD: end of day is same calendar day at that time
             endOfAppDay = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: appDayStart)!
         }
-        if appDayToCheck < 1 || appDayToCheck > numberOfDays { return false }
-        let missed = tasks.contains { !completedTaskIDs.contains($0.id) }
-        return date >= endOfAppDay && missed
+        
+        // Check if we're past the end of the app day
+        guard date >= endOfAppDay else {
+            return false // Not past EOD yet
+        }
+        
+        // Check if any tasks are incomplete
+        let hasIncompleteTasks = tasks.contains { !completedTaskIDs.contains($0.id) }
+        
+        return hasIncompleteTasks
     }
 } 

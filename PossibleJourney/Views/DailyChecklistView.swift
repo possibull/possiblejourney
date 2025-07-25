@@ -13,7 +13,6 @@ struct DailyChecklistView: View {
     @State private var showSettings = false
     @State private var showCalendar = false
     @State private var showSettingsNav = false
-    @State private var showMissedDayModal = false
     @State private var hideCompletedTasks = false
     @State private var notesForTask: [UUID: String] = [:]
     // Wrapper for Identifiable UUID for sheet
@@ -39,34 +38,31 @@ struct DailyChecklistView: View {
         formatter.dateStyle = .medium
         return formatter.string(from: today)
     }
-    // Helper to compute app day start and end based on endOfDayTime
-    private func appDayBounds(for date: Date) -> (start: Date, end: Date) {
-        let calendar = Calendar.current
-        let endHour = calendar.component(.hour, from: viewModel.program.endOfDayTime)
-        let endMinute = calendar.component(.minute, from: viewModel.program.endOfDayTime)
-        let startOfToday = calendar.startOfDay(for: date)
-        var endOfAppDay: Date
-        if endHour < 12 {
-            // AM: end of day is next calendar day at that time
-            let nextDay = calendar.date(byAdding: .day, value: 1, to: startOfToday)!
-            endOfAppDay = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: nextDay) ?? date
-        } else {
-            // PM: end of day is today at that time
-            endOfAppDay = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: startOfToday) ?? date
-        }
-        // Start of app day is previous end of day + 1 second
-        let startOfAppDay = calendar.date(byAdding: .second, value: 1, to: endOfAppDay.addingTimeInterval(-86400)) ?? date
-        return (startOfAppDay, endOfAppDay)
-    }
 
     var body: some View {
         ZStack {
             if viewModel.isDayMissed {
-                MissedDayScreen(onContinue: {
-                    // Handle continue logic here
-                }, onMissed: {
-                    // Handle missed logic here
-                })
+                MissedDayScreen(
+                    onContinue: {
+                        // Continue anyway - do nothing, just let the user continue with current day
+                    },
+                    onMissed: {
+                        // Reset program to Day 1 and clear all progress
+                        let resetProgram = Program(
+                            id: UUID(),
+                            startDate: Date(),
+                            numberOfDays: viewModel.program.numberOfDays,
+                            tasks: viewModel.program.tasks,
+                            endOfDayTime: viewModel.program.endOfDayTime
+                        )
+                        viewModel.program = resetProgram
+                        viewModel.dailyProgress = DailyProgress(id: UUID(), date: Date(), completedTaskIDs: [])
+                        
+                        // Save the reset program and clear all progress
+                        ProgramStorage().save(resetProgram)
+                        DailyProgressStorage().clearAll()
+                    }
+                )
                 .accessibilityIdentifier("MissedDayScreen")
             } else {
                 // Move visibleTasks inside the view builder
@@ -126,7 +122,7 @@ struct DailyChecklistView: View {
                             .foregroundColor(.green)
                             .accessibilityIdentifier("DebugCompletedTaskIDsLabel")
                         // Debug label for showMissedDayModal
-                        Text("DEBUG showMissedDayModal: \(showMissedDayModal ? "YES" : "NO")")
+                        Text("DEBUG showMissedDayModal: \(viewModel.isDayMissed ? "YES" : "NO")")
                             .font(.caption)
                             .foregroundColor(.red)
                             .accessibilityIdentifier("DebugShowMissedDayModalLabel")
@@ -255,15 +251,6 @@ struct DailyChecklistView: View {
                 viewModel.now = Date()
             }
             print("DEBUG: onAppear - viewModel.now = \(viewModel.now), currentTimeOverride = \(String(describing: currentTimeOverride))")
-            // Show missed day modal if the view model says the day is missed
-            if viewModel.isDayMissed {
-                showMissedDayModal = true
-            }
-        }
-        .onChange(of: viewModel.isDayMissed) { isMissed in
-            if isMissed {
-                showMissedDayModal = true
-            }
         }
         .onChange(of: viewModel.program.endOfDayTime) { newValue in
             ProgramStorage().save(viewModel.program)
