@@ -359,8 +359,7 @@ final class PossibleJourneyUITests: XCTestCase {
             var startDate: Date? = isoFormatter.date(from: programStartDateString)
             if startDate == nil {
                 let fallbackFormatter = DateFormatter()
-                fallbackFormatter.dateStyle = .medium
-                fallbackFormatter.timeStyle = .medium
+                fallbackFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss Z"
                 startDate = fallbackFormatter.date(from: programStartDateString)
             }
             guard let programStart = startDate else {
