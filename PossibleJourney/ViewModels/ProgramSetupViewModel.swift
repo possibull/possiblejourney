@@ -34,13 +34,30 @@ class DailyChecklistViewModel: ObservableObject {
     @Published var now: Date
     @Published var ignoreMissedDayForCurrentSession: Bool = false
 
+    // The current active day is determined by program.nextActiveDay(now)
+    var currentActiveDay: Date {
+        program.currentAppDay
+    }
+
     var isDayMissed: Bool {
         if ignoreMissedDayForCurrentSession {
             return false
         }
-        let result = program.isDayMissed(for: now, completedTaskIDs: Set(dailyProgress.completedTaskIDs))
-        print("DEBUG: DailyChecklistViewModel.isDayMissed - now: \(now), completedTaskIDs: \(dailyProgress.completedTaskIDs), result: \(result)")
-        return result
+        return program.isCurrentAppDayMissed(now: now, completedTaskIDs: Set(dailyProgress.completedTaskIDs))
+    }
+
+    func completeCurrentDay() {
+        // Called when all tasks are completed for the current day
+        program.lastCompletedDay = currentActiveDay
+        // Save program with updated lastCompletedDay
+        ProgramStorage().save(program)
+    }
+
+    func resetProgramToToday() {
+        // Called when user taps 'I Missed It'
+        program.startDate = Calendar.current.startOfDay(for: now)
+        program.lastCompletedDay = nil
+        ProgramStorage().save(program)
     }
 
     init(program: Program, dailyProgress: DailyProgress, now: Date = Date()) {

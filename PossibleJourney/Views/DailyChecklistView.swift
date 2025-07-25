@@ -45,19 +45,17 @@ struct DailyChecklistView: View {
                 MissedDayScreen(
                     onContinue: {
                         print("DEBUG: User clicked 'Continue Anyway' - dismissing Missed Day screen and returning to checklist (no changes to program or progress)")
-                        // Only set the flag to allow checklist view for this session; do not modify program or progress
                         viewModel.ignoreMissedDayForCurrentSession = true
                     },
                     onMissed: {
-                        print("DEBUG: User clicked 'I Missed It' - clearing all progress but keeping program unchanged")
-                        // Only clear all progress, do not reset the program
-                        DailyProgressStorage().clearAll()
-                        viewModel.dailyProgress = DailyProgress(id: UUID(), date: Date(), completedTaskIDs: [])
+                        print("DEBUG: User clicked 'I Missed It' - resetting program start date to today, keeping progress for history")
+                        viewModel.resetProgramToToday()
                     }
                 )
                 .accessibilityIdentifier("MissedDayScreen")
             } else {
-                // Move visibleTasks inside the view builder
+                // Use currentActiveDay for checklist
+                let checklistDate = viewModel.currentActiveDay ?? viewModel.now
                 let visibleTasks: [Task] = viewModel.program.tasks.filter { !hideCompletedTasks || !viewModel.dailyProgress.completedTaskIDs.contains($0.id) }
                 VStack(spacing: 0) {
                     // Header row with logo, DAY XX, and checklist icon
@@ -142,6 +140,10 @@ struct DailyChecklistView: View {
                                         let progress = DailyProgress(id: UUID(), date: viewModel.dailyProgress.date, completedTaskIDs: Array(completed))
                                         viewModel.dailyProgress = progress
                                         DailyProgressStorage().save(progress: progress)
+                                        // If all tasks are now complete, update lastCompletedDay
+                                        if viewModel.program.tasks.allSatisfy({ completed.contains($0.id) }) {
+                                            viewModel.completeCurrentDay()
+                                        }
                                     }) {
                                         ZStack {
                                             Circle()

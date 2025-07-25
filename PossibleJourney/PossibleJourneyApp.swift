@@ -34,13 +34,14 @@ struct PossibleJourneyApp: App {
         return WindowGroup {
             NavigationStack {
                 if let program = appState.loadedProgram {
-                    let today = Calendar.current.startOfDay(for: Date())
-                    let dailyProgress = DailyProgressStorage().load(for: today) ?? DailyProgress(id: UUID(), date: today, completedTaskIDs: [])
+                    let now = currentTimeOverride ?? Date()
+                    let activeDay = program.nextActiveDay(currentDate: now) ?? Calendar.current.startOfDay(for: now)
+                    let dailyProgress = DailyProgressStorage().load(for: activeDay) ?? DailyProgress(id: UUID(), date: activeDay, completedTaskIDs: [])
                     DailyChecklistView(
                         viewModel: DailyChecklistViewModel(
                             program: program,
                             dailyProgress: dailyProgress,
-                            now: currentTimeOverride ?? Date()
+                            now: now
                         ),
                         onReset: {
                             appState.loadedProgram = nil

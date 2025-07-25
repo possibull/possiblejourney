@@ -2,10 +2,11 @@ import Foundation
 
 struct Program: Codable {
     let id: UUID
-    let startDate: Date
+    var startDate: Date
     let numberOfDays: Int
     var tasks: [Task]
     var endOfDayTime: Date = Calendar.current.startOfDay(for: Date()) // Default 12:00AM
+    var lastCompletedDay: Date? = nil // New property
 }
 
 extension Program {
@@ -20,26 +21,36 @@ extension Program {
         return diff + 1
     }
     
+    /// Returns the date/time when the next app day is allowed to start, based on EOD and 12AM rules
+    func nextAppDayBoundary(after date: Date) -> Date {
+        let calendar = Calendar.current
+        let endHour = calendar.component(.hour, from: endOfDayTime)
+        let endMinute = calendar.component(.minute, from: endOfDayTime)
+        let startOfDate = calendar.startOfDay(for: date)
+        let eodBoundary: Date
+        if endHour < 12 {
+            // EOD is AM: next day boundary is at EOD (e.g., 2AM)
+            let nextDay = calendar.date(byAdding: .day, value: 1, to: startOfDate)!
+            eodBoundary = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: nextDay)!
+        } else {
+            // EOD is PM: end of day is same calendar day at that time
+            eodBoundary = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: startOfDate)!
+        }
+        let midnightBoundary = calendar.startOfDay(for: calendar.date(byAdding: .day, value: 1, to: startOfDate)!)
+        // The next day becomes active after whichever is later: EOD or 12AM
+        return max(eodBoundary, midnightBoundary)
+    }
+    
     func isDayMissed(for date: Date, completedTaskIDs: Set<UUID>) -> Bool {
         let calendar = Calendar.current
-        
-        // Get the app day for the given date
         let appDayNumber = appDay(for: date)
-        
-        // If we're before the program starts or after it ends, no missed day
         if appDayNumber < 1 || appDayNumber > numberOfDays {
             print("DEBUG: Program.isDayMissed - appDayNumber \(appDayNumber) out of range [1, \(numberOfDays)], returning false")
             return false
         }
-        
-        // Calculate the end of the app day
         let endHour = calendar.component(.hour, from: endOfDayTime)
         let endMinute = calendar.component(.minute, from: endOfDayTime)
-        
-        // Calculate the start of the app day (calendar day)
         let appDayStart = calendar.date(byAdding: .day, value: appDayNumber - 1, to: calendar.startOfDay(for: startDate))!
-        
-        // Calculate the end of the app day based on EOD time
         let endOfAppDay: Date
         if endHour < 12 {
             // AM EOD: end of day is next calendar day at that time
@@ -49,19 +60,65 @@ extension Program {
             // PM EOD: end of day is same calendar day at that time
             endOfAppDay = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: appDayStart)!
         }
-        
         print("DEBUG: Program.isDayMissed - appDayNumber: \(appDayNumber), date: \(date), endOfAppDay: \(endOfAppDay), endHour: \(endHour), endMinute: \(endMinute)")
-        
-        // Check if we're past the end of the app day
         guard date >= endOfAppDay else {
             print("DEBUG: Program.isDayMissed - not past EOD yet, returning false")
-            return false // Not past EOD yet
+            return false
         }
-        
-        // Check if any tasks are incomplete
         let hasIncompleteTasks = tasks.contains { !completedTaskIDs.contains($0.id) }
-        
         print("DEBUG: Program.isDayMissed - past EOD, hasIncompleteTasks: \(hasIncompleteTasks), returning \(hasIncompleteTasks)")
         return hasIncompleteTasks
+    }
+    
+    /// Returns true if the app can advance to the next day, based on EOD and midnight rules
+    func canAdvanceToNextDay(currentDate: Date, lastCompletedDay: Date?) -> Bool {
+        guard let lastCompleted = lastCompletedDay else { return false }
+        let boundary = nextAppDayBoundary(after: lastCompleted)
+        return currentDate >= boundary
+    }
+    
+    /// Returns the next active day (date) based on lastCompletedDay and advancement rules
+    func nextActiveDay(currentDate: Date) -> Date? {
+        guard let lastCompleted = lastCompletedDay else { return startDate }
+        let boundary = nextAppDayBoundary(after: lastCompleted)
+        if currentDate >= boundary {
+            // Next day is active
+            return Calendar.current.date(byAdding: .day, value: 1, to: Calendar.current.startOfDay(for: lastCompleted))
+        } else {
+            // Still on last completed day
+            return lastCompleted
+        }
+    }
+
+    var currentAppDay: Date {
+        let calendar = Calendar.current
+        if let last = lastCompletedDay {
+            return calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: last))!
+        } else {
+            return calendar.startOfDay(for: startDate)
+        }
+    }
+    
+    /// Returns the EOD boundary for a given app day
+    func endOfDay(for appDay: Date) -> Date {
+        let calendar = Calendar.current
+        let endHour = calendar.component(.hour, from: endOfDayTime)
+        let endMinute = calendar.component(.minute, from: endOfDayTime)
+        if endHour < 12 {
+            // AM EOD: boundary is next day at EOD time
+            let nextDay = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: appDay))!
+            return calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: nextDay)!
+        } else {
+            // PM EOD: boundary is same day at EOD time
+            return calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: calendar.startOfDay(for: appDay))!
+        }
+    }
+    
+    /// Returns true if the current app day is missed (incomplete and past EOD)
+    func isCurrentAppDayMissed(now: Date, completedTaskIDs: Set<UUID>) -> Bool {
+        let appDay = currentAppDay
+        let eod = endOfDay(for: appDay)
+        let allComplete = tasks.allSatisfy { completedTaskIDs.contains($0.id) }
+        return !allComplete && now >= eod
     }
 } 

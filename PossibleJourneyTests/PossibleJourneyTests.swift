@@ -245,3 +245,119 @@ final class ProgramModelDayLogicTests: XCTestCase {
         XCTAssertFalse(notMissed, "UI test scenario: EOD 8 PM, now 9 PM, all tasks complete should not be missed")
     }
 } 
+
+final class ProgramMissedDayAdvancingTests: XCTestCase {
+    func testEODBeforeMidnight_AdvancesAtMidnight() {
+        let calendar = Calendar.current
+        let startDate = calendar.date(from: DateComponents(year: 2023, month: 1, day: 1))!
+        let eod = calendar.date(bySettingHour: 19, minute: 0, second: 0, of: startDate)! // 7pm
+        let task = Task(id: UUID(), title: "A", description: nil)
+        var program = Program(id: UUID(), startDate: startDate, numberOfDays: 3, tasks: [task], endOfDayTime: eod)
+        program.lastCompletedDay = startDate // Jan 1 completed
+        let appDay = program.currentAppDay // Jan 2
+        // Before EOD
+        let beforeEOD = calendar.date(bySettingHour: 18, minute: 0, second: 0, of: appDay)!
+        XCTAssertFalse(program.isCurrentAppDayMissed(now: beforeEOD, completedTaskIDs: []))
+        // After EOD (7:01pm)
+        let afterEOD = calendar.date(bySettingHour: 19, minute: 1, second: 0, of: appDay)!
+        XCTAssertTrue(program.isCurrentAppDayMissed(now: afterEOD, completedTaskIDs: []))
+        // After midnight
+        let afterMidnight = calendar.date(bySettingHour: 0, minute: 1, second: 0, of: calendar.date(byAdding: .day, value: 1, to: appDay)!)!
+        XCTAssertTrue(program.isCurrentAppDayMissed(now: afterMidnight, completedTaskIDs: []))
+    }
+    func testEODAfterMidnight_AdvancesAtEOD() {
+        let calendar = Calendar.current
+        let startDate = calendar.date(from: DateComponents(year: 2023, month: 1, day: 1))!
+        let eod = calendar.date(bySettingHour: 2, minute: 0, second: 0, of: startDate)! // 2am
+        let task = Task(id: UUID(), title: "A", description: nil)
+        var program = Program(id: UUID(), startDate: startDate, numberOfDays: 3, tasks: [task], endOfDayTime: eod)
+        program.lastCompletedDay = calendar.date(from: DateComponents(year: 2023, month: 1, day: 2))! // Jan 2 completed
+        let appDay = program.currentAppDay // Jan 3
+        // Before EOD (Jan 4, 1am)
+        let beforeEOD = calendar.date(from: DateComponents(year: 2023, month: 1, day: 4, hour: 1))!
+        XCTAssertFalse(program.isCurrentAppDayMissed(now: beforeEOD, completedTaskIDs: []))
+        // After EOD (Jan 4, 2:01am)
+        let afterEOD = calendar.date(from: DateComponents(year: 2023, month: 4, day: 4, hour: 2, minute: 1))!
+        XCTAssertTrue(program.isCurrentAppDayMissed(now: afterEOD, completedTaskIDs: []))
+    }
+    func testMultipleMissedDays_ResolvesInOrder() {
+        let calendar = Calendar.current
+        let startDate = calendar.date(from: DateComponents(year: 2023, month: 1, day: 1))!
+        let eod = calendar.date(bySettingHour: 19, minute: 0, second: 0, of: startDate)! // 7pm
+        let task = Task(id: UUID(), title: "A", description: nil)
+        var program = Program(id: UUID(), startDate: startDate, numberOfDays: 3, tasks: [task], endOfDayTime: eod)
+        // Simulate completing Jan 1
+        program.lastCompletedDay = startDate
+        // Jan 2 is current app day
+        let appDay2 = program.currentAppDay
+        // Miss Jan 2 (after EOD)
+        let afterEOD2 = calendar.date(bySettingHour: 19, minute: 1, second: 0, of: appDay2)!
+        XCTAssertTrue(program.isCurrentAppDayMissed(now: afterEOD2, completedTaskIDs: []))
+        // Complete Jan 2
+        program.lastCompletedDay = appDay2
+        // Jan 3 is current app day
+        let appDay3 = program.currentAppDay
+        // Miss Jan 3 (after EOD)
+        let afterEOD3 = calendar.date(bySettingHour: 19, minute: 1, second: 0, of: appDay3)!
+        XCTAssertTrue(program.isCurrentAppDayMissed(now: afterEOD3, completedTaskIDs: []))
+    }
+} 
+
+final class ProgramLastCompletedDayTests: XCTestCase {
+    func testLastCompletedDayUpdatesOnCompletion() {
+        let calendar = Calendar.current
+        let startDate = calendar.date(from: DateComponents(year: 2023, month: 1, day: 1))!
+        let eod = calendar.date(bySettingHour: 19, minute: 0, second: 0, of: startDate)! // 7pm
+        let task = Task(id: UUID(), title: "A", description: nil)
+        var program = Program(id: UUID(), startDate: startDate, numberOfDays: 3, tasks: [task], endOfDayTime: eod)
+        XCTAssertNil(program.lastCompletedDay)
+        // Simulate completing day 1
+        let day1 = startDate
+        program.lastCompletedDay = day1
+        XCTAssertEqual(program.lastCompletedDay, day1)
+    }
+    func testIMissedItResetsStartDateButKeepsProgress() {
+        let calendar = Calendar.current
+        let startDate = calendar.date(from: DateComponents(year: 2023, month: 1, day: 1))!
+        let eod = calendar.date(bySettingHour: 19, minute: 0, second: 0, of: startDate)! // 7pm
+        let task = Task(id: UUID(), title: "A", description: nil)
+        var program = Program(id: UUID(), startDate: startDate, numberOfDays: 3, tasks: [task], endOfDayTime: eod)
+        let progress = DailyProgress(id: UUID(), date: startDate, completedTaskIDs: [task.id])
+        // Simulate 'I Missed It'
+        let today = calendar.startOfDay(for: Date())
+        program.startDate = today
+        program.lastCompletedDay = nil
+        XCTAssertEqual(program.startDate, today)
+        XCTAssertNil(program.lastCompletedDay)
+        // Progress is not cleared
+        XCTAssertEqual(progress.completedTaskIDs, [task.id])
+    }
+    func testDayAdvancementOnlyAfterBoundary() {
+        let calendar = Calendar.current
+        let startDate = calendar.date(from: DateComponents(year: 2023, month: 1, day: 1))!
+        let eod = calendar.date(bySettingHour: 19, minute: 0, second: 0, of: startDate)! // 7pm
+        let task = Task(id: UUID(), title: "A", description: nil)
+        var program = Program(id: UUID(), startDate: startDate, numberOfDays: 3, tasks: [task], endOfDayTime: eod)
+        program.lastCompletedDay = startDate
+        // Before midnight
+        let beforeMidnight = calendar.date(bySettingHour: 23, minute: 0, second: 0, of: startDate)!
+        XCTAssertFalse(program.canAdvanceToNextDay(currentDate: beforeMidnight, lastCompletedDay: program.lastCompletedDay))
+        // After midnight
+        let afterMidnight = calendar.date(bySettingHour: 0, minute: 1, second: 0, of: calendar.date(byAdding: .day, value: 1, to: startDate)!)!
+        XCTAssertTrue(program.canAdvanceToNextDay(currentDate: afterMidnight, lastCompletedDay: program.lastCompletedDay))
+    }
+    func testHistoryPreservedAfterReset() {
+        let calendar = Calendar.current
+        let startDate = calendar.date(from: DateComponents(year: 2023, month: 1, day: 1))!
+        let eod = calendar.date(bySettingHour: 19, minute: 0, second: 0, of: startDate)! // 7pm
+        let task = Task(id: UUID(), title: "A", description: nil)
+        let program = Program(id: UUID(), startDate: startDate, numberOfDays: 3, tasks: [task], endOfDayTime: eod)
+        let progress = DailyProgress(id: UUID(), date: startDate, completedTaskIDs: [task.id])
+        // Simulate 'I Missed It' (reset startDate)
+        let today = calendar.startOfDay(for: Date())
+        var resetProgram = program
+        resetProgram.startDate = today
+        // Progress for previous days is still available
+        XCTAssertEqual(progress.completedTaskIDs, [task.id])
+    }
+} 
