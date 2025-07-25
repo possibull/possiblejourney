@@ -136,6 +136,16 @@ final class PossibleJourneyUITests: XCTestCase {
                 sw.tap()
             }
         }
+        // Print all toggles (switches) for diagnosis and tap each
+        print("Toggles: \(app.switches.allElementsBoundByIndex.map { $0.label })")
+        print("Toggle count: \(app.switches.count)")
+        for i in 0..<app.switches.count {
+            let toggle = app.switches.element(boundBy: i)
+            print("Toggle \(i): label=\(toggle.label), identifier=\(toggle.identifier), value=\(toggle.value ?? "nil"), isHittable=\(toggle.isHittable)")
+            if toggle.isHittable {
+                toggle.tap()
+            }
+        }
         // Robustly scroll to and tap the debug toggle
         let debugToggle = app.switches["Show Debug Labels"]
         var attempts = 0
