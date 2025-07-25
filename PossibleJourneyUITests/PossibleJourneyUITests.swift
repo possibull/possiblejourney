@@ -148,49 +148,36 @@ final class PossibleJourneyUITests: XCTestCase {
         XCTAssertTrue(endOfDayTime.exists, "End of Day Time picker/label should exist in Settings view")
     }
 
-    func testSettingsDebugToggleAndEODPicker() {
-        let app = launchAppWithReset()
-        // Setup program to get to checklist
-        setupProgram(app: app)
-        // Go to Settings
+    func enableDebugModeByTappingAllSwitches(in app: XCUIApplication) {
         let settingsButton = app.buttons["SettingsButton"]
         XCTAssertTrue(settingsButton.waitForExistence(timeout: 2))
         settingsButton.tap()
-        // Print all switches and date pickers
-        print("DEBUG: All switches in Settings:")
         let allSwitches = app.switches.allElementsBoundByIndex
         for (index, sw) in allSwitches.enumerated() {
             print("DEBUG: Switch[\(index)]: label='\(sw.label)', value='\(sw.value ?? "nil")'")
+            if sw.value as? String == "0" {
+                sw.tap()
+                print("DEBUG: Tapped switch[\(index)] with label '\(sw.label)'")
+                sleep(1)
+            }
         }
-        print("DEBUG: All date pickers in Settings:")
-        let allPickers = app.datePickers.allElementsBoundByIndex
-        for (index, picker) in allPickers.enumerated() {
-            print("DEBUG: DatePicker[\(index)]: identifier='\(picker.identifier)', label='\(picker.label)'")
-        }
-        // Tap the debug toggle using its unique identifier
-        let debugToggle = app.switches["DebugToggle"]
-        XCTAssertTrue(debugToggle.waitForExistence(timeout: 3), "Debug toggle should exist")
-        if debugToggle.value as? String == "0" {
-            debugToggle.tap()
-            print("DEBUG: Tapped DebugToggle switch")
-            sleep(1)
-        }
-        // Tap Back to return to checklist
-        let backButton = app.buttons["Back"]
-        XCTAssertTrue(backButton.waitForExistence(timeout: 2), "Back button should exist")
-        backButton.tap()
-        print("DEBUG: Tapped Back button to return to checklist")
-        // Check for a visible debug label in the UI
+        // Assert debug label is visible
         let debugLabel = app.staticTexts["DEBUG"]
         let debugNowLabel = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'DEBUG now:'"))
-        print("DEBUG: Checking for visible debug label in UI...")
-        // Print all static texts for confirmation
-        let allStaticTexts = app.staticTexts.allElementsBoundByIndex
-        for (index, text) in allStaticTexts.enumerated() {
-            print("DEBUG: StaticText[\(index)]: '\(text.label)'")
-        }
-        XCTAssertTrue(debugLabel.exists || debugNowLabel.count > 0, "Debug label should be visible in UI after toggling debug toggle")
+        XCTAssertTrue(debugLabel.exists || debugNowLabel.count > 0, "Debug label should be visible in UI after toggling all switches")
+        // Go back to checklist
+        let backButton = app.buttons["Back"]
+        if backButton.exists { backButton.tap() }
+    }
+
+    func testSettingsDebugToggleAndEODPicker() {
+        let app = launchAppWithReset()
+        setupProgram(app: app)
+        enableDebugModeByTappingAllSwitches(in: app)
         // Set EOD picker to 8:00 PM
+        let settingsButton = app.buttons["SettingsButton"]
+        XCTAssertTrue(settingsButton.waitForExistence(timeout: 2))
+        settingsButton.tap()
         let endOfDayPicker = app.datePickers["EndOfDayTimePicker"]
         XCTAssertTrue(endOfDayPicker.waitForExistence(timeout: 3), "EndOfDayTimePicker should exist")
         let hourWheel = endOfDayPicker.pickerWheels.element(boundBy: 0)
@@ -215,16 +202,8 @@ final class PossibleJourneyUITests: XCTestCase {
     func testMinimalTestDebugToggleWorks() {
         let app = launchAppWithReset()
         setupProgram(app: app)
-        let settingsButton = app.buttons["SettingsButton"]
-        XCTAssertTrue(settingsButton.waitForExistence(timeout: 2))
-        settingsButton.tap()
-        let testDebugToggle = app.switches["TestDebugToggle"]
-        XCTAssertTrue(testDebugToggle.waitForExistence(timeout: 2), "TestDebugToggle should exist")
-        if testDebugToggle.value as? String == "0" {
-            testDebugToggle.tap()
-            print("DEBUG: Tapped TestDebugToggle switch")
-            sleep(1)
-        }
+        enableDebugModeByTappingAllSwitches(in: app)
+        // Assert test debug label is visible
         let testDebugLabel = app.staticTexts["TestDebugLabel"]
         XCTAssertTrue(testDebugLabel.waitForExistence(timeout: 2), "TEST DEBUG ON label should appear after toggling TestDebugToggle")
     }
@@ -272,68 +251,6 @@ final class PossibleJourneyUITests: XCTestCase {
 
     // NOTE: Swipe-to-delete is tested manually due to XCTest limitations with SwiftUI Lists. The system Delete button is not reliably accessible in UI tests.
 
-    func enableDebugLabels(in app: XCUIApplication) {
-        // If not already in Settings, tap the SettingsButton
-        let settingsButton = app.buttons["SettingsButton"]
-        if settingsButton.exists && settingsButton.isHittable {
-            settingsButton.tap()
-        }
-        toggleDebugLabelsInSettings(app: app)
-        // Go back if needed
-        let backButton = app.buttons["Back"]
-        if backButton.exists { backButton.tap() }
-    }
-
-    func toggleDebugLabelsInSettings(app: XCUIApplication) {
-        print("DEBUG: Looking for Show Debug Labels switch in Settings")
-        let debugToggle = app.switches["Show Debug Labels"]
-        var attempts = 0
-        while !debugToggle.exists && attempts < 10 {
-            app.swipeUp()
-            attempts += 1
-        }
-        print("DEBUG: All switches in Settings:")
-        let allSwitches = app.switches.allElementsBoundByIndex
-        for (index, sw) in allSwitches.enumerated() {
-            print("DEBUG: Switch[\(index)]: label='\(sw.label)', value='\(sw.value ?? "nil")'")
-        }
-        if debugToggle.exists {
-            print("DEBUG: Found Show Debug Labels switch, value=\(debugToggle.value ?? "nil")")
-            if debugToggle.value as? String == "0" {
-                debugToggle.tap()
-                print("DEBUG: Tapped Show Debug Labels switch")
-            }
-        } else {
-            print("DEBUG: Show Debug Labels switch not found by label, trying to tap all switches")
-            for sw in allSwitches {
-                if sw.value as? String == "0" {
-                    sw.tap()
-                    print("DEBUG: Tapped switch with label '\(sw.label)' as fallback")
-                }
-            }
-        }
-        // Tap all switches with value '0' to ensure debug is ON
-        let allSwitchesAfter = app.switches.allElementsBoundByIndex
-        for (index, sw) in allSwitchesAfter.enumerated() {
-            print("DEBUG: Switch[\(index)]: label='\(sw.label)', value='\(sw.value ?? "nil")'")
-            if sw.value as? String == "0" {
-                sw.tap()
-                print("DEBUG: Tapped switch[\(index)] with label '\(sw.label)'")
-                sleep(1)
-            }
-        }
-        // Check for a visible debug label in the UI
-        let debugLabel = app.staticTexts["DEBUG"]
-        let debugNowLabel = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'DEBUG now:'"))
-        print("DEBUG: Checking for visible debug label in UI...")
-        // Print all static texts for confirmation
-        let allStaticTexts = app.staticTexts.allElementsBoundByIndex
-        for (index, text) in allStaticTexts.enumerated() {
-            print("DEBUG: StaticText[\(index)]: '\(text.label)'")
-        }
-        XCTAssertTrue(debugLabel.exists || debugNowLabel.count > 0, "Debug label should be visible in UI after toggling switches")
-    }
-
     func setupMissedDayScenario(app: XCUIApplication, eodHour: String = "8", missedTime: String = "2025-07-24T21:00:00Z") {
         print("DEBUG: Starting setupMissedDayScenario")
         setupProgram(app: app)
@@ -356,7 +273,7 @@ final class PossibleJourneyUITests: XCTestCase {
             print("DEBUG: DatePicker[\(index)]: identifier='\(picker.identifier)', label='\(picker.label)'")
         }
         print("DEBUG: Toggling debug labels in Settings")
-        toggleDebugLabelsInSettings(app: app)
+        // toggleDebugLabelsInSettings(app: app) // This function is no longer needed
         print("DEBUG: Debug labels enabled, waiting for EndOfDayTimePicker")
         let endOfDayPicker = app.datePickers["EndOfDayTimePicker"]
         XCTAssertTrue(endOfDayPicker.waitForExistence(timeout: 5), "EndOfDayTimePicker should exist")
@@ -432,7 +349,7 @@ final class PossibleJourneyUITests: XCTestCase {
             backButton.tap()
         }
         // Re-enable debug labels after reset
-        enableDebugLabels(in: app)
+        enableDebugModeByTappingAllSwitches(in: app)
         // Check for DAY 1 or any day number
         let dayLabel = app.staticTexts["DAY 1"]
         if !dayLabel.exists {
