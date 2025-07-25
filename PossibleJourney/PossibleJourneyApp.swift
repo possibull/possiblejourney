@@ -74,37 +74,12 @@ struct PossibleJourneyApp: App {
                             .environmentObject(debugState)
                         )
                     } else {
-                        // Show debug info for setup screen in the debug window
-                        let storedProgram = ProgramStorage().load()
                         return AnyView(
-                            Group {
-                                Text("DEBUG: Program Setup Screen")
-                                    .font(.caption)
-                                    .foregroundColor(.yellow)
-                                    .accessibilityIdentifier("DebugSetupScreenLabel")
-                                if let program = storedProgram {
-                                    Text("Saved Program UUID: \(program.id.uuidString)")
-                                        .font(.caption)
-                                        .foregroundColor(.pink)
-                                        .accessibilityIdentifier("DebugSavedProgramUUIDLabel")
-                                    Text("Start Date: \(program.startDate)")
-                                        .font(.caption)
-                                        .foregroundColor(.orange)
-                                    Text("Number of Days: \(program.numberOfDays)")
-                                        .font(.caption)
-                                        .foregroundColor(.green)
-                                    Text("Task Count: \(program.tasks.count)")
-                                        .font(.caption)
-                                        .foregroundColor(.blue)
-                                    Text("Task Titles: \(program.tasks.map { $0.title }.joined(separator: ", "))")
-                                        .font(.caption)
-                                        .foregroundColor(.purple)
-                                } else {
-                                    Text("No program saved.")
-                                        .font(.caption)
-                                        .foregroundColor(.gray)
-                                }
-                            }
+                            ProgramSetupView(onSave: { program in
+                                appState.loadedProgram = program
+                                ProgramStorage().save(program)
+                            })
+                            .environmentObject(debugState)
                         )
                     }
                 }
