@@ -44,8 +44,8 @@ struct DailyChecklistView: View {
             if viewModel.isDayMissed {
                 MissedDayScreen(
                     onContinue: {
-                        print("DEBUG: User clicked 'Continue Anyway' - dismissing Missed Day screen and returning to checklist")
-                        // Set a flag in the view model to temporarily ignore isDayMissed until the next app launch or checklist completion
+                        print("DEBUG: User clicked 'Continue Anyway' - dismissing Missed Day screen and returning to checklist (no changes to program or progress)")
+                        // Only set the flag to allow checklist view for this session; do not modify program or progress
                         viewModel.ignoreMissedDayForCurrentSession = true
                     },
                     onMissed: {
