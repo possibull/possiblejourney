@@ -251,18 +251,7 @@ final class PossibleJourneyUITests: XCTestCase {
         XCTAssertTrue(ampmValue.uppercased().contains("PM"), "AM/PM wheel should be PM, got: \(ampmValue)")
     }
 
-    func testGoDirectlyToSettingsAndMaximizeDebug() {
-        let app = launchAppWithReset()
-        // Complete program setup to reach Daily Checklist screen
-        app.addTask(title: "Read", description: "Read 10 pages")
-        app.saveProgram()
-        // Go directly to settings
-        let settingsButton = app.buttons["SettingsButton"]
-        XCTAssertTrue(settingsButton.waitForExistence(timeout: 2), "Settings button should exist")
-        settingsButton.tap()
-        // Enable and maximize debug
-        enableDebugModeByTappingAllSwitchesInSettings(in: app)
-        // Tap the expand debug window icon (try multiple element types)
+    func expandAndAssertDebugWindow(in app: XCUIApplication) {
         var didTapExpand = false
         let expandButton = app.buttons["ExpandDebugWindow"]
         if expandButton.exists {
@@ -282,9 +271,23 @@ final class PossibleJourneyUITests: XCTestCase {
             }
         }
         XCTAssertTrue(didTapExpand, "Expand debug window icon should exist and be tappable (button, other, or image)")
-        // Assert debug window is maximized
         let programUUIDLabel = app.staticTexts["DebugProgramUUIDLabel"]
         XCTAssertTrue(programUUIDLabel.waitForExistence(timeout: 2), "Debug window should be maximized and show Program UUID label")
+    }
+
+    func testGoDirectlyToSettingsAndMaximizeDebug() {
+        let app = launchAppWithReset()
+        // Complete program setup to reach Daily Checklist screen
+        app.addTask(title: "Read", description: "Read 10 pages")
+        app.saveProgram()
+        // Go directly to settings
+        let settingsButton = app.buttons["SettingsButton"]
+        XCTAssertTrue(settingsButton.waitForExistence(timeout: 2), "Settings button should exist")
+        settingsButton.tap()
+        // Enable and maximize debug
+        enableDebugModeByTappingAllSwitchesInSettings(in: app)
+        // Expand and assert debug window
+        expandAndAssertDebugWindow(in: app)
     }
 
     /*
