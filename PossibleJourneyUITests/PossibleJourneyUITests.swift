@@ -102,6 +102,11 @@ final class PossibleJourneyUITests: XCTestCase {
         app.launchArguments = []
         app.launch()
         enableDebugModeByTappingAllSwitches(in: app)
+        // Tap Back button to return to checklist
+        let backButton = app.buttons["Back"]
+        if backButton.exists {
+            backButton.tap()
+        }
         app.checkOnScreen(identifier: "DailyChecklistScreen", timeout: 5, message: "Should be on Daily Checklist screen after relaunch")
         // Print task IDs after relaunch
         print("DEBUG: Task IDs after relaunch:")
