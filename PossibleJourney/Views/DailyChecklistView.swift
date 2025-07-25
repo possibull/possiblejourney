@@ -61,8 +61,7 @@ struct DailyChecklistView: View {
     var onReset: (() -> Void)? = nil
     var currentTimeOverride: Date? = nil // For test injection
     @State private var debug = false
-    // For debugging, force debug window to always show
-    @State private var debugWindowExpanded = true // Always open by default
+    // DebugWindow state now managed globally
     
     // 75 Hard deep red
     let hardRed = Color(red: 183/255, green: 28/255, blue: 28/255)
@@ -136,36 +135,7 @@ struct DailyChecklistView: View {
                         .font(.headline.weight(.medium))
                         .foregroundColor(.white.opacity(0.85))
                         .padding(.bottom, 24)
-                    if debug {
-                        DebugWindow(isExpanded: $debugWindowExpanded) {
-                            Group {
-                                Text("DEBUG now: \(viewModel.now)")
-                                    .font(.caption)
-                                    .foregroundColor(.yellow)
-                                    .accessibilityIdentifier("DebugNowLabel")
-                                Text("DEBUG isDayMissed: \(viewModel.isDayMissed ? "YES" : "NO")")
-                                    .font(.caption)
-                                    .foregroundColor(.orange)
-                                    .accessibilityIdentifier("DebugIsDayMissedLabel")
-                                Text("DEBUG completedTaskIDs: \(viewModel.dailyProgress.completedTaskIDs.map { $0.uuidString }.joined(separator: ", "))")
-                                    .font(.caption)
-                                    .foregroundColor(.green)
-                                    .accessibilityIdentifier("DebugCompletedTaskIDsLabel")
-                                Text("DEBUG showMissedDayModal: \(viewModel.isDayMissed ? "YES" : "NO")")
-                                    .font(.caption)
-                                    .foregroundColor(.red)
-                                    .accessibilityIdentifier("DebugShowMissedDayModalLabel")
-                                Text("TaskTitles: \(viewModel.program.tasks.map { $0.title }.joined(separator: ", "))")
-                                    .font(.caption)
-                                    .foregroundColor(.blue)
-                                    .accessibilityIdentifier("TaskTitlesDebug")
-                                Text("TaskIDs: \(viewModel.program.tasks.map { $0.id.uuidString }.joined(separator: ", "))")
-                                    .font(.caption)
-                                    .foregroundColor(.purple)
-                                    .accessibilityIdentifier("TaskIDsDebug")
-                            }
-                        }
-                    }
+                    // DebugWindow will be shown globally
                     // Checklist Card
                     ZStack {
                         RoundedRectangle(cornerRadius: 24)
