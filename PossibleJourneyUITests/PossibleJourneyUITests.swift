@@ -129,7 +129,25 @@ final class PossibleJourneyUITests: XCTestCase {
         // Print debug completed task IDs after relaunch
         let debugCompletedTaskIDsAfter = app.staticTexts["DebugCompletedTaskIDsLabel"].label
         print("DEBUG: CompletedTaskIDsDebug after relaunch: \(debugCompletedTaskIDsAfter)")
-        // Assert that the Read task's ID is present in the completed IDs after relaunch
+        // Wait for checklist screen after relaunch
+        let checklistScreen = app.otherElements["DailyChecklistScreen"]
+        XCTAssertTrue(checklistScreen.waitForExistence(timeout: 5), "Checklist screen should appear after relaunch")
+        // Wait for the completed task cell to appear
+        let completedTaskCell = app.staticTexts["TaskCell_\(readTaskID)"]
+        XCTAssertTrue(completedTaskCell.waitForExistence(timeout: 5), "Completed task cell should appear after relaunch")
+        // Wait for the checkmark button to appear
+        let completedCheckmark = app.buttons["checkmark_\(readTaskID)"]
+        XCTAssertTrue(completedCheckmark.waitForExistence(timeout: 5), "Completed checkmark should appear after relaunch")
+        // Print debug info if assertion fails
+        if !completedCheckmark.isSelected {
+            print("DEBUG: Checkmark for Read task is not selected after relaunch")
+            print("DEBUG: CompletedTaskIDsDebug after relaunch: \(debugCompletedTaskIDsAfter)")
+            print("DEBUG: TaskIDsDebug after relaunch: \(debugTaskIDsAfter)")
+            print("DEBUG: All static texts after relaunch:")
+            for cell in taskCellsAfter { print("DEBUG: Task cell label: \(cell.label)") }
+        }
+        // Assert that the checkmark is selected (if your UI uses .isSelected or similar)
+        // If not, assert that the completedTaskIDsAfter contains the readTaskID
         let completedTaskIDsAfter = debugCompletedTaskIDsAfter.components(separatedBy: ",")
         XCTAssertTrue(completedTaskIDsAfter.contains(readTaskID), "Read task should be marked as complete after relaunch")
         // Print all images and their accessibility identifiers
