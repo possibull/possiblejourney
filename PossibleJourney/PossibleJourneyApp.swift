@@ -36,6 +36,8 @@ struct PossibleJourneyApp: App {
     init() {
         print("DEBUG: PossibleJourneyApp init")
         resetForUITestingIfNeeded()
+        // Always minimize debug window on launch
+        UserDefaults.standard.set(false, forKey: "debugWindowExpanded")
     }
     @StateObject private var appState = ProgramAppState()
     @StateObject private var debugState = DebugState()
