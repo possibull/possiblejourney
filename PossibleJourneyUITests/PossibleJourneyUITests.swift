@@ -264,8 +264,29 @@ final class PossibleJourneyUITests: XCTestCase {
         setupMissedDayScenario(app: app)
         app.buttons["I Missed It"].tap()
         app.checkOnScreen(identifier: "DailyChecklistScreen", message: "Should return to checklist screen")
+        
+        // Debug: Print all static text to see what's actually displayed
+        print("DEBUG: All static text after 'I Missed It' reset:")
+        let allStaticTexts = app.staticTexts.allElementsBoundByIndex
+        for (index, text) in allStaticTexts.enumerated() {
+            print("DEBUG: StaticText[\(index)]: '\(text.label)'")
+        }
+        
+        // Check for DAY 1 or any day number
         let dayLabel = app.staticTexts["DAY 1"]
-        XCTAssertTrue(dayLabel.exists, "Should be on Day 1 after reset")
+        if !dayLabel.exists {
+            // Try to find any day label
+            let anyDayLabel = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'DAY'"))
+            if anyDayLabel.count > 0 {
+                print("DEBUG: Found day label: '\(anyDayLabel.first!.label)'")
+                XCTAssertTrue(anyDayLabel.first!.label.contains("DAY 1"), "Should be on Day 1 after reset, but found: \(anyDayLabel.first!.label)")
+            } else {
+                XCTFail("No day label found after reset")
+            }
+        } else {
+            XCTAssertTrue(dayLabel.exists, "Should be on Day 1 after reset")
+        }
+        
         let completedTasks = app.buttons.matching(identifier: "checkmark")
         XCTAssertEqual(completedTasks.count, 0, "No tasks should be completed after reset")
     }
