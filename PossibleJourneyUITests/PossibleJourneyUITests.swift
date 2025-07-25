@@ -216,30 +216,9 @@ final class PossibleJourneyUITests: XCTestCase {
         let settingsButton = app.buttons["SettingsButton"]
         XCTAssertTrue(settingsButton.exists)
         settingsButton.tap()
+        enableDebugLabels(in: app)
         let endOfDayPicker = app.datePickers["EndOfDayTimePicker"]
         XCTAssertTrue(endOfDayPicker.waitForExistence(timeout: 2))
-        // Robustly scroll to and tap the debug toggle
-        let debugToggle = app.switches["Show Debug Labels"]
-        var attempts = 0
-        while !debugToggle.exists && attempts < 5 {
-            app.swipeUp()
-            attempts += 1
-        }
-        XCTAssertTrue(debugToggle.waitForExistence(timeout: 2), "Debug toggle should exist")
-        if debugToggle.exists && debugToggle.isHittable && debugToggle.value as? String == "0" {
-            debugToggle.tap()
-            sleep(1)
-            if debugToggle.value as? String == "0" {
-                debugToggle.tap()
-            }
-        } else if debugToggle.exists {
-            let coord = debugToggle.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
-            coord.tap()
-            sleep(1)
-            if debugToggle.value as? String == "0" {
-                coord.tap()
-            }
-        }
         // Set the picker to a fixed time: 8:00 PM
         let hourWheel = endOfDayPicker.pickerWheels.element(boundBy: 0)
         let minuteWheel = endOfDayPicker.pickerWheels.element(boundBy: 1)
