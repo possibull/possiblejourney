@@ -126,13 +126,13 @@ final class PossibleJourneyUITests: XCTestCase {
         // Wait for the Settings page to be visible
         let endOfDayPicker = app.datePickers["EndOfDayTimePicker"]
         XCTAssertTrue(endOfDayPicker.waitForExistence(timeout: 2))
-        // Print all switches for diagnosis and tap each
+        // Print all switches for diagnosis
         print("Switches: \(app.switches.allElementsBoundByIndex.map { $0.label })")
         print("Switch count: \(app.switches.count)")
         for i in 0..<app.switches.count {
             let sw = app.switches.element(boundBy: i)
             print("Switch \(i): label=\(sw.label), value=\(sw.value ?? "nil")")
-            if sw.value as? String == "0" {
+            if sw.label == "Show Debug Labels" && sw.value as? String == "0" {
                 sw.tap()
             }
         }
