@@ -192,9 +192,18 @@ final class PossibleJourneyUITests: XCTestCase {
     // NOTE: Swipe-to-delete is tested manually due to XCTest limitations with SwiftUI Lists. The system Delete button is not reliably accessible in UI tests.
 
     func enableDebugLabels(in app: XCUIApplication) {
+        // If not already in Settings, tap the SettingsButton
         let settingsButton = app.buttons["SettingsButton"]
-        XCTAssertTrue(settingsButton.waitForExistence(timeout: 2))
-        settingsButton.tap()
+        if settingsButton.exists && settingsButton.isHittable {
+            settingsButton.tap()
+        }
+        toggleDebugLabelsInSettings(app: app)
+        // Go back if needed
+        let backButton = app.buttons["Back"]
+        if backButton.exists { backButton.tap() }
+    }
+
+    func toggleDebugLabelsInSettings(app: XCUIApplication) {
         let debugToggle = app.switches["Show Debug Labels"]
         var attempts = 0
         while !debugToggle.exists && attempts < 5 {
@@ -205,20 +214,23 @@ final class PossibleJourneyUITests: XCTestCase {
         if debugToggle.value as? String == "0" {
             debugToggle.tap()
         }
-        // Go back if needed
-        let backButton = app.buttons["Back"]
-        if backButton.exists { backButton.tap() }
     }
 
     func setupMissedDayScenario(app: XCUIApplication, eodHour: String = "8", missedTime: String = "2025-07-24T21:00:00Z") {
+        print("DEBUG: Starting setupMissedDayScenario")
         setupProgram(app: app)
+        print("DEBUG: Program setup complete, navigating to Settings")
         // Set end of day time to just before now (simulate after end of day)
         let settingsButton = app.buttons["SettingsButton"]
+        print("DEBUG: Waiting for SettingsButton to exist")
         XCTAssertTrue(settingsButton.exists)
         settingsButton.tap()
-        enableDebugLabels(in: app)
+        print("DEBUG: SettingsButton tapped, toggling debug labels in Settings")
+        toggleDebugLabelsInSettings(app: app)
+        print("DEBUG: Debug labels enabled, waiting for EndOfDayTimePicker")
         let endOfDayPicker = app.datePickers["EndOfDayTimePicker"]
         XCTAssertTrue(endOfDayPicker.waitForExistence(timeout: 2))
+        print("DEBUG: EndOfDayTimePicker exists, setting EOD picker wheels")
         // Set the picker to a fixed time: 8:00 PM
         let hourWheel = endOfDayPicker.pickerWheels.element(boundBy: 0)
         let minuteWheel = endOfDayPicker.pickerWheels.element(boundBy: 1)
@@ -226,6 +238,7 @@ final class PossibleJourneyUITests: XCTestCase {
         hourWheel.adjust(toPickerWheelValue: "8")
         minuteWheel.adjust(toPickerWheelValue: "00")
         amPmWheel.adjust(toPickerWheelValue: "PM")
+        print("DEBUG: EOD set to 8:00 PM, preparing to relaunch with fake time")
         // Set fake 'now' to 9:00 PM (1 hour after EOD)
         let calendar = Calendar.current
         let now = Date()
@@ -233,9 +246,11 @@ final class PossibleJourneyUITests: XCTestCase {
         let fakeNow = calendar.date(from: DateComponents(year: components.year, month: components.month, day: components.day, hour: 21, minute: 0))!
         let fakeNowTimestamp = Int(fakeNow.timeIntervalSince1970)
         app.buttons["Back"].tap()
+        print("DEBUG: Back button tapped, terminating app for relaunch")
         app.terminate()
         app.launchArguments = ["--uitesting-current-time", String(fakeNowTimestamp)]
         app.launch()
+        print("DEBUG: App relaunched with fake time, setupMissedDayScenario complete")
     }
 
     func testMissedDayScreen_IMissedIt_ResetsToDay1() {
