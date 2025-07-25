@@ -79,6 +79,10 @@ struct DailyChecklistView: View {
         return formatter.string(from: today)
     }
 
+    private var visibleTasks: [Task] {
+        viewModel.program.tasks.filter { !hideCompletedTasks || !viewModel.dailyProgress.completedTaskIDs.contains($0.id) }
+    }
+
     var body: some View {
         ZStack(alignment: .top) {
             if viewModel.isDayMissed {
@@ -96,7 +100,6 @@ struct DailyChecklistView: View {
             } else {
                 // Use currentActiveDay for checklist
                 let checklistDate = viewModel.currentActiveDay ?? viewModel.now
-                let visibleTasks: [Task] = viewModel.program.tasks.filter { !hideCompletedTasks || !viewModel.dailyProgress.completedTaskIDs.contains($0.id) }
                 VStack(spacing: 0) {
                     // Header row with logo, DAY XX, and checklist icon
                     HStack(alignment: .center) {
