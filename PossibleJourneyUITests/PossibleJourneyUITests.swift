@@ -199,15 +199,6 @@ final class PossibleJourneyUITests: XCTestCase {
         XCTAssertTrue(ampmValue.uppercased().contains("PM"), "AM/PM wheel should be PM, got: \(ampmValue)")
     }
 
-    func testMinimalTestDebugToggleWorks() {
-        let app = launchAppWithReset()
-        setupProgram(app: app)
-        enableDebugModeByTappingAllSwitches(in: app)
-        // Assert test debug label is visible
-        let testDebugLabel = app.staticTexts["TestDebugLabel"]
-        XCTAssertTrue(testDebugLabel.waitForExistence(timeout: 2), "TEST DEBUG ON label should appear after toggling TestDebugToggle")
-    }
-
     /*
     func testResetProgramReturnsToSetupScreen() throws {
         let app = XCUIApplication()

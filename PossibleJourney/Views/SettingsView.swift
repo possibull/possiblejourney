@@ -44,15 +44,6 @@ struct SettingsView: View {
                         print("DEBUG TOGGLE: \(newValue)")
                     }
                     .padding(.horizontal)
-                // Minimal test toggle
-                Toggle("Test Debug Toggle", isOn: $testDebug)
-                    .accessibilityIdentifier("TestDebugToggle")
-                    .padding(.horizontal)
-                if testDebug {
-                    Text("TEST DEBUG ON")
-                        .foregroundColor(.green)
-                        .accessibilityIdentifier("TestDebugLabel")
-                }
                 // End of Day Time Picker Section in Form
                 Form {
                     Section(header: Text("End of Day Time").font(.headline).foregroundColor(hardRed)) {
@@ -67,7 +58,11 @@ struct SettingsView: View {
                             }
                     }
                     Section(header: Text("Debug").font(.headline).foregroundColor(hardRed)) {
-                        // Toggle removed from here for testing
+                        Toggle("Show Debug Labels", isOn: $debug)
+                            .accessibilityIdentifier("DebugToggle")
+                            .onChange(of: debug) { newValue in
+                                print("DEBUG TOGGLE: \(newValue)")
+                            }
                     }
                 }
                 .cornerRadius(16)
