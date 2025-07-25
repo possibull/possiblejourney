@@ -123,8 +123,8 @@ final class PossibleJourneyUITests: XCTestCase {
         let settingsButton = app.buttons["SettingsButton"]
         XCTAssertTrue(settingsButton.exists)
         settingsButton.tap()
-        // Enable debug mode
-        let debugToggle = app.switches["Show Debug Labels"]
+        // Enable debug mode by tapping the first switch
+        let debugToggle = app.switches.element(boundBy: 0)
         XCTAssertTrue(debugToggle.waitForExistence(timeout: 2))
         if debugToggle.value as? String == "0" {
             debugToggle.tap()
