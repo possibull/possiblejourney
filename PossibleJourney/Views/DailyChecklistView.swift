@@ -123,7 +123,7 @@ struct DailyChecklistView: View {
                             .foregroundColor(.white)
                             .scaleEffect(isCompleted ? 1.2 : 1.0)
                             .animation(.spring(response: 0.3, dampingFraction: 0.6), value: isCompleted)
-                            .accessibilityIdentifier("checkmark")
+                            .accessibilityIdentifier("checkmark_\(task.id.uuidString)")
                     }
                 }
             }

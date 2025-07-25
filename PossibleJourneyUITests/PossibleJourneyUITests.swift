@@ -83,29 +83,26 @@ final class PossibleJourneyUITests: XCTestCase {
         if backButton1.exists {
             backButton1.tap()
         }
-        // Minimize the debug window by tapping the spyglass icon
-        let debugIcon = app.images["magnifyingglass"]
-        if debugIcon.exists {
-            debugIcon.tap()
-        }
-        // Print task IDs before relaunch
-        print("DEBUG: Task IDs before relaunch:")
-        let taskCells = app.staticTexts.allElementsBoundByIndex
-        for cell in taskCells {
-            print("DEBUG: Task cell label: \(cell.label)")
-        }
-        // Print debug task IDs before relaunch
+        // Get the task IDs from the debug label (while debug window is still visible)
         let debugTaskIDsBefore = app.staticTexts["TaskIDsDebug"].label
         print("DEBUG: TaskIDsDebug before relaunch: \(debugTaskIDsBefore)")
         // Print debug completed task IDs before relaunch
         let debugCompletedTaskIDsBefore = app.staticTexts["DebugCompletedTaskIDsLabel"].label
         print("DEBUG: CompletedTaskIDsDebug before relaunch: \(debugCompletedTaskIDsBefore)")
+        // Minimize the debug window by tapping the spyglass icon
+        let debugIcon = app.images["magnifyingglass"]
+        if debugIcon.exists {
+            debugIcon.tap()
+        }
         // Get the Read task's ID (assume it's the first in the list)
-        let readTaskID = debugTaskIDsBefore.components(separatedBy: ",").first!.trimmingCharacters(in: .whitespaces)
-        // Mark the first task as complete using accessibility identifier
-        let readTaskCell = app.otherElements["TaskCell_\(readTaskID)"]
-        XCTAssertTrue(readTaskCell.waitForExistence(timeout: 5), "Read task cell should exist")
-        readTaskCell.tap()
+        let taskIDsString = debugTaskIDsBefore.replacingOccurrences(of: "TaskIDs: ", with: "")
+        let readTaskID = taskIDsString.components(separatedBy: ",").first!.trimmingCharacters(in: .whitespaces)
+        let readTaskCell = app.staticTexts["TaskCell_\(readTaskID)"]
+        XCTAssertTrue(readTaskCell.exists, "Read task cell should exist")
+        // Tap the checkmark button for the Read task
+        let checkmark = app.buttons["checkmark_\(readTaskID)"]
+        XCTAssertTrue(checkmark.exists, "Checkmark for Read task should exist")
+        checkmark.tap()
         // Relaunch app (no reset)
         app.terminate()
         app.launchArguments = []
