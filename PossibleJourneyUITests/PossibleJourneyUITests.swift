@@ -148,6 +148,49 @@ final class PossibleJourneyUITests: XCTestCase {
         XCTAssertTrue(endOfDayTime.exists, "End of Day Time picker/label should exist in Settings view")
     }
 
+    func testSettingsDebugToggleAndEODPicker() {
+        let app = launchAppWithReset()
+        // Setup program to get to checklist
+        setupProgram(app: app)
+        // Go to Settings
+        let settingsButton = app.buttons["SettingsButton"]
+        XCTAssertTrue(settingsButton.waitForExistence(timeout: 2))
+        settingsButton.tap()
+        // Print all switches and date pickers
+        print("DEBUG: All switches in Settings:")
+        let allSwitches = app.switches.allElementsBoundByIndex
+        for (index, sw) in allSwitches.enumerated() {
+            print("DEBUG: Switch[\(index)]: label='\(sw.label)', value='\(sw.value ?? "nil")'")
+        }
+        print("DEBUG: All date pickers in Settings:")
+        let allPickers = app.datePickers.allElementsBoundByIndex
+        for (index, picker) in allPickers.enumerated() {
+            print("DEBUG: DatePicker[\(index)]: identifier='\(picker.identifier)', label='\(picker.label)'")
+        }
+        // Toggle debug ON
+        let debugToggle = app.switches["Show Debug Labels"]
+        XCTAssertTrue(debugToggle.waitForExistence(timeout: 3), "Debug toggle should exist")
+        if debugToggle.value as? String == "0" {
+            debugToggle.tap()
+            print("DEBUG: Tapped Show Debug Labels switch")
+        }
+        XCTAssertEqual(debugToggle.value as? String, "1", "Debug toggle should be ON after tap")
+        // Set EOD picker to 8:00 PM
+        let endOfDayPicker = app.datePickers["EndOfDayTimePicker"]
+        XCTAssertTrue(endOfDayPicker.waitForExistence(timeout: 3), "EndOfDayTimePicker should exist")
+        let hourWheel = endOfDayPicker.pickerWheels.element(boundBy: 0)
+        let minuteWheel = endOfDayPicker.pickerWheels.element(boundBy: 1)
+        let amPmWheel = endOfDayPicker.pickerWheels.element(boundBy: 2)
+        hourWheel.adjust(toPickerWheelValue: "8")
+        minuteWheel.adjust(toPickerWheelValue: "00")
+        amPmWheel.adjust(toPickerWheelValue: "PM")
+        print("DEBUG: Set EOD to 8:00 PM")
+        // Assert picker wheels are set
+        XCTAssertEqual(hourWheel.value as? String, "8", "Hour wheel should be 8")
+        XCTAssertEqual(minuteWheel.value as? String, "00", "Minute wheel should be 00")
+        XCTAssertTrue((amPmWheel.value as? String)?.uppercased().contains("PM") ?? false, "AM/PM wheel should be PM")
+    }
+
     /*
     func testResetProgramReturnsToSetupScreen() throws {
         let app = XCUIApplication()
