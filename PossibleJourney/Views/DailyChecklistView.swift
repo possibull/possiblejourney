@@ -16,6 +16,8 @@ struct DebugWindow<Content: View>: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(.white)
                 Text(isExpanded ? "Debug (tap to minimize)" : "Debug (tap to expand)")
                     .font(.caption.bold())
                     .foregroundColor(.white)
