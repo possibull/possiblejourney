@@ -265,6 +265,9 @@ final class PossibleJourneyUITests: XCTestCase {
         app.buttons["I Missed It"].tap()
         app.checkOnScreen(identifier: "DailyChecklistScreen", message: "Should return to checklist screen")
         
+        // Re-enable debug labels after reset
+        enableDebugLabels(in: app)
+        
         // Debug: Print all static text to see what's actually displayed
         print("DEBUG: All static text after 'I Missed It' reset:")
         let allStaticTexts = app.staticTexts.allElementsBoundByIndex
