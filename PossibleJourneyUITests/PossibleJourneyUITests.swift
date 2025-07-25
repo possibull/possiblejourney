@@ -159,12 +159,12 @@ final class PossibleJourneyUITests: XCTestCase {
         app.launchArguments = ["--uitesting-current-time", String(fakeNowTimestamp)]
         app.launch()
         // Assert missed day screen appears directly after relaunch
-        let missedDayScreen = app.otherElements["MissedDayScreen"]
-        let foundMissedDayScreen = missedDayScreen.waitForExistence(timeout: 10)
-        if !foundMissedDayScreen {
+        let missedDayLabel = app.staticTexts["MissedDayScreen"]
+        let foundMissedDayLabel = missedDayLabel.waitForExistence(timeout: 10)
+        if !foundMissedDayLabel {
             print(app.debugDescription)
         }
-        XCTAssertTrue(foundMissedDayScreen, "Missed day screen should appear after end of day if tasks are incomplete")
+        XCTAssertTrue(foundMissedDayLabel, "Missed day screen should appear after end of day if tasks are incomplete")
     }
 
     func testSettingsViewShowsEndOfDayTimePicker() throws {
