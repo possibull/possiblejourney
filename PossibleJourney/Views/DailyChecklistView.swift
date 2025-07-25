@@ -154,6 +154,7 @@ struct DailyChecklistView: View {
         )
         .listRowInsets(EdgeInsets())
         .listRowBackground(Color.clear)
+        .accessibilityIdentifier("TaskCell_\(task.id.uuidString)")
     }
 
     var body: some View {

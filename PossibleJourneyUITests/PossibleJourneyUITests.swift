@@ -101,12 +101,11 @@ final class PossibleJourneyUITests: XCTestCase {
         let debugCompletedTaskIDsBefore = app.staticTexts["DebugCompletedTaskIDsLabel"].label
         print("DEBUG: CompletedTaskIDsDebug before relaunch: \(debugCompletedTaskIDsBefore)")
         // Get the Read task's ID (assume it's the first in the list)
-        let readTaskID = debugTaskIDsBefore.components(separatedBy: ",").first!
-        // Mark the first task as complete
-        let firstTask = app.staticTexts["Read"]
-        XCTAssertTrue(firstTask.exists)
-        let firstTaskCell = firstTask.coordinate(withNormalizedOffset: CGVector(dx: -0.2, dy: 0.5))
-        firstTaskCell.tap()
+        let readTaskID = debugTaskIDsBefore.components(separatedBy: ",").first!.trimmingCharacters(in: .whitespaces)
+        // Mark the first task as complete using accessibility identifier
+        let readTaskCell = app.otherElements["TaskCell_\(readTaskID)"]
+        XCTAssertTrue(readTaskCell.waitForExistence(timeout: 5), "Read task cell should exist")
+        readTaskCell.tap()
         // Relaunch app (no reset)
         app.terminate()
         app.launchArguments = []
