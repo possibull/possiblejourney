@@ -308,6 +308,23 @@ final class PossibleJourneyUITests: XCTestCase {
 
     // NOTE: Swipe-to-delete is tested manually due to XCTest limitations with SwiftUI Lists. The system Delete button is not reliably accessible in UI tests.
 
+    func assertOverriddenTimeWithinProgramRange(app: XCUIApplication, message: String = "Overridden time should be within program's range") {
+        let overriddenTimeLabel = app.staticTexts["DebugCurrentTimeLabel"]
+        let programStartDateLabel = app.staticTexts["DebugProgramStartDateLabel"]
+        XCTAssertTrue(overriddenTimeLabel.waitForExistence(timeout: 2), "Overridden time label should exist")
+        XCTAssertTrue(programStartDateLabel.waitForExistence(timeout: 2), "Program start date label should exist")
+        let overriddenTimeString = overriddenTimeLabel.label.replacingOccurrences(of: "DEBUG Overridden Time: ", with: "")
+        let programStartDateString = programStartDateLabel.label.replacingOccurrences(of: "DEBUG Program Start Date: ", with: "")
+        let formatter = ISO8601DateFormatter()
+        // Try to parse both as ISO8601, fallback to Date() parsing
+        guard let overriddenTime = formatter.date(from: overriddenTimeString) ?? DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .medium) as? Date,
+              let programStartDate = formatter.date(from: programStartDateString) ?? DateFormatter.localizedString(from: Date(), dateStyle: .medium, timeStyle: .medium) as? Date else {
+            XCTFail("Could not parse overridden time or program start date")
+            return
+        }
+        XCTAssertTrue(overriddenTime >= programStartDate, message + " (overridden: \(overriddenTime), start: \(programStartDate))")
+    }
+
     func setupMissedDayScenario(app: XCUIApplication, eodHour: String = "8", missedTime: String = "2025-07-24T21:00:00Z") {
         // Setup program
         setupProgram(app: app)
@@ -335,6 +352,8 @@ final class PossibleJourneyUITests: XCTestCase {
         app.launchArguments.append("--uitesting-current-time")
         app.launchArguments.append(missedTime)
         app.launch()
+        // Assert overridden time is within program's range
+        assertOverriddenTimeWithinProgramRange(app: app)
     }
 
     func testMissedDayScreen_IMissedIt_ResetsToDay1() {
