@@ -147,10 +147,18 @@ final class PossibleJourneyUITests: XCTestCase {
         // Assert missed day screen appears directly after relaunch
         let missedDayLabel = app.staticTexts["MissedDayScreen"]
         let foundMissedDayLabel = missedDayLabel.waitForExistence(timeout: 10)
-        if !foundMissedDayLabel {
-            print(app.debugDescription)
+        if foundMissedDayLabel {
+            XCTAssertTrue(foundMissedDayLabel, "Missed day screen should appear after end of day if tasks are incomplete")
+            return
         }
-        XCTAssertTrue(foundMissedDayLabel, "Missed day screen should appear after end of day if tasks are incomplete")
+        // If not found, enable debug mode and print debug info
+        enableDebugModeByTappingAllSwitches(in: app)
+        let backButton = app.buttons["Back"]
+        if backButton.exists { backButton.tap() }
+        let debugLabel = app.staticTexts["DEBUG"].label
+        print("DEBUG: Debug label after relaunch: \(debugLabel)")
+        // Add more debug prints as needed
+        XCTFail("Missed day screen did not appear; debug info printed above")
     }
 
     func testSettingsViewShowsEndOfDayTimePicker() throws {
