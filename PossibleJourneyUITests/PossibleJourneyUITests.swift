@@ -278,8 +278,8 @@ final class PossibleJourneyUITests: XCTestCase {
             // Try to find any day label
             let anyDayLabel = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'DAY'"))
             if anyDayLabel.count > 0 {
-                print("DEBUG: Found day label: '\(anyDayLabel.first!.label)'")
-                XCTAssertTrue(anyDayLabel.first!.label.contains("DAY 1"), "Should be on Day 1 after reset, but found: \(anyDayLabel.first!.label)")
+                print("DEBUG: Found day label: '\(anyDayLabel.element(boundBy: 0).label)'")
+                XCTAssertTrue(anyDayLabel.element(boundBy: 0).label.contains("DAY 1"), "Should be on Day 1 after reset, but found: \(anyDayLabel.element(boundBy: 0).label)")
             } else {
                 XCTFail("No day label found after reset")
             }
