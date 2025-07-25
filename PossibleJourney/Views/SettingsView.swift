@@ -1,11 +1,15 @@
 import SwiftUI
 import Foundation
 
+class DebugState: ObservableObject {
+    @Published var debug: Bool = false
+    @Published var debugWindowExpanded: Bool = true
+}
+
 struct SettingsView: View {
     var onReset: (() -> Void)? = nil
     @Binding var endOfDayTime: Date
-    @State private var debug: Bool = false
-    @State private var debugWindowExpanded: Bool = true
+    @EnvironmentObject var debugState: DebugState
     // Minimal test-only toggle for UI test isolation
     @State private var testDebug = false
     // 75 Hard deep red
@@ -53,9 +57,9 @@ struct SettingsView: View {
                             }
                     }
                     Section(header: Text("Debug").font(.headline).foregroundColor(hardRed)) {
-                        Toggle("Show Debug Labels", isOn: $debug)
+                        Toggle("Show Debug Labels", isOn: $debugState.debug)
                             .accessibilityIdentifier("DebugToggle")
-                            .onChange(of: debug) { newValue in
+                            .onChange(of: debugState.debug) { newValue in
                                 print("DEBUG TOGGLE: \(newValue)")
                             }
                     }

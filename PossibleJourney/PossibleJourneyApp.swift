@@ -12,13 +12,12 @@ import Foundation
 import SwiftUI
 
 struct GlobalDebugWindow: View {
-    @State private var debug: Bool = false
-    @State private var debugWindowExpanded: Bool = true
+    @EnvironmentObject var debugState: DebugState
     @EnvironmentObject var appState: ProgramAppState
     var checklistDebugContent: () -> AnyView
     var body: some View {
-        if debug {
-            DebugWindow(isExpanded: $debugWindowExpanded) {
+        if debugState.debug {
+            DebugWindow(isExpanded: $debugState.debugWindowExpanded) {
                 checklistDebugContent()
             }
         }
@@ -39,6 +38,7 @@ struct PossibleJourneyApp: App {
         resetForUITestingIfNeeded()
     }
     @StateObject private var appState = ProgramAppState()
+    @StateObject private var debugState = DebugState()
     var currentTimeOverride: Date? {
         if let idx = CommandLine.arguments.firstIndex(of: "--uitesting-current-time"),
            CommandLine.arguments.count > idx + 1,
@@ -68,11 +68,13 @@ struct PossibleJourneyApp: App {
                             },
                             currentTimeOverride: currentTimeOverride
                         )
+                        .environmentObject(debugState)
                     } else {
                         ProgramSetupView(onSave: { program in
                             appState.loadedProgram = program
                             ProgramStorage().save(program)
                         })
+                        .environmentObject(debugState)
                     }
                 }
                 // Global DebugWindow always visible at top
@@ -112,7 +114,9 @@ struct PossibleJourneyApp: App {
                         return AnyView(EmptyView())
                     }
                 }).padding(.top, 80)
+                .environmentObject(debugState)
             }
+            .environmentObject(appState)
         }
     }
 }
