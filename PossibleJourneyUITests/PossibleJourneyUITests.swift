@@ -189,6 +189,12 @@ final class PossibleJourneyUITests: XCTestCase {
         let expandButton = app.buttons["ExpandDebugWindow"]
         if expandButton.exists {
             expandButton.tap()
+            // Check if window is expanded (optionally, check for a label or state)
+            // If not expanded, fail immediately
+            if expandButton.exists { // If still exists, assume not expanded
+                XCTFail("Failed to expand debug window via ExpandDebugWindow button")
+                fatalError("Failed to expand debug window via ExpandDebugWindow button")
+            }
         }
     }
 
@@ -210,6 +216,12 @@ final class PossibleJourneyUITests: XCTestCase {
         let expandButton = app.buttons["ExpandDebugWindow"]
         if expandButton.exists {
             expandButton.tap()
+            // Check if window is expanded (optionally, check for a label or state)
+            // If not expanded, fail immediately
+            if expandButton.exists { // If still exists, assume not expanded
+                XCTFail("Failed to expand debug window via ExpandDebugWindow button")
+                fatalError("Failed to expand debug window via ExpandDebugWindow button")
+            }
         }
     }
 
