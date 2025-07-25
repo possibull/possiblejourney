@@ -8,6 +8,44 @@ struct TaskIDWrapper: Identifiable, Equatable {
     let id: UUID
 }
 
+// Add DebugWindow reusable view
+struct DebugWindow<Content: View>: View {
+    @Binding var isExpanded: Bool
+    let content: () -> Content
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Text(isExpanded ? "Debug (tap to collapse)" : "Debug (tap to expand)")
+                    .font(.caption.bold())
+                    .foregroundColor(.white)
+                Spacer()
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(Color.black.opacity(0.8))
+            .onTapGesture {
+                withAnimation { isExpanded.toggle() }
+            }
+            if isExpanded {
+                ScrollView(.vertical, showsIndicators: true) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        content()
+                    }
+                    .padding(8)
+                }
+                .background(Color.black.opacity(0.85))
+                .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+        .cornerRadius(12)
+        .shadow(radius: 8)
+        .padding(.horizontal, 8)
+        .padding(.top, 8)
+        .zIndex(100)
+    }
+}
+
 struct DailyChecklistView: View {
     @ObservedObject var viewModel: DailyChecklistViewModel
     @State private var showSettings = false
@@ -22,6 +60,7 @@ struct DailyChecklistView: View {
     var onReset: (() -> Void)? = nil
     var currentTimeOverride: Date? = nil // For test injection
     @State private var debug = false
+    @State private var debugWindowExpanded = false
     
     // 75 Hard deep red
     let hardRed = Color(red: 183/255, green: 28/255, blue: 28/255)
@@ -40,7 +79,7 @@ struct DailyChecklistView: View {
     }
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
             if viewModel.isDayMissed {
                 MissedDayScreen(
                     onContinue: {
@@ -96,36 +135,38 @@ struct DailyChecklistView: View {
                         .foregroundColor(.white.opacity(0.85))
                         .padding(.bottom, 24)
                     if debug {
-                        // Debug label for 'now'
-                        Text("DEBUG now: \(viewModel.now)")
-                            .font(.caption)
-                            .foregroundColor(.yellow)
-                            .accessibilityIdentifier("DebugNowLabel")
-                        // Debug label for isDayMissed
-                        Text("DEBUG isDayMissed: \(viewModel.isDayMissed ? "YES" : "NO")")
-                            .font(.caption)
-                            .foregroundColor(.orange)
-                            .accessibilityIdentifier("DebugIsDayMissedLabel")
-                        // Debug label for completedTaskIDs
-                        Text("DEBUG completedTaskIDs: \(viewModel.dailyProgress.completedTaskIDs.map { $0.uuidString }.joined(separator: ", "))")
-                            .font(.caption)
-                            .foregroundColor(.green)
-                            .accessibilityIdentifier("DebugCompletedTaskIDsLabel")
-                        // Debug label for showMissedDayModal
-                        Text("DEBUG showMissedDayModal: \(viewModel.isDayMissed ? "YES" : "NO")")
-                            .font(.caption)
-                            .foregroundColor(.red)
-                            .accessibilityIdentifier("DebugShowMissedDayModalLabel")
-                        // Debug label for all task titles
-                        Text("TaskTitles: \(viewModel.program.tasks.map { $0.title }.joined(separator: ", "))")
-                            .font(.caption)
-                            .foregroundColor(.blue)
-                            .accessibilityIdentifier("TaskTitlesDebug")
-                        // Debug label for all task IDs
-                        Text("TaskIDs: \(viewModel.program.tasks.map { $0.id.uuidString }.joined(separator: ", "))")
-                            .font(.caption)
-                            .foregroundColor(.purple)
-                            .accessibilityIdentifier("TaskIDsDebug")
+                        DebugWindow(isExpanded: $debugWindowExpanded) {
+                            // Debug label for 'now'
+                            Text("DEBUG now: \(viewModel.now)")
+                                .font(.caption)
+                                .foregroundColor(.yellow)
+                                .accessibilityIdentifier("DebugNowLabel")
+                            // Debug label for isDayMissed
+                            Text("DEBUG isDayMissed: \(viewModel.isDayMissed ? "YES" : "NO")")
+                                .font(.caption)
+                                .foregroundColor(.orange)
+                                .accessibilityIdentifier("DebugIsDayMissedLabel")
+                            // Debug label for completedTaskIDs
+                            Text("DEBUG completedTaskIDs: \(viewModel.dailyProgress.completedTaskIDs.map { $0.uuidString }.joined(separator: ", "))")
+                                .font(.caption)
+                                .foregroundColor(.green)
+                                .accessibilityIdentifier("DebugCompletedTaskIDsLabel")
+                            // Debug label for showMissedDayModal
+                            Text("DEBUG showMissedDayModal: \(viewModel.isDayMissed ? "YES" : "NO")")
+                                .font(.caption)
+                                .foregroundColor(.red)
+                                .accessibilityIdentifier("DebugShowMissedDayModalLabel")
+                            // Debug label for all task titles
+                            Text("TaskTitles: \(viewModel.program.tasks.map { $0.title }.joined(separator: ", "))")
+                                .font(.caption)
+                                .foregroundColor(.blue)
+                                .accessibilityIdentifier("TaskTitlesDebug")
+                            // Debug label for all task IDs
+                            Text("TaskIDs: \(viewModel.program.tasks.map { $0.id.uuidString }.joined(separator: ", "))")
+                                .font(.caption)
+                                .foregroundColor(.purple)
+                                .accessibilityIdentifier("TaskIDsDebug")
+                        }
                     }
                     // Checklist Card
                     ZStack {
