@@ -51,6 +51,9 @@ struct SettingsView: View {
                     Section(header: Text("Debug").font(.headline).foregroundColor(hardRed)) {
                         Toggle("Show Debug Labels", isOn: $debug)
                             .accessibilityIdentifier("DebugToggle")
+                            .onChange(of: debug) { newValue in
+                                print("DEBUG TOGGLE: \(newValue)")
+                            }
                     }
                 }
                 .cornerRadius(16)
