@@ -137,6 +137,10 @@ struct PossibleJourneyApp: App {
                                 .font(.caption)
                                 .foregroundColor(.purple)
                                 .accessibilityIdentifier("TaskIDsDebug")
+                            Text("DEBUG Program Start Date: \(viewModel.program.startDate)")
+                                .font(.caption)
+                                .foregroundColor(.cyan)
+                                .accessibilityIdentifier("DebugProgramStartDateLabel")
                         })
                     } else {
                         // Show debug info for setup screen in the debug window
@@ -152,6 +156,12 @@ struct PossibleJourneyApp: App {
                                         .font(.caption)
                                         .foregroundColor(.gray)
                                         .accessibilityIdentifier("DebugRawTimeArgLabel")
+                                }
+                                if let program = storedProgram {
+                                    Text("DEBUG Program Start Date: \(program.startDate)")
+                                        .font(.caption)
+                                        .foregroundColor(.cyan)
+                                        .accessibilityIdentifier("DebugProgramStartDateLabel")
                                 }
                                 Text("DEBUG: Program Setup Screen")
                                     .font(.caption)
