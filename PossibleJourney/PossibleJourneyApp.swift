@@ -86,6 +86,13 @@ struct PossibleJourneyApp: App {
                 // Global DebugWindow always visible at top
                 GlobalDebugWindow(checklistDebugContent: {
                     let debugTime = currentTimeOverride ?? Date()
+                    let rawTimeArg: String? = {
+                        if let idx = CommandLine.arguments.firstIndex(of: "--uitesting-current-time"),
+                           CommandLine.arguments.count > idx + 1 {
+                            return CommandLine.arguments[idx + 1]
+                        }
+                        return nil
+                    }()
                     if let program = appState.loadedProgram {
                         let now = currentTimeOverride ?? Date()
                         let activeDay = program.nextActiveDay(currentDate: now) ?? Calendar.current.startOfDay(for: now)
@@ -96,6 +103,12 @@ struct PossibleJourneyApp: App {
                                 .font(.caption)
                                 .foregroundColor(.orange)
                                 .accessibilityIdentifier("DebugCurrentTimeLabel")
+                            if let raw = rawTimeArg {
+                                Text("DEBUG Raw Time Arg: \(raw)")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                                    .accessibilityIdentifier("DebugRawTimeArgLabel")
+                            }
                             Text("DEBUG Program UUID: \(viewModel.program.id.uuidString)")
                                 .font(.caption)
                                 .foregroundColor(.pink)
@@ -134,6 +147,12 @@ struct PossibleJourneyApp: App {
                                     .font(.caption)
                                     .foregroundColor(.orange)
                                     .accessibilityIdentifier("DebugCurrentTimeLabel")
+                                if let raw = rawTimeArg {
+                                    Text("DEBUG Raw Time Arg: \(raw)")
+                                        .font(.caption)
+                                        .foregroundColor(.gray)
+                                        .accessibilityIdentifier("DebugRawTimeArgLabel")
+                                }
                                 Text("DEBUG: Program Setup Screen")
                                     .font(.caption)
                                     .foregroundColor(.yellow)
