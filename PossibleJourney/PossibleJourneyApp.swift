@@ -104,7 +104,6 @@ struct PossibleJourneyApp: App {
                                 }
                             }
                         )
-                        .environmentObject(debugState)
                     }
                 }
                 // Global DebugWindow always visible at top
