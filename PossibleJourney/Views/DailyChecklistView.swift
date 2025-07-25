@@ -116,6 +116,16 @@ struct DailyChecklistView: View {
                             .font(.caption)
                             .foregroundColor(.red)
                             .accessibilityIdentifier("DebugShowMissedDayModalLabel")
+                        // Debug label for all task titles
+                        Text("TaskTitles: \(viewModel.program.tasks.map { $0.title }.joined(separator: ", "))")
+                            .font(.caption)
+                            .foregroundColor(.blue)
+                            .accessibilityIdentifier("TaskTitlesDebug")
+                        // Debug label for all task IDs
+                        Text("TaskIDs: \(viewModel.program.tasks.map { $0.id.uuidString }.joined(separator: ", "))")
+                            .font(.caption)
+                            .foregroundColor(.purple)
+                            .accessibilityIdentifier("TaskIDsDebug")
                     }
                     // Checklist Card
                     ZStack {
