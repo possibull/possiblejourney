@@ -18,6 +18,7 @@ struct DebugWindow<Content: View>: View {
             HStack {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(.white)
+                    .accessibilityIdentifier("ExpandDebugWindow")
                 // Removed the Debug (tap to expand/minimize) text
                 Spacer()
             }
