@@ -16,7 +16,7 @@ struct DebugWindow<Content: View>: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Text(isExpanded ? "Debug (tap to collapse)" : "Debug (tap to expand)")
+                Text(isExpanded ? "Debug (tap to minimize)" : "Debug (tap to expand)")
                     .font(.caption.bold())
                     .foregroundColor(.white)
                 Spacer()
@@ -34,6 +34,7 @@ struct DebugWindow<Content: View>: View {
                     }
                     .padding(8)
                 }
+                .frame(maxHeight: UIScreen.main.bounds.height * 0.5)
                 .background(Color.black.opacity(0.85))
                 .transition(.move(edge: .top).combined(with: .opacity))
             }
@@ -61,7 +62,7 @@ struct DailyChecklistView: View {
     var currentTimeOverride: Date? = nil // For test injection
     @State private var debug = false
     // For debugging, force debug window to always show
-    @State private var debugWindowExpanded = true
+    @State private var debugWindowExpanded = true // Always open by default
     
     // 75 Hard deep red
     let hardRed = Color(red: 183/255, green: 28/255, blue: 28/255)
@@ -164,7 +165,6 @@ struct DailyChecklistView: View {
                                     .accessibilityIdentifier("TaskIDsDebug")
                             }
                         }
-                        .background(Color.red.opacity(0.2))
                     }
                     // Checklist Card
                     ZStack {
