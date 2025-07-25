@@ -83,6 +83,27 @@ struct DailyChecklistView: View {
         viewModel.program.tasks.filter { !hideCompletedTasks || !viewModel.dailyProgress.completedTaskIDs.contains($0.id) }
     }
 
+    private var programDaysCircle: some View {
+        ZStack {
+            Circle().fill(Color.white).frame(width: 48, height: 48)
+            Text("\(viewModel.program.numberOfDays)")
+                .font(.system(size: 22, weight: .heavy))
+                .foregroundColor(hardRed)
+        }
+    }
+    private var dayNumberRow: some View {
+        HStack(spacing: 6) {
+            Text("DAY \(currentDay)")
+                .font(.system(size: 40, weight: .black))
+                .foregroundColor(.white)
+            Text("OF \(viewModel.program.numberOfDays)")
+                .font(.system(size: 14, weight: .bold))
+                .foregroundColor(.white)
+                .baselineOffset(12)
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
+    }
+
     var body: some View {
         ZStack(alignment: .top) {
             if viewModel.isDayMissed {
@@ -103,24 +124,8 @@ struct DailyChecklistView: View {
                 VStack(spacing: 0) {
                     // Header row with logo, DAY XX, and checklist icon
                     HStack(alignment: .center) {
-                        // Circle with total number of days in program (restored)
-                        ZStack {
-                            Circle().fill(Color.white).frame(width: 48, height: 48)
-                            Text("\(viewModel.program.numberOfDays)")
-                                .font(.system(size: 22, weight: .heavy))
-                                .foregroundColor(hardRed)
-                        }
-                        HStack(spacing: 6) {
-                            Text("DAY \(currentDay)")
-                                .font(.system(size: 40, weight: .black))
-                                .foregroundColor(.white)
-                            Text("OF \(viewModel.program.numberOfDays)")
-                                .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(.white)
-                                .baselineOffset(12)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        // Checklist icon toggle for hiding/showing finished tasks
+                        programDaysCircle
+                        dayNumberRow
                         Button(action: { hideCompletedTasks.toggle() }) {
                             Image(systemName: hideCompletedTasks ? "checklist.checked" : "checklist")
                                 .font(.system(size: 32, weight: .bold))
