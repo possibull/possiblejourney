@@ -60,7 +60,8 @@ struct DailyChecklistView: View {
     var onReset: (() -> Void)? = nil
     var currentTimeOverride: Date? = nil // For test injection
     @State private var debug = false
-    @State private var debugWindowExpanded = false
+    // For debugging, force debug window to always show
+    @State private var debugWindowExpanded = true
     
     // 75 Hard deep red
     let hardRed = Color(red: 183/255, green: 28/255, blue: 28/255)
@@ -163,6 +164,7 @@ struct DailyChecklistView: View {
                                     .accessibilityIdentifier("TaskIDsDebug")
                             }
                         }
+                        .background(Color.red.opacity(0.2))
                     }
                     // Checklist Card
                     ZStack {
