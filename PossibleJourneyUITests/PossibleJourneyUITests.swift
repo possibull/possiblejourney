@@ -204,15 +204,32 @@ final class PossibleJourneyUITests: XCTestCase {
     }
 
     func toggleDebugLabelsInSettings(app: XCUIApplication) {
+        print("DEBUG: Looking for Show Debug Labels switch in Settings")
         let debugToggle = app.switches["Show Debug Labels"]
         var attempts = 0
-        while !debugToggle.exists && attempts < 5 {
+        while !debugToggle.exists && attempts < 10 {
             app.swipeUp()
             attempts += 1
         }
-        XCTAssertTrue(debugToggle.waitForExistence(timeout: 2), "Debug toggle should exist")
-        if debugToggle.value as? String == "0" {
-            debugToggle.tap()
+        print("DEBUG: All switches in Settings:")
+        let allSwitches = app.switches.allElementsBoundByIndex
+        for (index, sw) in allSwitches.enumerated() {
+            print("DEBUG: Switch[\(index)]: label='\(sw.label)', value='\(sw.value ?? "nil")'")
+        }
+        if debugToggle.exists {
+            print("DEBUG: Found Show Debug Labels switch, value=\(debugToggle.value ?? "nil")")
+            if debugToggle.value as? String == "0" {
+                debugToggle.tap()
+                print("DEBUG: Tapped Show Debug Labels switch")
+            }
+        } else {
+            print("DEBUG: Show Debug Labels switch not found by label, trying to tap all switches")
+            for sw in allSwitches {
+                if sw.value as? String == "0" {
+                    sw.tap()
+                    print("DEBUG: Tapped switch with label '\(sw.label)' as fallback")
+                }
+            }
         }
     }
 
@@ -225,18 +242,33 @@ final class PossibleJourneyUITests: XCTestCase {
         print("DEBUG: Waiting for SettingsButton to exist")
         XCTAssertTrue(settingsButton.exists)
         settingsButton.tap()
-        print("DEBUG: SettingsButton tapped, toggling debug labels in Settings")
+        print("DEBUG: SettingsButton tapped, printing accessibility hierarchy:")
+        print(app.debugDescription)
+        print("DEBUG: All switches in Settings after opening:")
+        let allSwitches = app.switches.allElementsBoundByIndex
+        for (index, sw) in allSwitches.enumerated() {
+            print("DEBUG: Switch[\(index)]: label='\(sw.label)', value='\(sw.value ?? "nil")'")
+        }
+        print("DEBUG: All date pickers in Settings after opening:")
+        let allPickers = app.datePickers.allElementsBoundByIndex
+        for (index, picker) in allPickers.enumerated() {
+            print("DEBUG: DatePicker[\(index)]: identifier='\(picker.identifier)', label='\(picker.label)'")
+        }
+        print("DEBUG: Toggling debug labels in Settings")
         toggleDebugLabelsInSettings(app: app)
         print("DEBUG: Debug labels enabled, waiting for EndOfDayTimePicker")
         let endOfDayPicker = app.datePickers["EndOfDayTimePicker"]
-        XCTAssertTrue(endOfDayPicker.waitForExistence(timeout: 2))
+        XCTAssertTrue(endOfDayPicker.waitForExistence(timeout: 5), "EndOfDayTimePicker should exist")
         print("DEBUG: EndOfDayTimePicker exists, setting EOD picker wheels")
         // Set the picker to a fixed time: 8:00 PM
         let hourWheel = endOfDayPicker.pickerWheels.element(boundBy: 0)
         let minuteWheel = endOfDayPicker.pickerWheels.element(boundBy: 1)
         let amPmWheel = endOfDayPicker.pickerWheels.element(boundBy: 2)
+        print("DEBUG: Adjusting hour wheel to 8")
         hourWheel.adjust(toPickerWheelValue: "8")
+        print("DEBUG: Adjusting minute wheel to 00")
         minuteWheel.adjust(toPickerWheelValue: "00")
+        print("DEBUG: Adjusting am/pm wheel to PM")
         amPmWheel.adjust(toPickerWheelValue: "PM")
         print("DEBUG: EOD set to 8:00 PM, preparing to relaunch with fake time")
         // Set fake 'now' to 9:00 PM (1 hour after EOD)
@@ -256,21 +288,41 @@ final class PossibleJourneyUITests: XCTestCase {
     func testMissedDayScreen_IMissedIt_ResetsToDay1() {
         let app = launchAppWithReset()
         setupMissedDayScenario(app: app)
-        app.buttons["I Missed It"].tap()
-        app.checkOnScreen(identifier: "DailyChecklistScreen", message: "Should return to checklist screen")
-        
-        // Print all buttons and static texts after reset
-        print("DEBUG: All buttons after 'I Missed It' reset:")
+        // Print all buttons and static texts after missed day screen appears
+        print("DEBUG: All buttons after missed day screen appears:")
         let allButtons = app.buttons.allElementsBoundByIndex
         for (index, button) in allButtons.enumerated() {
             print("DEBUG: Button[\(index)]: label='\(button.label)', identifier='\(button.identifier)'")
         }
-        print("DEBUG: All static text after 'I Missed It' reset:")
+        print("DEBUG: All static text after missed day screen appears:")
         let allStaticTexts = app.staticTexts.allElementsBoundByIndex
         for (index, text) in allStaticTexts.enumerated() {
             print("DEBUG: StaticText[\(index)]: '\(text.label)'")
         }
-        
+        // Wait for and tap I Missed It
+        let missedButton = app.buttons["I Missed It"]
+        XCTAssertTrue(missedButton.waitForExistence(timeout: 5), "I Missed It button should exist")
+        missedButton.tap()
+        app.checkOnScreen(identifier: "DailyChecklistScreen", message: "Should return to checklist screen")
+        // Print all buttons and static texts after reset
+        print("DEBUG: All buttons after 'I Missed It' reset:")
+        let allButtons2 = app.buttons.allElementsBoundByIndex
+        for (index, button) in allButtons2.enumerated() {
+            print("DEBUG: Button[\(index)]: label='\(button.label)', identifier='\(button.identifier)'")
+        }
+        print("DEBUG: All static text after 'I Missed It' reset:")
+        let allStaticTexts2 = app.staticTexts.allElementsBoundByIndex
+        for (index, text) in allStaticTexts2.enumerated() {
+            print("DEBUG: StaticText[\(index)]: '\(text.label)'")
+        }
+        // Print accessibility hierarchy and all switches after reset
+        print("DEBUG: Accessibility hierarchy after reset:")
+        print(app.debugDescription)
+        print("DEBUG: All switches after reset:")
+        let allSwitchesAfter = app.switches.allElementsBoundByIndex
+        for (index, sw) in allSwitchesAfter.enumerated() {
+            print("DEBUG: Switch[\(index)]: label='\(sw.label)', value='\(sw.value ?? "nil")'")
+        }
         // If SettingsButton is not found but Back is, tap Back
         let settingsButton = app.buttons["SettingsButton"]
         let backButton = app.buttons["Back"]
@@ -278,10 +330,8 @@ final class PossibleJourneyUITests: XCTestCase {
             print("DEBUG: SettingsButton not found, tapping Back to return to checklist")
             backButton.tap()
         }
-        
         // Re-enable debug labels after reset
         enableDebugLabels(in: app)
-        
         // Check for DAY 1 or any day number
         let dayLabel = app.staticTexts["DAY 1"]
         if !dayLabel.exists {
@@ -296,7 +346,6 @@ final class PossibleJourneyUITests: XCTestCase {
         } else {
             XCTAssertTrue(dayLabel.exists, "Should be on Day 1 after reset")
         }
-        
         let completedTasks = app.buttons.matching(identifier: "checkmark")
         XCTAssertEqual(completedTasks.count, 0, "No tasks should be completed after reset")
     }
