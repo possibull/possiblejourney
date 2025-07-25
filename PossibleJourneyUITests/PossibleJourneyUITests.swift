@@ -279,15 +279,14 @@ final class PossibleJourneyUITests: XCTestCase {
         if backButton.exists { backButton.tap() }
     }
 
-    func testMissedDayScreen_IMissedIt_ResetsToDay1() {
-        let app = launchAppWithReset()
+    func setupMissedDayScenario(app: XCUIApplication, eodHour: String = "8", missedTime: String = "2025-07-24T21:00:00Z") {
         app.checkOnScreen(identifier: "ProgramSetupScreen", message: "Should start on Program Setup screen")
         app.addTask(title: "Task 1", description: "Description 1")
         app.addTask(title: "Task 2", description: "Description 2")
         app.saveProgram()
         app.checkOnScreen(identifier: "DailyChecklistScreen", message: "Should navigate to checklist after saving program")
         enableDebugLabels(in: app)
-        // Navigate to Settings and set EOD to 8:00 PM
+        // Navigate to Settings and set EOD
         let settingsButton = app.buttons["SettingsButton"]
         XCTAssertTrue(settingsButton.waitForExistence(timeout: 2))
         settingsButton.tap()
@@ -295,14 +294,19 @@ final class PossibleJourneyUITests: XCTestCase {
         XCTAssertTrue(endOfDayPicker.waitForExistence(timeout: 2), "End of Day Time picker should exist")
         let hourPicker = endOfDayPicker.pickerWheels.element(boundBy: 0)
         let minutePicker = endOfDayPicker.pickerWheels.element(boundBy: 1)
-        hourPicker.adjust(toPickerWheelValue: "8")
+        hourPicker.adjust(toPickerWheelValue: eodHour)
         minutePicker.adjust(toPickerWheelValue: "00")
         app.buttons["Back"].tap()
         app.terminate()
-        app.launchArguments = ["--uitesting", "--currentTimeOverride", "2025-07-24T21:00:00Z"]
+        app.launchArguments = ["--uitesting", "--currentTimeOverride", missedTime]
         app.launch()
         enableDebugLabels(in: app)
         app.checkOnScreen(identifier: "MissedDayScreen", timeout: 10, message: "Missed day screen should appear")
+    }
+
+    func testMissedDayScreen_IMissedIt_ResetsToDay1() {
+        let app = launchAppWithReset()
+        setupMissedDayScenario(app: app)
         app.buttons["I Missed It"].tap()
         app.checkOnScreen(identifier: "DailyChecklistScreen", message: "Should return to checklist screen")
         let dayLabel = app.staticTexts["DAY 1"]
@@ -310,31 +314,10 @@ final class PossibleJourneyUITests: XCTestCase {
         let completedTasks = app.buttons.matching(identifier: "checkmark")
         XCTAssertEqual(completedTasks.count, 0, "No tasks should be completed after reset")
     }
-    
+
     func testMissedDayScreen_ContinueAnyway_AdvancesToNextDay() {
         let app = launchAppWithReset()
-        app.checkOnScreen(identifier: "ProgramSetupScreen", message: "Should start on Program Setup screen")
-        app.addTask(title: "Task 1", description: "Description 1")
-        app.addTask(title: "Task 2", description: "Description 2")
-        app.saveProgram()
-        app.checkOnScreen(identifier: "DailyChecklistScreen", message: "Should navigate to checklist after saving program")
-        enableDebugLabels(in: app)
-        // Navigate to Settings and set EOD to 8:00 PM
-        let settingsButton = app.buttons["SettingsButton"]
-        XCTAssertTrue(settingsButton.waitForExistence(timeout: 2))
-        settingsButton.tap()
-        let endOfDayPicker = app.datePickers["EndOfDayTimePicker"]
-        XCTAssertTrue(endOfDayPicker.waitForExistence(timeout: 2), "End of Day Time picker should exist")
-        let hourPicker = endOfDayPicker.pickerWheels.element(boundBy: 0)
-        let minutePicker = endOfDayPicker.pickerWheels.element(boundBy: 1)
-        hourPicker.adjust(toPickerWheelValue: "8")
-        minutePicker.adjust(toPickerWheelValue: "00")
-        app.buttons["Back"].tap()
-        app.terminate()
-        app.launchArguments = ["--uitesting", "--currentTimeOverride", "2025-07-24T21:00:00Z"]
-        app.launch()
-        enableDebugLabels(in: app)
-        app.checkOnScreen(identifier: "MissedDayScreen", timeout: 10, message: "Missed day screen should appear")
+        setupMissedDayScenario(app: app)
         app.buttons["Continue Anyway"].tap()
         app.checkOnScreen(identifier: "DailyChecklistScreen", message: "Should return to checklist screen")
         let dayLabel = app.staticTexts["DAY 2"]
