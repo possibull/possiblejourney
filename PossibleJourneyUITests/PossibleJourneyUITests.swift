@@ -83,6 +83,11 @@ final class PossibleJourneyUITests: XCTestCase {
         if backButton1.exists {
             backButton1.tap()
         }
+        // Minimize the debug window by tapping the spyglass icon
+        let debugIcon = app.images["magnifyingglass"]
+        if debugIcon.exists {
+            debugIcon.tap()
+        }
         // Print task IDs before relaunch
         print("DEBUG: Task IDs before relaunch:")
         let taskCells = app.staticTexts.allElementsBoundByIndex
