@@ -260,6 +260,25 @@ final class PossibleJourneyUITests: XCTestCase {
 
     // NOTE: Swipe-to-delete is tested manually due to XCTest limitations with SwiftUI Lists. The system Delete button is not reliably accessible in UI tests.
 
+    func enableDebugLabels(in app: XCUIApplication) {
+        let settingsButton = app.buttons["SettingsButton"]
+        XCTAssertTrue(settingsButton.waitForExistence(timeout: 2))
+        settingsButton.tap()
+        let debugToggle = app.switches["Show Debug Labels"]
+        var attempts = 0
+        while !debugToggle.exists && attempts < 5 {
+            app.swipeUp()
+            attempts += 1
+        }
+        XCTAssertTrue(debugToggle.waitForExistence(timeout: 2), "Debug toggle should exist")
+        if debugToggle.value as? String == "0" {
+            debugToggle.tap()
+        }
+        // Go back if needed
+        let backButton = app.buttons["Back"]
+        if backButton.exists { backButton.tap() }
+    }
+
     func testMissedDayScreen_IMissedIt_ResetsToDay1() {
         let app = launchAppWithReset()
         app.checkOnScreen(identifier: "ProgramSetupScreen", message: "Should start on Program Setup screen")
@@ -267,6 +286,7 @@ final class PossibleJourneyUITests: XCTestCase {
         app.addTask(title: "Task 2", description: "Description 2")
         app.saveProgram()
         app.checkOnScreen(identifier: "DailyChecklistScreen", message: "Should navigate to checklist after saving program")
+        enableDebugLabels(in: app)
         // Navigate to Settings and set EOD to 8:00 PM
         let settingsButton = app.buttons["SettingsButton"]
         XCTAssertTrue(settingsButton.waitForExistence(timeout: 2))
@@ -281,6 +301,7 @@ final class PossibleJourneyUITests: XCTestCase {
         app.terminate()
         app.launchArguments = ["--uitesting", "--currentTimeOverride", "2025-07-24T21:00:00Z"]
         app.launch()
+        enableDebugLabels(in: app)
         app.checkOnScreen(identifier: "MissedDayScreen", timeout: 10, message: "Missed day screen should appear")
         app.buttons["I Missed It"].tap()
         app.checkOnScreen(identifier: "DailyChecklistScreen", message: "Should return to checklist screen")
@@ -297,6 +318,7 @@ final class PossibleJourneyUITests: XCTestCase {
         app.addTask(title: "Task 2", description: "Description 2")
         app.saveProgram()
         app.checkOnScreen(identifier: "DailyChecklistScreen", message: "Should navigate to checklist after saving program")
+        enableDebugLabels(in: app)
         // Navigate to Settings and set EOD to 8:00 PM
         let settingsButton = app.buttons["SettingsButton"]
         XCTAssertTrue(settingsButton.waitForExistence(timeout: 2))
@@ -311,6 +333,7 @@ final class PossibleJourneyUITests: XCTestCase {
         app.terminate()
         app.launchArguments = ["--uitesting", "--currentTimeOverride", "2025-07-24T21:00:00Z"]
         app.launch()
+        enableDebugLabels(in: app)
         app.checkOnScreen(identifier: "MissedDayScreen", timeout: 10, message: "Missed day screen should appear")
         app.buttons["Continue Anyway"].tap()
         app.checkOnScreen(identifier: "DailyChecklistScreen", message: "Should return to checklist screen")
