@@ -33,15 +33,16 @@ func resetForUITestingIfNeeded() {
 
 @main
 struct PossibleJourneyApp: App {
+    @StateObject private var appState = ProgramAppState()
+    @StateObject private var debugState = DebugState()
+    @State private var showSplash = true
+    
     init() {
         print("DEBUG: PossibleJourneyApp init")
         resetForUITestingIfNeeded()
         // Always minimize debug window on launch
         UserDefaults.standard.set(false, forKey: "debugWindowExpanded")
     }
-    @StateObject private var appState = ProgramAppState()
-    @StateObject private var debugState = DebugState()
-    @State private var showSplash = true
     var currentTimeOverride: Date? {
         if let idx = CommandLine.arguments.firstIndex(of: "--uitesting-current-time"),
            CommandLine.arguments.count > idx + 1,
@@ -206,6 +207,7 @@ struct PossibleJourneyApp: App {
                 .environmentObject(debugState)
             }
             .environmentObject(appState)
+            }
         }
     }
 }
