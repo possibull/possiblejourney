@@ -41,6 +41,7 @@ struct PossibleJourneyApp: App {
     }
     @StateObject private var appState = ProgramAppState()
     @StateObject private var debugState = DebugState()
+    @State private var showSplash = true
     var currentTimeOverride: Date? {
         if let idx = CommandLine.arguments.firstIndex(of: "--uitesting-current-time"),
            CommandLine.arguments.count > idx + 1,
@@ -52,37 +53,44 @@ struct PossibleJourneyApp: App {
     var body: some Scene {
         print("DEBUG: Launching DailyChecklistView with now = \(currentTimeOverride ?? Date())")
         return WindowGroup {
-            ZStack(alignment: .top) {
-                NavigationStack {
-                    if let program = appState.loadedProgram {
-                        let now = currentTimeOverride ?? Date()
-                        let activeDay = program.nextActiveDay(currentDate: now) ?? Calendar.current.startOfDay(for: now)
-                        let dailyProgress = DailyProgressStorage().load(for: activeDay) ?? DailyProgress(id: UUID(), date: activeDay, completedTaskIDs: [])
-                        return AnyView(
-                            DailyChecklistView(
-                                viewModel: DailyChecklistViewModel(
-                                    program: program,
-                                    dailyProgress: dailyProgress,
-                                    now: now
-                                ),
-                                onReset: {
-                                    appState.loadedProgram = nil
-                                    ProgramStorage().clear()
-                                },
-                                currentTimeOverride: currentTimeOverride
-                            )
-                            .environmentObject(debugState)
-                        )
-                    } else {
-                        return AnyView(
-                            ProgramSetupView(onSave: { program in
-                                appState.loadedProgram = program
-                                ProgramStorage().save(program)
-                            })
-                            .environmentObject(debugState)
-                        )
+            if showSplash {
+                SplashView {
+                    withAnimation(.easeInOut(duration: 0.5)) {
+                        showSplash = false
                     }
                 }
+            } else {
+                ZStack(alignment: .top) {
+                    NavigationStack {
+                        if let program = appState.loadedProgram {
+                            let now = currentTimeOverride ?? Date()
+                            let activeDay = program.nextActiveDay(currentDate: now) ?? Calendar.current.startOfDay(for: now)
+                            let dailyProgress = DailyProgressStorage().load(for: activeDay) ?? DailyProgress(id: UUID(), date: activeDay, completedTaskIDs: [])
+                            return AnyView(
+                                DailyChecklistView(
+                                    viewModel: DailyChecklistViewModel(
+                                        program: program,
+                                        dailyProgress: dailyProgress,
+                                        now: now
+                                    ),
+                                    onReset: {
+                                        appState.loadedProgram = nil
+                                        ProgramStorage().clear()
+                                    },
+                                    currentTimeOverride: currentTimeOverride
+                                )
+                                .environmentObject(debugState)
+                            )
+                        } else {
+                            return AnyView(
+                                ProgramSetupView(onSave: { program in
+                                    appState.loadedProgram = program
+                                    ProgramStorage().save(program)
+                                })
+                                .environmentObject(debugState)
+                            )
+                        }
+                    }
                 // Global DebugWindow always visible at top
                 GlobalDebugWindow(checklistDebugContent: {
                     let debugTime = currentTimeOverride ?? Date()

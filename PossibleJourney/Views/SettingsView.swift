@@ -2,8 +2,8 @@ import SwiftUI
 import Foundation
 
 class DebugState: ObservableObject {
-    @Published var debug: Bool = false
-    @Published var debugWindowExpanded: Bool = true
+    @AppStorage("debug") var debug: Bool = false
+    @AppStorage("debugWindowExpanded") var debugWindowExpanded: Bool = false // Minimized by default
 }
 
 struct SettingsView: View {
