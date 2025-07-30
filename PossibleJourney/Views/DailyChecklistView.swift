@@ -721,9 +721,10 @@ struct FullPhotoViewer: View {
                 if let image = image {
                     Image(uiImage: image)
                         .resizable()
-                        .aspectRatio(contentMode: .fit)
+                        .aspectRatio(contentMode: .fill)
                         .scaleEffect(scale)
                         .offset(offset)
+                        .clipped()
                         .gesture(
                             SimultaneousGesture(
                                 MagnificationGesture()
