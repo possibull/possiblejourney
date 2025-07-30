@@ -513,46 +513,110 @@ struct TaskRowView: View {
         
         print("DEBUG: Loading thumbnail for task: \(task.title) from URL: \(url)")
         
-        // Load image asynchronously to avoid blocking the UI
+        // Try to load the image, and if it fails, try to find it in other possible locations
+        loadImageFromURL(url) { [weak self] image in
+            guard let self = self else { return }
+            
+            if let image = image {
+                print("DEBUG: Successfully loaded image for task: \(self.task.title)")
+                DispatchQueue.main.async {
+                    self.fullImage = image
+                    self.hasPhoto = true
+                    print("DEBUG: Set full image for task: \(self.task.title)")
+                    print("DEBUG: fullImage after setting: \(self.fullImage == nil ? "nil" : "not nil")")
+                }
+                
+                image.prepareThumbnail(of: CGSize(width: 80, height: 80)) { thumbnail in
+                    DispatchQueue.main.async {
+                        self.thumbnailImage = thumbnail ?? image
+                        print("DEBUG: Set thumbnail for task: \(self.task.title)")
+                    }
+                }
+            } else {
+                print("DEBUG: Failed to load image for task: \(self.task.title)")
+                DispatchQueue.main.async {
+                    self.thumbnailImage = nil
+                    self.fullImage = nil
+                    self.hasPhoto = false
+                    print("DEBUG: fullImage after clearing (failed): \(self.fullImage == nil ? "nil" : "not nil")")
+                }
+            }
+        }
+    }
+    
+    private func loadImageFromURL(_ url: URL, completion: @escaping (UIImage?) -> Void) {
+        // First try the original URL
+        loadImageFromSpecificURL(url) { image in
+            if image != nil {
+                completion(image)
+                return
+            }
+            
+            // If that fails, try to find the file in other possible locations
+            self.findImageInOtherLocations(url) { foundImage in
+                completion(foundImage)
+            }
+        }
+    }
+    
+    private func loadImageFromSpecificURL(_ url: URL, completion: @escaping (UIImage?) -> Void) {
         DispatchQueue.global(qos: .userInitiated).async {
             do {
                 let imageData = try Data(contentsOf: url)
-                print("DEBUG: Successfully loaded image data for task: \(task.title), size: \(imageData.count) bytes")
+                print("DEBUG: Successfully loaded image data from URL: \(url), size: \(imageData.count) bytes")
                 
                 if let image = UIImage(data: imageData) {
-                    print("DEBUG: Successfully created UIImage for task: \(task.title)")
-                    
-                    // Store the full image for the viewer
-                    DispatchQueue.main.async {
-                        fullImage = image
-                        hasPhoto = true
-                        print("DEBUG: Set full image for task: \(task.title)")
-                        print("DEBUG: fullImage after setting: \(fullImage == nil ? "nil" : "not nil")")
-                    }
-                    
-                    // Create a smaller thumbnail for better performance
-                    image.prepareThumbnail(of: CGSize(width: 80, height: 80)) { thumbnail in
-                        DispatchQueue.main.async {
-                            thumbnailImage = thumbnail ?? image
-                            print("DEBUG: Set thumbnail for task: \(task.title)")
-                        }
-                    }
+                    print("DEBUG: Successfully created UIImage from URL: \(url)")
+                    completion(image)
                 } else {
-                    print("DEBUG: Failed to create UIImage from data for task: \(task.title)")
-                    DispatchQueue.main.async {
-                        thumbnailImage = nil
-                        fullImage = nil
-                        hasPhoto = false
-                        print("DEBUG: fullImage after clearing (failed): \(fullImage == nil ? "nil" : "not nil")")
-                    }
+                    print("DEBUG: Failed to create UIImage from data for URL: \(url)")
+                    completion(nil)
                 }
             } catch {
-                print("DEBUG: Error loading image for task: \(task.title) - \(error)")
-                DispatchQueue.main.async {
-                    thumbnailImage = nil
-                    fullImage = nil
-                    hasPhoto = false
-                    print("DEBUG: fullImage after clearing (error): \(fullImage == nil ? "nil" : "not nil")")
+                print("DEBUG: Error loading image from URL: \(url) - \(error)")
+                completion(nil)
+            }
+        }
+    }
+    
+    private func findImageInOtherLocations(_ originalURL: URL, completion: @escaping (UIImage?) -> Void) {
+        print("DEBUG: Attempting to find image in other locations for: \(originalURL)")
+        
+        // Extract the filename from the original URL
+        let fileName = originalURL.lastPathComponent
+        print("DEBUG: Looking for filename: \(fileName)")
+        
+        // Try different possible base directories
+        let possibleDirectories = [
+            FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first,
+            FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first,
+            FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first
+        ].compactMap { $0 }
+        
+        // Also try with Photos subdirectory
+        var allPossiblePaths: [URL] = []
+        for directory in possibleDirectories {
+            allPossiblePaths.append(directory.appendingPathComponent(fileName))
+            allPossiblePaths.append(directory.appendingPathComponent("Photos").appendingPathComponent(fileName))
+        }
+        
+        print("DEBUG: Checking \(allPossiblePaths.count) possible paths for image")
+        
+        // Try each possible path
+        for (index, path) in allPossiblePaths.enumerated() {
+            print("DEBUG: Checking path \(index + 1): \(path)")
+            
+            loadImageFromSpecificURL(path) { image in
+                if image != nil {
+                    print("DEBUG: Found image at path: \(path)")
+                    completion(image)
+                    return
+                }
+                
+                // If this was the last path to check, return nil
+                if index == allPossiblePaths.count - 1 {
+                    print("DEBUG: Image not found in any of the checked paths")
+                    completion(nil)
                 }
             }
         }
