@@ -114,7 +114,7 @@ struct DailyChecklistView: View {
                     completedDates: viewModel.getCompletedDates(),
                     selectedDate: viewModel.selectedDate,
                     onDateSelected: { date in
-                        loadDailyProgressForDate(date)
+                        viewModel.selectDate(date)
                         showingCalendar = false
                     }
                 )
@@ -130,8 +130,10 @@ struct DailyChecklistView: View {
             }
         }
         .onAppear {
-            // Load progress for the selected date (initially today)
-            loadDailyProgressForDate(viewModel.selectedDate)
+            // Always start with current date unless a calendar date was explicitly selected
+            // Reset to current date to ensure we're not showing a persistent calendar selection
+            viewModel.selectedDate = viewModel.now
+            loadDailyProgressForDate(viewModel.now)
         }
     }
     

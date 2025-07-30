@@ -66,7 +66,19 @@ class DailyChecklistViewModel: ObservableObject {
     
     func updateDailyProgress(_ newProgress: DailyProgress) {
         dailyProgress = newProgress
-        selectedDate = newProgress.date
+        // Don't automatically update selectedDate - only update when user explicitly selects from calendar
+    }
+    
+    func selectDate(_ date: Date) {
+        selectedDate = date
+        // Load the progress for the selected date
+        let dailyProgressStorage = DailyProgressStorage()
+        let progress = dailyProgressStorage.load(for: date) ?? DailyProgress(
+            id: UUID(),
+            date: date,
+            completedTaskIDs: []
+        )
+        updateDailyProgress(progress)
     }
     
     func getCompletedDates() -> Set<Date> {
@@ -92,6 +104,6 @@ class DailyChecklistViewModel: ObservableObject {
         self.program = program
         self.dailyProgress = dailyProgress
         self.now = now
-        self.selectedDate = dailyProgress.date
+        self.selectedDate = now // Always start with current date, not the loaded progress date
     }
 } 
