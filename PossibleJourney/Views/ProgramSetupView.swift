@@ -184,11 +184,22 @@ struct ProgramSetupView: View {
     
     private var saveButton: some View {
         Button(action: {
+            let template = ProgramTemplate(
+                name: "Custom Program",
+                description: "A custom program created by the user.",
+                category: .custom,
+                defaultNumberOfDays: numberOfDays,
+                tasks: tasks,
+                isDefault: false
+            )
+            let storage = ProgramTemplateStorage()
+            storage.add(template)
             let program = Program(
                 id: UUID(),
                 startDate: startDate,
-                numberOfDays: numberOfDays,
-                tasks: tasks
+                endOfDayTime: Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22), // Default 10pm
+                lastCompletedDay: nil,
+                templateID: template.id
             )
             onSave(program)
         }) {

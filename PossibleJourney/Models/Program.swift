@@ -3,13 +3,27 @@ import Foundation
 struct Program: Codable {
     let id: UUID
     var startDate: Date
-    let numberOfDays: Int
-    var tasks: [Task]
     var endOfDayTime: Date = Calendar.current.startOfDay(for: Date()) // Default 12:00AM
     var lastCompletedDay: Date? = nil // New property
+    let templateID: UUID // Reference to the template this program was created from
 }
 
 extension Program {
+    /// Fetch the template for this program
+    func template(using storage: ProgramTemplateStorage = ProgramTemplateStorage()) -> ProgramTemplate? {
+        storage.get(by: templateID)
+    }
+    
+    /// Computed property to get tasks from the template
+    func tasks(using storage: ProgramTemplateStorage = ProgramTemplateStorage()) -> [Task] {
+        template(using: storage)?.tasks ?? []
+    }
+    
+    /// Computed property to get number of days from the template
+    func numberOfDays(using storage: ProgramTemplateStorage = ProgramTemplateStorage()) -> Int {
+        template(using: storage)?.defaultNumberOfDays ?? 0
+    }
+    
     func appDay(for date: Date) -> Int {
         let calendar = Calendar.current
         let startOfStartDate = calendar.startOfDay(for: startDate)
@@ -44,8 +58,8 @@ extension Program {
     func isDayMissed(for date: Date, completedTaskIDs: Set<UUID>) -> Bool {
         let calendar = Calendar.current
         let appDayNumber = appDay(for: date)
-        if appDayNumber < 1 || appDayNumber > numberOfDays {
-            print("DEBUG: Program.isDayMissed - appDayNumber \(appDayNumber) out of range [1, \(numberOfDays)], returning false")
+        if appDayNumber < 1 || appDayNumber > numberOfDays() {
+            print("DEBUG: Program.isDayMissed - appDayNumber \(appDayNumber) out of range [1, \(numberOfDays())], returning false")
             return false
         }
         let endHour = calendar.component(.hour, from: endOfDayTime)
@@ -65,7 +79,7 @@ extension Program {
             print("DEBUG: Program.isDayMissed - not past EOD yet, returning false")
             return false
         }
-        let hasIncompleteTasks = tasks.contains { !completedTaskIDs.contains($0.id) }
+        let hasIncompleteTasks = tasks().contains { !completedTaskIDs.contains($0.id) }
         print("DEBUG: Program.isDayMissed - past EOD, hasIncompleteTasks: \(hasIncompleteTasks), returning \(hasIncompleteTasks)")
         return hasIncompleteTasks
     }
@@ -118,7 +132,7 @@ extension Program {
     func isCurrentAppDayMissed(now: Date, completedTaskIDs: Set<UUID>) -> Bool {
         let appDay = currentAppDay
         let eod = endOfDay(for: appDay)
-        let allComplete = tasks.allSatisfy { completedTaskIDs.contains($0.id) }
+        let allComplete = tasks().allSatisfy { completedTaskIDs.contains($0.id) }
         return !allComplete && now >= eod
     }
 } 

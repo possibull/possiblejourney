@@ -70,7 +70,7 @@ struct DailyChecklistView: View {
         let start = Calendar.current.startOfDay(for: viewModel.program.startDate)
         let today = Calendar.current.startOfDay(for: Date())
         let diff = Calendar.current.dateComponents([.day], from: start, to: today).day ?? 0
-        return min(max(diff + 1, 1), viewModel.program.numberOfDays)
+        return min(max(diff + 1, 1), viewModel.program.numberOfDays())
     }
     private var formattedDate: String {
         let today = Calendar.current.startOfDay(for: Date())
@@ -80,13 +80,13 @@ struct DailyChecklistView: View {
     }
 
     private var visibleTasks: [Task] {
-        viewModel.program.tasks.filter { !hideCompletedTasks || !viewModel.dailyProgress.completedTaskIDs.contains($0.id) }
+        viewModel.program.tasks().filter { !hideCompletedTasks || !viewModel.dailyProgress.completedTaskIDs.contains($0.id) }
     }
 
     private var programDaysCircle: some View {
         ZStack {
             Circle().fill(Color.white).frame(width: 48, height: 48)
-            Text("\(viewModel.program.numberOfDays)")
+            Text("\(viewModel.program.numberOfDays())")
                 .font(.system(size: 22, weight: .heavy))
                 .foregroundColor(hardRed)
         }
@@ -96,7 +96,7 @@ struct DailyChecklistView: View {
             Text("DAY \(currentDay)")
                 .font(.system(size: 40, weight: .black))
                 .foregroundColor(.white)
-            Text("OF \(viewModel.program.numberOfDays)")
+            Text("OF \(viewModel.program.numberOfDays())")
                 .font(.system(size: 14, weight: .bold))
                 .foregroundColor(.white)
                 .baselineOffset(12)
@@ -151,6 +151,86 @@ struct DailyChecklistView: View {
         .accessibilityIdentifier("TaskCell_\(task.id.uuidString)")
     }
 
+    private var headerView: some View {
+        HStack(alignment: .center) {
+            programDaysCircle
+            dayNumberRow
+            Button(action: { hideCompletedTasks.toggle() }) {
+                Image(systemName: hideCompletedTasks ? "checklist.checked" : "checklist")
+                    .font(.system(size: 32, weight: .bold))
+                    .foregroundColor(.white)
+                    .opacity(hideCompletedTasks ? 0.7 : 1.0)
+            }
+            .accessibilityIdentifier("ChecklistToggleButton")
+        }
+        .padding(.top, 32)
+        .padding(.horizontal)
+        .accessibilityElement()
+        .accessibilityIdentifier("ChecklistScreenHeader")
+    }
+    
+    private var checklistCard: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 24)
+                .fill(Color(red: 24/255, green: 24/255, blue: 24/255))
+                .shadow(color: .black.opacity(0.18), radius: 12, x: 0, y: 6)
+            List {
+                ForEach(visibleTasks, id: \.id) { task in
+                    let isCompleted = viewModel.dailyProgress.completedTaskIDs.contains(task.id)
+                    ChecklistTaskRow(
+                        task: task,
+                        isCompleted: isCompleted,
+                        onToggle: {
+                            var completed = Set(viewModel.dailyProgress.completedTaskIDs)
+                            if isCompleted {
+                                completed.remove(task.id)
+                            } else {
+                                completed.insert(task.id)
+                            }
+                            // Haptic feedback
+                            let generator = UIImpactFeedbackGenerator(style: .medium)
+                            generator.impactOccurred()
+                            // Save progress to storage
+                            let progress = DailyProgress(id: UUID(), date: viewModel.dailyProgress.date, completedTaskIDs: Array(completed))
+                            viewModel.dailyProgress = progress
+                            DailyProgressStorage().save(progress: progress)
+                            // If all tasks are now complete, update lastCompletedDay
+                            if viewModel.program.tasks().allSatisfy({ completed.contains($0.id) }) {
+                                viewModel.completeCurrentDay()
+                            }
+                        },
+                        onNotes: {
+                            notesSheetTaskID = TaskIDWrapper(id: task.id)
+                            notesSheetText = notesForTask[task.id, default: ""]
+                        }
+                    )
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        Button {
+                            // Request notification permission and schedule a local notification (demo: 5 seconds from now)
+                            UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, error in
+                                if granted {
+                                    let content = UNMutableNotificationContent()
+                                    content.title = "Task Reminder"
+                                    content.body = task.title
+                                    content.sound = .default
+                                    let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
+                                    let request = UNNotificationRequest(identifier: task.id.uuidString, content: content, trigger: trigger)
+                                    UNUserNotificationCenter.current().add(request)
+                                }
+                            }
+                        } label: {
+                            Label("Remind Me", systemImage: "bell")
+                        }
+                        .tint(Color.purple)
+                    }
+                }
+                .onMove { indices, newOffset in
+                    // Handle reordering if needed
+                }
+            }
+        }
+    }
+    
     var body: some View {
         ZStack(alignment: .top) {
             if viewModel.isDayMissed {
@@ -166,108 +246,27 @@ struct DailyChecklistView: View {
                 )
                 .accessibilityIdentifier("MissedDayScreen")
             } else {
-                // Use currentActiveDay for checklist
-                let checklistDate = viewModel.currentActiveDay ?? viewModel.now
                 VStack(spacing: 0) {
-                    // Header row with logo, DAY XX, and checklist icon
-                    HStack(alignment: .center) {
-                        programDaysCircle
-                        dayNumberRow
-                        Button(action: { hideCompletedTasks.toggle() }) {
-                            Image(systemName: hideCompletedTasks ? "checklist.checked" : "checklist")
-                                .font(.system(size: 32, weight: .bold))
-                                .foregroundColor(.white)
-                                .opacity(hideCompletedTasks ? 0.7 : 1.0)
-                        }
-                        .accessibilityIdentifier("ChecklistToggleButton")
-                    }
-                    .padding(.top, 32)
-                    .padding(.horizontal)
-                    .accessibilityElement()
-                    .accessibilityIdentifier("ChecklistScreenHeader")
+                    headerView
+                    
                     // Date below header
                     Text(formattedDate)
                         .font(.headline.weight(.medium))
                         .foregroundColor(.white.opacity(0.85))
                         .padding(.bottom, 24)
-                    // DebugWindow will be shown globally
-                    // Checklist Card
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 24)
-                            .fill(Color(red: 24/255, green: 24/255, blue: 24/255))
-                            .shadow(color: .black.opacity(0.18), radius: 12, x: 0, y: 6)
-                        List {
-                            ForEach(visibleTasks, id: \.id) { task in
-                                let isCompleted = viewModel.dailyProgress.completedTaskIDs.contains(task.id)
-                                ChecklistTaskRow(
-                                    task: task,
-                                    isCompleted: isCompleted,
-                                    onToggle: {
-                                        var completed = Set(viewModel.dailyProgress.completedTaskIDs)
-                                        if isCompleted {
-                                            completed.remove(task.id)
-                                        } else {
-                                            completed.insert(task.id)
-                                        }
-                                        // Haptic feedback
-                                        let generator = UIImpactFeedbackGenerator(style: .medium)
-                                        generator.impactOccurred()
-                                        // Save progress to storage
-                                        let progress = DailyProgress(id: UUID(), date: viewModel.dailyProgress.date, completedTaskIDs: Array(completed))
-                                        viewModel.dailyProgress = progress
-                                        DailyProgressStorage().save(progress: progress)
-                                        // If all tasks are now complete, update lastCompletedDay
-                                        if viewModel.program.tasks.allSatisfy({ completed.contains($0.id) }) {
-                                            viewModel.completeCurrentDay()
-                                        }
-                                    },
-                                    onNotes: {
-                                        notesSheetTaskID = TaskIDWrapper(id: task.id)
-                                        notesSheetText = notesForTask[task.id, default: ""]
-                                    }
-                                )
-                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                    Button {
-                                        // Request notification permission and schedule a local notification (demo: 5 seconds from now)
-                                        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { granted, error in
-                                            if granted {
-                                                let content = UNMutableNotificationContent()
-                                                content.title = "Task Reminder"
-                                                content.body = task.title
-                                                content.sound = .default
-                                                let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 5, repeats: false)
-                                                let request = UNNotificationRequest(identifier: task.id.uuidString, content: content, trigger: trigger)
-                                                UNUserNotificationCenter.current().add(request)
-                                            }
-                                        }
-                                    } label: {
-                                        Label("Remind Me", systemImage: "bell")
-                                    }
-                                    .tint(Color.purple)
-                                }
-                            }
-                            .onMove { indices, newOffset in
-                                viewModel.program.tasks.move(fromOffsets: indices, toOffset: newOffset)
-                                ProgramStorage().save(viewModel.program)
-                            }
-                        }
-                        .listStyle(PlainListStyle())
-                        .scrollContentBackground(.hidden)
-                        .background(Color.clear)
-                        .padding([.horizontal, .bottom], 8)
+                    
+                    checklistCard
+                    
+                    // NavigationLink for SettingsView
+                    NavigationLink(destination:
+                        SettingsView(onReset: {
+                            showSettingsNav = false
+                            onReset?()
+                        }, endOfDayTime: $viewModel.program.endOfDayTime)
+                            .environmentObject(debugState)
+                    , isActive: $showSettingsNav) {
+                        EmptyView()
                     }
-                    .padding(.horizontal, 8)
-                    .padding(.bottom, 16)
-                }
-                // NavigationLink for SettingsView
-                NavigationLink(destination:
-                    SettingsView(onReset: {
-                        showSettingsNav = false
-                        onReset?()
-                    }, endOfDayTime: $viewModel.program.endOfDayTime)
-                        .environmentObject(debugState)
-                , isActive: $showSettingsNav) {
-                    EmptyView()
                 }
             }
         }
@@ -306,12 +305,10 @@ struct DailyChecklistView: View {
             let completed = Set([0, 1, 2, 10, 15].compactMap { Calendar.current.date(byAdding: .day, value: $0, to: today) })
             ProgramCalendarView(startDate: today, numberOfDays: 75, completedDates: completed)
         }
-        // Missed Day Modal (remove this .sheet)
-        // .sheet(isPresented: $showMissedDayModal) { ... }
         // Dedicated subview for editing notes
         .sheet(item: $notesSheetTaskID) { wrapper in
             let taskID = wrapper.id
-            let task = viewModel.program.tasks.first(where: { $0.id == taskID })
+            let task = viewModel.program.tasks().first(where: { $0.id == taskID })
             TaskNotesSheet(
                 title: task?.title ?? "",
                 note: $notesSheetText,
@@ -325,19 +322,29 @@ struct DailyChecklistView: View {
 }
 
 #Preview {
-    let program = Program(
-        id: UUID(),
-        startDate: Date(),
-        numberOfDays: 75,
+    // Create a template for the preview
+    let template = ProgramTemplate(
+        name: "Preview Template",
+        description: "A template for preview purposes",
+        category: .health,
+        defaultNumberOfDays: 75,
         tasks: [
             Task(id: UUID(), title: "Drink 1 gallon of water", description: nil),
             Task(id: UUID(), title: "Read 10 pages", description: nil),
             Task(id: UUID(), title: "Follow a diet", description: nil)
         ],
-        endOfDayTime: Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22) // Default 10pm
+        isDefault: false
+    )
+    
+    let program = Program(
+        id: UUID(),
+        startDate: Date(),
+        endOfDayTime: Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22), // Default 10pm
+        lastCompletedDay: nil,
+        templateID: template.id
     )
     let dailyProgress = DailyProgress(id: UUID(), date: Date(), completedTaskIDs: [])
-    return DailyChecklistView(viewModel: DailyChecklistViewModel(program: program, dailyProgress: dailyProgress))
+    DailyChecklistView(viewModel: DailyChecklistViewModel(program: program, dailyProgress: dailyProgress))
 } 
 
 // Dedicated subview for editing notes

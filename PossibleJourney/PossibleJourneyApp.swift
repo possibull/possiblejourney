@@ -67,7 +67,7 @@ struct PossibleJourneyApp: App {
                             let now = currentTimeOverride ?? Date()
                             let activeDay = program.nextActiveDay(currentDate: now) ?? Calendar.current.startOfDay(for: now)
                             let dailyProgress = DailyProgressStorage().load(for: activeDay) ?? DailyProgress(id: UUID(), date: activeDay, completedTaskIDs: [])
-                            return AnyView(
+                            AnyView(
                                 DailyChecklistView(
                                     viewModel: DailyChecklistViewModel(
                                         program: program,
@@ -83,8 +83,8 @@ struct PossibleJourneyApp: App {
                                 .environmentObject(debugState)
                             )
                         } else {
-                            return AnyView(
-                                ProgramSetupView(onSave: { program in
+                            AnyView(
+                                ProgramSetupMainView(onProgramCreated: { program in
                                     appState.loadedProgram = program
                                     ProgramStorage().save(program)
                                 })
@@ -138,11 +138,11 @@ struct PossibleJourneyApp: App {
                                 .font(.caption)
                                 .foregroundColor(.red)
                                 .accessibilityIdentifier("DebugShowMissedDayModalLabel")
-                            Text("TaskTitles: \(viewModel.program.tasks.map { $0.title }.joined(separator: ", "))")
+                            Text("TaskTitles: \(viewModel.program.tasks().map { $0.title }.joined(separator: ", "))")
                                 .font(.caption)
                                 .foregroundColor(.blue)
                                 .accessibilityIdentifier("TaskTitlesDebug")
-                            Text("TaskIDs: \(viewModel.program.tasks.map { $0.id.uuidString }.joined(separator: ", "))")
+                            Text("TaskIDs: \(viewModel.program.tasks().map { $0.id.uuidString }.joined(separator: ", "))")
                                 .font(.caption)
                                 .foregroundColor(.purple)
                                 .accessibilityIdentifier("TaskIDsDebug")
@@ -184,13 +184,13 @@ struct PossibleJourneyApp: App {
                                     Text("Start Date: \(program.startDate)")
                                         .font(.caption)
                                         .foregroundColor(.orange)
-                                    Text("Number of Days: \(program.numberOfDays)")
+                                    Text("Number of Days: \(program.numberOfDays())")
                                         .font(.caption)
                                         .foregroundColor(.green)
-                                    Text("Task Count: \(program.tasks.count)")
+                                    Text("Task Count: \(program.tasks().count)")
                                         .font(.caption)
                                         .foregroundColor(.blue)
-                                    Text("Task Titles: \(program.tasks.map { $0.title }.joined(separator: ", "))")
+                                    Text("Task Titles: \(program.tasks().map { $0.title }.joined(separator: ", "))")
                                         .font(.caption)
                                         .foregroundColor(.purple)
                                 } else {

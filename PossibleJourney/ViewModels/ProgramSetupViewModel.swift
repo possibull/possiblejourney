@@ -17,13 +17,14 @@ class ProgramSetupViewModel {
         description.count <= 100
     }
 
-    func saveProgram() -> Program? {
+    func saveProgram(templateID: UUID) -> Program? {
         guard !tasks.isEmpty else { return nil }
         return Program(
             id: UUID(),
             startDate: Date(),
-            numberOfDays: numberOfDays,
-            tasks: tasks
+            endOfDayTime: Calendar.current.startOfDay(for: Date()),
+            lastCompletedDay: nil,
+            templateID: templateID
         )
     }
 }
