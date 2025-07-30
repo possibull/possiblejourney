@@ -63,47 +63,49 @@ struct ProgramTemplateSelectionView: View {
                     .padding(.vertical, 8)
                     
                     // Templates list
-                    ScrollView {
-                        LazyVStack(spacing: 16) {
-                            ForEach(viewModel.filteredTemplates) { template in
-                                TemplateCardView(
-                                    template: template,
-                                    onTap: {
-                                        selectedTemplate = template
-                                    }
-                                )
-                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                                    // Duplicate action (for all templates)
-                                    Button {
-                                        let copy = viewModel.duplicateTemplate(template)
-                                        editingTemplate = copy
-                                    } label: {
-                                        Label("Duplicate", systemImage: "plus.square.on.square")
-                                    }
-                                    .tint(.blue)
-                                    
-                                    // Edit action (only for non-default templates)
-                                    if !template.isDefault {
-                                        Button {
-                                            editingTemplate = template
-                                        } label: {
-                                            Label("Edit", systemImage: "pencil")
-                                        }
-                                        .tint(.orange)
-                                    }
-                                    
-                                    // Delete action (for all templates)
-                                    Button {
-                                        templateToDelete = template
-                                    } label: {
-                                        Label("Delete", systemImage: "trash")
-                                    }
-                                    .tint(.red)
+                    List {
+                        ForEach(viewModel.filteredTemplates) { template in
+                            TemplateCardView(
+                                template: template,
+                                onTap: {
+                                    selectedTemplate = template
                                 }
+                            )
+                            .listRowInsets(EdgeInsets())
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                // Duplicate action (for all templates)
+                                Button {
+                                    let copy = viewModel.duplicateTemplate(template)
+                                    editingTemplate = copy
+                                } label: {
+                                    Label("Duplicate", systemImage: "plus.square.on.square")
+                                }
+                                .tint(.blue)
+                                
+                                // Edit action (only for non-default templates)
+                                if !template.isDefault {
+                                    Button {
+                                        editingTemplate = template
+                                    } label: {
+                                        Label("Edit", systemImage: "pencil")
+                                    }
+                                    .tint(.orange)
+                                }
+                                
+                                // Delete action (for all templates)
+                                Button {
+                                    templateToDelete = template
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                                .tint(.red)
                             }
                         }
-                        .padding()
                     }
+                    .listStyle(PlainListStyle())
+                    .background(Color(.systemGroupedBackground))
                 }
             }
             .navigationTitle("Choose Template")
@@ -294,7 +296,8 @@ struct TemplateCardView: View {
                     }
                 }
             }
-            .padding()
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
             .background(Color(.systemBackground))
             .cornerRadius(12)
             .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
