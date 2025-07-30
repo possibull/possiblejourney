@@ -119,18 +119,10 @@ struct ProgramTemplateSelectionView: View {
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    HStack(spacing: 16) {
-                        Button("Reset") {
-                            viewModel.resetToDefaults()
-                        }
-                        .fontWeight(.medium)
-                        .foregroundColor(.orange)
-                        
-                        Button("Custom") {
-                            showingTemplateCreate = true
-                        }
-                        .fontWeight(.medium)
+                    Button("Custom") {
+                        showingTemplateCreate = true
                     }
+                    .fontWeight(.medium)
                 }
             }
 
