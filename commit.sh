@@ -15,22 +15,30 @@ if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git ls-files --o
     # Get list of changed files for commit message
     changed_files=$(git diff --cached --name-only | head -5 | tr '\n' ' ')
     
+    # Debug: Print the changed files
+    echo "DEBUG: Changed files: '$changed_files'"
+    
     # Generate descriptive comment based on file types and changes
     comment=""
     
     # Check for specific file types and generate appropriate comments
     if echo "$changed_files" | grep -q "\.swift$"; then
+        echo "DEBUG: Swift files detected"
         # Check if any Swift file ends with View.swift
         if echo "$changed_files" | grep -q "View\.swift$"; then
+            echo "DEBUG: View.swift files detected"
             comment="UI improvements and view updates"
         # Check if any Swift file ends with ViewModel.swift
         elif echo "$changed_files" | grep -q "ViewModel\.swift$"; then
+            echo "DEBUG: ViewModel.swift files detected"
             comment="View model logic updates"
         # Check if any Swift file ends with Model.swift
         elif echo "$changed_files" | grep -q "Model\.swift$"; then
+            echo "DEBUG: Model.swift files detected"
             comment="Data model changes"
         # Any other Swift file
         else
+            echo "DEBUG: Other Swift files detected"
             comment="Swift code updates"
         fi
     elif echo "$changed_files" | grep -q "\.xcodeproj$"; then
@@ -44,6 +52,8 @@ if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git ls-files --o
     else
         comment="General project updates"
     fi
+    
+    echo "DEBUG: Selected comment: '$comment'"
     
     # Create commit message with timestamp, comment, and files
     commit_msg="Auto-commit: $timestamp - $comment - $changed_files"
