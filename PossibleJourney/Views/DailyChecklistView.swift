@@ -728,10 +728,10 @@ struct TaskRowView: View {
                 
                 // Get the current daily progress from storage to ensure we have the latest
                 let dailyProgressStorage = DailyProgressStorage()
-                let today = Date()
-                var currentProgress = dailyProgressStorage.load(for: today) ?? DailyProgress(
+                let targetDate = currentDailyProgress.date // Use the date from current daily progress
+                var currentProgress = dailyProgressStorage.load(for: targetDate) ?? DailyProgress(
                     id: UUID(),
-                    date: today,
+                    date: targetDate,
                     completedTaskIDs: [],
                     photoURLs: [:]
                 )
@@ -751,7 +751,7 @@ struct TaskRowView: View {
                 let formatter = DateFormatter()
                 formatter.dateFormat = "yyyy-MM-dd"
                 formatter.timeZone = TimeZone(secondsFromGMT: 0)
-                let dateString = formatter.string(from: today)
+                let dateString = formatter.string(from: targetDate)
                 print("DEBUG: Saving to storage key: dailyProgress_\(dateString)")
                 print("DEBUG: Progress date: \(currentProgress.date)")
                 print("DEBUG: Progress ID: \(currentProgress.id)")
