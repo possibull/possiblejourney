@@ -152,6 +152,13 @@ struct SettingsView: View {
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button("Back") {
+                    presentationMode.wrappedValue.dismiss()
+                }
+                .fontWeight(.medium)
+            }
+            
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button("Done") {
                     presentationMode.wrappedValue.dismiss()
