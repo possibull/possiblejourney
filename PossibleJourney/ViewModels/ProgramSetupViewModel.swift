@@ -47,20 +47,38 @@ class DailyChecklistViewModel: ObservableObject {
             return false
         }
         
-        // If we're viewing a specific date (not the current app day), check if that date is incomplete
+        // Check if any previous days in the program were missed
         let calendar = Calendar.current
-        let currentAppDay = program.currentAppDay
+        let startDate = program.startDate
         let viewingDate = selectedDate
         
-        // If we're viewing a different date than the current app day, check if that date is incomplete
-        if !calendar.isDate(viewingDate, inSameDayAs: currentAppDay) {
-            let eod = program.endOfDay(for: viewingDate)
-            let allComplete = program.tasks().allSatisfy { dailyProgress.completedTaskIDs.contains($0.id) }
-            return !allComplete && now >= eod
-        } else {
-            // We're viewing the current app day, use the standard logic
-            return program.isCurrentAppDayMissed(now: now, completedTaskIDs: Set(dailyProgress.completedTaskIDs))
+        // Check all days from start date up to (but not including) the viewing date
+        var currentDate = startDate
+        while currentDate < viewingDate {
+            let eod = program.endOfDay(for: currentDate)
+            
+            // If this day is past its end-of-day, check if it was completed
+            if now >= eod {
+                let dailyProgressStorage = DailyProgressStorage()
+                let dayProgress = dailyProgressStorage.load(for: currentDate) ?? DailyProgress(
+                    id: UUID(),
+                    date: currentDate,
+                    completedTaskIDs: []
+                )
+                
+                let allComplete = program.tasks().allSatisfy { dayProgress.completedTaskIDs.contains($0.id) }
+                if !allComplete {
+                    // Found a missed day, trigger missed day screen
+                    return true
+                }
+            }
+            
+            // Move to next day
+            currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate)!
         }
+        
+        // No missed days found
+        return false
     }
 
     func completeCurrentDay() {
