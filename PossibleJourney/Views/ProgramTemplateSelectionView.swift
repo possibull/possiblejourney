@@ -70,18 +70,36 @@ struct ProgramTemplateSelectionView: View {
                                     template: template,
                                     onTap: {
                                         selectedTemplate = template
-                                    },
-                                    onEdit: {
-                                        editingTemplate = template
-                                    },
-                                    onDuplicate: {
-                                        let copy = viewModel.duplicateTemplate(template)
-                                        editingTemplate = copy
-                                    },
-                                    onDelete: {
-                                        templateToDelete = template
                                     }
                                 )
+                                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                    // Duplicate action (for all templates)
+                                    Button {
+                                        let copy = viewModel.duplicateTemplate(template)
+                                        editingTemplate = copy
+                                    } label: {
+                                        Label("Duplicate", systemImage: "plus.square.on.square")
+                                    }
+                                    .tint(.blue)
+                                    
+                                    // Edit action (only for non-default templates)
+                                    if !template.isDefault {
+                                        Button {
+                                            editingTemplate = template
+                                        } label: {
+                                            Label("Edit", systemImage: "pencil")
+                                        }
+                                        .tint(.orange)
+                                    }
+                                    
+                                    // Delete action (for all templates)
+                                    Button {
+                                        templateToDelete = template
+                                    } label: {
+                                        Label("Delete", systemImage: "trash")
+                                    }
+                                    .tint(.red)
+                                }
                             }
                         }
                         .padding()
@@ -173,9 +191,6 @@ struct ProgramTemplateSelectionView: View {
 struct TemplateCardView: View {
     let template: ProgramTemplate
     let onTap: () -> Void
-    let onEdit: () -> Void
-    let onDuplicate: () -> Void
-    let onDelete: () -> Void
     @State private var isExpanded = false
     
     private func formatLastModified(_ date: Date) -> String {
@@ -237,36 +252,7 @@ struct TemplateCardView: View {
                     }
                 }
                 
-                // Action buttons
-                HStack {
-                    Spacer()
-                    
-                    // Duplicate button (for all templates)
-                    Button(action: onDuplicate) {
-                        Image(systemName: "plus.square.on.square")
-                            .font(.title2)
-                            .foregroundColor(.blue)
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                    
-                    // Edit button (only for non-default templates)
-                    if !template.isDefault {
-                        Button(action: onEdit) {
-                            Image(systemName: "pencil.circle.fill")
-                                .font(.title2)
-                                .foregroundColor(.orange)
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                    }
-                    
-                    // Delete button (for all templates)
-                    Button(action: onDelete) {
-                        Image(systemName: "trash.circle.fill")
-                            .font(.title2)
-                            .foregroundColor(.red)
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                }
+
                 
                 // Tasks preview
                 VStack(alignment: .leading, spacing: 4) {
