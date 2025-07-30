@@ -19,7 +19,7 @@ struct ProgramSetupMainView: View {
                 if showingTemplateSelection {
                     ProgramTemplateSelectionView(
                         onTemplateSelected: { template in
-                            let program = template.createProgram()
+                            let program = template.createProgram(numberOfDays: nil)
                             onProgramCreated(program)
                         },
                         onProgramCreated: { program in

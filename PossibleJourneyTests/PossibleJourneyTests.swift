@@ -27,7 +27,7 @@ final class ProgramModelTests: XCTestCase {
         let storage = ProgramTemplateStorage()
         storage.clear()
         storage.add(template)
-        let program = template.createProgram(startDate: Date(), endOfDayTime: Date())
+        let program = template.createProgram(startDate: Date(), endOfDayTime: Date(), numberOfDays: nil)
         XCTAssertEqual(program.tasks(using: storage).count, 2)
         XCTAssertEqual(program.numberOfDays(using: storage), 75)
     }
@@ -155,7 +155,7 @@ final class ProgramStorageTests: XCTestCase {
         let templateStorage = ProgramTemplateStorage()
         templateStorage.clear()
         templateStorage.add(template)
-        let program = template.createProgram(startDate: Date(), endOfDayTime: Date())
+        let program = template.createProgram(startDate: Date(), endOfDayTime: Date(), numberOfDays: nil)
         storage.save(program)
         let loaded = storage.load()
         XCTAssertNotNil(loaded)
@@ -200,7 +200,7 @@ final class ProgramModelDayLogicTests: XCTestCase {
         let startDate = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1))!
         let template = makeTemplate()
         let storage = makeStorage(with: template)
-        let program = Program(id: UUID(), startDate: startDate, endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!, lastCompletedDay: nil, templateID: template.id)
+        let program = Program(id: UUID(), startDate: startDate, endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!, lastCompletedDay: nil, templateID: template.id, customNumberOfDays: nil)
         let fakeNow = Calendar.current.date(from: DateComponents(year: 2022, month: 12, day: 31, hour: 23))!
         let day = program.appDay(for: fakeNow)
         XCTAssertEqual(day, 0, "Should be day 0 before program starts")
@@ -209,7 +209,7 @@ final class ProgramModelDayLogicTests: XCTestCase {
         let startDate = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1))!
         let template = makeTemplate()
         let storage = makeStorage(with: template)
-        let program = Program(id: UUID(), startDate: startDate, endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!, lastCompletedDay: nil, templateID: template.id)
+        let program = Program(id: UUID(), startDate: startDate, endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!, lastCompletedDay: nil, templateID: template.id, customNumberOfDays: nil)
         let fakeNow = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1, hour: 10))!
         let day = program.appDay(for: fakeNow)
         XCTAssertEqual(day, 1, "Should be day 1 on program start date")
@@ -218,7 +218,7 @@ final class ProgramModelDayLogicTests: XCTestCase {
         let startDate = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1))!
         let template = makeTemplate()
         let storage = makeStorage(with: template)
-        let program = Program(id: UUID(), startDate: startDate, endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!, lastCompletedDay: nil, templateID: template.id)
+        let program = Program(id: UUID(), startDate: startDate, endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!, lastCompletedDay: nil, templateID: template.id, customNumberOfDays: nil)
         let fakeNow = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 5, hour: 21))!
         let day = program.appDay(for: fakeNow)
         XCTAssertEqual(day, 5, "Should be day 5 on Jan 5th before EOD")
@@ -246,7 +246,7 @@ final class ProgramMissedDayAdvancingTests: XCTestCase {
         let startDate = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1))!
         let template = makeTemplate()
         let storage = makeStorage(with: template)
-        let program = Program(id: UUID(), startDate: startDate, endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!, lastCompletedDay: nil, templateID: template.id)
+        let program = Program(id: UUID(), startDate: startDate, endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!, lastCompletedDay: nil, templateID: template.id, customNumberOfDays: nil)
         let fakeNow = Calendar.current.date(from: DateComponents(year: 2022, month: 12, day: 31, hour: 23))!
         let day = program.appDay(for: fakeNow)
         XCTAssertEqual(day, 0, "Should be day 0 before program starts")
@@ -255,7 +255,7 @@ final class ProgramMissedDayAdvancingTests: XCTestCase {
         let startDate = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1))!
         let template = makeTemplate()
         let storage = makeStorage(with: template)
-        let program = Program(id: UUID(), startDate: startDate, endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!, lastCompletedDay: nil, templateID: template.id)
+        let program = Program(id: UUID(), startDate: startDate, endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!, lastCompletedDay: nil, templateID: template.id, customNumberOfDays: nil)
         let fakeNow = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1, hour: 10))!
         let day = program.appDay(for: fakeNow)
         XCTAssertEqual(day, 1, "Should be day 1 on program start date")
@@ -264,7 +264,7 @@ final class ProgramMissedDayAdvancingTests: XCTestCase {
         let startDate = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1))!
         let template = makeTemplate()
         let storage = makeStorage(with: template)
-        let program = Program(id: UUID(), startDate: startDate, endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!, lastCompletedDay: nil, templateID: template.id)
+        let program = Program(id: UUID(), startDate: startDate, endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!, lastCompletedDay: nil, templateID: template.id, customNumberOfDays: nil)
         let fakeNow = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 5, hour: 21))!
         let day = program.appDay(for: fakeNow)
         XCTAssertEqual(day, 5, "Should be day 5 on Jan 5th before EOD")
@@ -292,7 +292,7 @@ final class ProgramLastCompletedDayTests: XCTestCase {
         let startDate = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1))!
         let template = makeTemplate()
         let storage = makeStorage(with: template)
-        let program = Program(id: UUID(), startDate: startDate, endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!, lastCompletedDay: nil, templateID: template.id)
+        let program = Program(id: UUID(), startDate: startDate, endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!, lastCompletedDay: nil, templateID: template.id, customNumberOfDays: nil)
         let fakeNow = Calendar.current.date(from: DateComponents(year: 2022, month: 12, day: 31, hour: 23))!
         let day = program.appDay(for: fakeNow)
         XCTAssertEqual(day, 0, "Should be day 0 before program starts")
@@ -301,7 +301,7 @@ final class ProgramLastCompletedDayTests: XCTestCase {
         let startDate = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1))!
         let template = makeTemplate()
         let storage = makeStorage(with: template)
-        let program = Program(id: UUID(), startDate: startDate, endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!, lastCompletedDay: nil, templateID: template.id)
+        let program = Program(id: UUID(), startDate: startDate, endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!, lastCompletedDay: nil, templateID: template.id, customNumberOfDays: nil)
         let fakeNow = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1, hour: 10))!
         let day = program.appDay(for: fakeNow)
         XCTAssertEqual(day, 1, "Should be day 1 on program start date")
@@ -310,7 +310,7 @@ final class ProgramLastCompletedDayTests: XCTestCase {
         let startDate = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 1))!
         let template = makeTemplate()
         let storage = makeStorage(with: template)
-        let program = Program(id: UUID(), startDate: startDate, endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!, lastCompletedDay: nil, templateID: template.id)
+        let program = Program(id: UUID(), startDate: startDate, endOfDayTime: Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: startDate)!, lastCompletedDay: nil, templateID: template.id, customNumberOfDays: nil)
         let fakeNow = Calendar.current.date(from: DateComponents(year: 2023, month: 1, day: 5, hour: 21))!
         let day = program.appDay(for: fakeNow)
         XCTAssertEqual(day, 5, "Should be day 5 on Jan 5th before EOD")

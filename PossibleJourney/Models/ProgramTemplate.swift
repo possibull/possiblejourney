@@ -62,13 +62,14 @@ enum TemplateCategory: String, Codable, CaseIterable {
 
 extension ProgramTemplate {
     /// Creates a Program from this template
-    func createProgram(startDate: Date? = nil, endOfDayTime: Date? = nil) -> Program {
+    func createProgram(startDate: Date? = nil, endOfDayTime: Date? = nil, numberOfDays: Int? = nil) -> Program {
         return Program(
             id: UUID(),
             startDate: startDate ?? Date(),
             endOfDayTime: endOfDayTime ?? Calendar.current.startOfDay(for: Date()),
             lastCompletedDay: nil,
-            templateID: id
+            templateID: id,
+            customNumberOfDays: numberOfDays
         )
     }
 } 

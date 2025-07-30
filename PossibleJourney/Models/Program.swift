@@ -6,6 +6,7 @@ struct Program: Codable {
     var endOfDayTime: Date = Calendar.current.startOfDay(for: Date()) // Default 12:00AM
     var lastCompletedDay: Date? = nil // New property
     let templateID: UUID // Reference to the template this program was created from
+    let customNumberOfDays: Int? // Custom number of days, nil means use template default
 }
 
 extension Program {
@@ -19,9 +20,13 @@ extension Program {
         template(using: storage)?.tasks ?? []
     }
     
-    /// Computed property to get number of days from the template
+    /// Computed property to get number of days from the template or custom value
     func numberOfDays(using storage: ProgramTemplateStorage = ProgramTemplateStorage()) -> Int {
-        template(using: storage)?.defaultNumberOfDays ?? 0
+        // Use custom number of days if specified, otherwise use template default
+        if let customDays = customNumberOfDays {
+            return customDays
+        }
+        return template(using: storage)?.defaultNumberOfDays ?? 0
     }
     
     func appDay(for date: Date) -> Int {

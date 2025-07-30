@@ -24,7 +24,8 @@ class ProgramSetupViewModel {
             startDate: Date(),
             endOfDayTime: Calendar.current.startOfDay(for: Date()),
             lastCompletedDay: nil,
-            templateID: templateID
+            templateID: templateID,
+            customNumberOfDays: nil
         )
     }
 }

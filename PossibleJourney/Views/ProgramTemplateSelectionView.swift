@@ -195,6 +195,14 @@ struct TemplateDetailView: View {
     
     @State private var startDate = Date()
     @State private var endOfDayTime = Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22) // Default 10pm
+    @State private var numberOfDays: Int
+    @State private var useCustomDays = false
+    
+    init(template: ProgramTemplate, onStartProgram: @escaping (Program) -> Void) {
+        self.template = template
+        self.onStartProgram = onStartProgram
+        self._numberOfDays = State(initialValue: template.defaultNumberOfDays)
+    }
     
     var body: some View {
         NavigationStack {
@@ -202,6 +210,7 @@ struct TemplateDetailView: View {
                 VStack(alignment: .leading, spacing: 20) {
                     headerSection
                     tasksSection
+                    numberOfDaysSection
                     startDateSection
                     endOfDaySection
                     startButton
@@ -303,6 +312,33 @@ struct TemplateDetailView: View {
         }
     }
     
+    private var numberOfDaysSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Number of Days")
+                .font(.headline)
+                .fontWeight(.semibold)
+            
+            HStack {
+                Toggle("Custom", isOn: $useCustomDays)
+                    .font(.body)
+                
+                Spacer()
+                
+                if useCustomDays {
+                    Stepper("\(numberOfDays) days", value: $numberOfDays, in: 1...365)
+                        .font(.body)
+                } else {
+                    Text("\(template.defaultNumberOfDays) days (default)")
+                        .font(.body)
+                        .foregroundColor(.secondary)
+                }
+            }
+            .padding()
+            .background(Color(.systemGray6))
+            .cornerRadius(8)
+        }
+    }
+    
     private var endOfDaySection: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("End of Day Time")
@@ -319,7 +355,8 @@ struct TemplateDetailView: View {
     
     private var startButton: some View {
         Button(action: {
-            let program = template.createProgram(startDate: startDate, endOfDayTime: endOfDayTime)
+            let customDays = useCustomDays ? numberOfDays : nil
+            let program = template.createProgram(startDate: startDate, endOfDayTime: endOfDayTime, numberOfDays: customDays)
             onStartProgram(program)
         }) {
             HStack {

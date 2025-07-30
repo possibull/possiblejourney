@@ -199,7 +199,8 @@ struct ProgramSetupView: View {
                 startDate: startDate,
                 endOfDayTime: Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22), // Default 10pm
                 lastCompletedDay: nil,
-                templateID: template.id
+                templateID: template.id,
+                customNumberOfDays: nil
             )
             onSave(program)
         }) {

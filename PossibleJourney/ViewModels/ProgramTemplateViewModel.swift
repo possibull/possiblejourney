@@ -60,7 +60,7 @@ class ProgramTemplateViewModel: ObservableObject {
     
     /// Create a program from a template
     func createProgram(from template: ProgramTemplate, startDate: Date? = nil, endOfDayTime: Date? = nil) -> Program {
-        return template.createProgram(startDate: startDate, endOfDayTime: endOfDayTime)
+        return template.createProgram(startDate: startDate, endOfDayTime: endOfDayTime, numberOfDays: nil)
     }
     
     /// Add a new template

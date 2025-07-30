@@ -63,7 +63,8 @@ struct DailyChecklistView: View {
             startDate: Date(),
             endOfDayTime: Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22),
             lastCompletedDay: nil,
-            templateID: UUID() // This will be set when a program is actually created
+            templateID: UUID(), // This will be set when a program is actually created
+            customNumberOfDays: nil
         )
         
         let today = Date()

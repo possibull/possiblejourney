@@ -179,4 +179,121 @@ final class ProgramTemplateTests: XCTestCase {
         XCTAssertEqual(resolvedTasks.count, 2)
         XCTAssertEqual(resolvedNumberOfDays, 10)
     }
+
+    func testProgramWithCustomNumberOfDays() {
+        // Arrange
+        let storage = ProgramTemplateStorage()
+        storage.clear()
+        
+        let template = ProgramTemplate(
+            name: "Test Template",
+            description: "A template for testing custom days.",
+            category: .learning,
+            defaultNumberOfDays: 30,
+            tasks: [
+                Task(id: UUID(), title: "Test Task 1", description: "Desc 1"),
+                Task(id: UUID(), title: "Test Task 2", description: "Desc 2")
+            ],
+            isDefault: true
+        )
+        storage.add(template)
+        
+        // Act - Create program with custom number of days
+        let customDays = 15
+        let program = template.createProgram(numberOfDays: customDays)
+        
+        // Assert
+        XCTAssertEqual(program.numberOfDays(), customDays)
+        XCTAssertEqual(program.templateID, template.id)
+        XCTAssertNotNil(program.startDate)
+        XCTAssertNotNil(program.endOfDayTime)
+    }
+    
+    func testProgramUsesTemplateDefaultWhenNoCustomDaysSpecified() {
+        // Arrange
+        let storage = ProgramTemplateStorage()
+        storage.clear()
+        
+        let template = ProgramTemplate(
+            name: "Test Template",
+            description: "A template for testing default days.",
+            category: .learning,
+            defaultNumberOfDays: 25,
+            tasks: [
+                Task(id: UUID(), title: "Test Task 1", description: "Desc 1")
+            ],
+            isDefault: true
+        )
+        storage.add(template)
+        
+        // Act - Create program without specifying custom days
+        let program = template.createProgram()
+        
+        // Assert
+        XCTAssertEqual(program.numberOfDays(), template.defaultNumberOfDays)
+        XCTAssertEqual(program.numberOfDays(), 25)
+    }
+    
+    func testProgramWithCustomDaysAndOtherParameters() {
+        // Arrange
+        let storage = ProgramTemplateStorage()
+        storage.clear()
+        
+        let template = ProgramTemplate(
+            name: "Test Template",
+            description: "A template for testing custom days with other params.",
+            category: .health,
+            defaultNumberOfDays: 21,
+            tasks: [
+                Task(id: UUID(), title: "Exercise", description: "Daily workout")
+            ],
+            isDefault: true
+        )
+        storage.add(template)
+        
+        let customStartDate = Calendar.current.date(byAdding: .day, value: 1, to: Date())!
+        let customEndTime = Calendar.current.date(bySettingHour: 22, minute: 0, second: 0, of: Date())!
+        let customDays = 45
+        
+        // Act
+        let program = template.createProgram(
+            startDate: customStartDate,
+            endOfDayTime: customEndTime,
+            numberOfDays: customDays
+        )
+        
+        // Assert
+        XCTAssertEqual(program.numberOfDays(), customDays)
+        XCTAssertEqual(program.startDate, customStartDate)
+        XCTAssertEqual(program.endOfDayTime, customEndTime)
+        XCTAssertEqual(program.templateID, template.id)
+    }
+    
+    func testProgramDayCalculationWithCustomDays() {
+        // Arrange
+        let storage = ProgramTemplateStorage()
+        storage.clear()
+        
+        let template = ProgramTemplate(
+            name: "Test Template",
+            description: "A template for testing day calculation.",
+            category: .productivity,
+            defaultNumberOfDays: 10,
+            tasks: [
+                Task(id: UUID(), title: "Task", description: "Description")
+            ],
+            isDefault: true
+        )
+        storage.add(template)
+        
+        let startDate = Calendar.current.startOfDay(for: Date())
+        let customDays = 7
+        let program = template.createProgram(startDate: startDate, numberOfDays: customDays)
+        
+        // Act & Assert
+        XCTAssertEqual(program.appDay(for: startDate), 1)
+        XCTAssertEqual(program.appDay(for: Calendar.current.date(byAdding: .day, value: 6, to: startDate)!), 7)
+        XCTAssertEqual(program.appDay(for: Calendar.current.date(byAdding: .day, value: 7, to: startDate)!), 8) // Should be 8 even though program is only 7 days
+        XCTAssertEqual(program.appDay(for: Calendar.current.date(byAdding: .day, value: -1, to: startDate)!), 0) // Before start
+    }
 } 
