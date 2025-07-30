@@ -75,16 +75,6 @@ struct ProgramTemplateSelectionView: View {
                             .listRowSeparator(.hidden)
                             .listRowBackground(Color.clear)
                             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                // Edit action (only for non-default templates)
-                                if !template.isDefault {
-                                    Button {
-                                        editingTemplate = template
-                                    } label: {
-                                        Label("Edit", systemImage: "pencil")
-                                    }
-                                    .tint(.orange)
-                                }
-                                
                                 // Duplicate action (for all templates)
                                 Button {
                                     let copy = viewModel.duplicateTemplate(template)
@@ -101,6 +91,17 @@ struct ProgramTemplateSelectionView: View {
                                     Label("Delete", systemImage: "trash")
                                 }
                                 .tint(.red)
+                            }
+                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                                // Edit action (only for non-default templates) - separate group
+                                if !template.isDefault {
+                                    Button {
+                                        editingTemplate = template
+                                    } label: {
+                                        Label("Edit", systemImage: "pencil")
+                                    }
+                                    .tint(.orange)
+                                }
                             }
                         }
                     }
