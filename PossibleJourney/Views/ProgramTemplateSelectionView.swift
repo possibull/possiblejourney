@@ -602,11 +602,13 @@ struct TemplateCreateView: View {
                             .foregroundColor(.secondary)
                             .italic()
                     } else {
-                        ForEach(template.tasks.indices, id: \.self) { index in
+                        ForEach(template.tasks, id: \.id) { task in
                             TaskEditRow(
-                                task: template.tasks[index],
+                                task: task,
                                 onUpdate: { updatedTask in
-                                    template.tasks[index] = updatedTask
+                                    if let index = template.tasks.firstIndex(where: { $0.id == task.id }) {
+                                        template.tasks[index] = updatedTask
+                                    }
                                 }
                             )
                         }
@@ -734,11 +736,13 @@ struct TemplateEditView: View {
                 }
                 
                 Section(header: Text("Tasks")) {
-                    ForEach(template.tasks.indices, id: \.self) { index in
+                    ForEach(template.tasks, id: \.id) { task in
                         TaskEditRow(
-                            task: template.tasks[index],
+                            task: task,
                             onUpdate: { updatedTask in
-                                template.tasks[index] = updatedTask
+                                if let index = template.tasks.firstIndex(where: { $0.id == task.id }) {
+                                    template.tasks[index] = updatedTask
+                                }
                             }
                         )
                     }
@@ -842,11 +846,6 @@ struct TaskEditRow: View {
             // Update local state when task changes
             title = task.title
             description = task.description ?? ""
-        }
-        .onChange(of: task) { _, newTask in
-            // Update local state when task changes
-            title = newTask.title
-            description = newTask.description ?? ""
         }
     }
     
