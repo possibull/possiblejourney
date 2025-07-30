@@ -60,6 +60,25 @@ class DailyChecklistViewModel: ObservableObject {
         program.lastCompletedDay = nil
         ProgramStorage().save(program)
     }
+    
+    func getCompletedDates() -> Set<Date> {
+        // Get all completed dates from the program
+        var completedDates: Set<Date> = []
+        
+        if let lastCompleted = program.lastCompletedDay {
+            // Add all dates from start to last completed day
+            let calendar = Calendar.current
+            var currentDate = calendar.startOfDay(for: program.startDate)
+            let endDate = calendar.startOfDay(for: lastCompleted)
+            
+            while currentDate <= endDate {
+                completedDates.insert(currentDate)
+                currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate) ?? currentDate
+            }
+        }
+        
+        return completedDates
+    }
 
     init(program: Program, dailyProgress: DailyProgress, now: Date = Date()) {
         self.program = program

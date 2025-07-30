@@ -51,6 +51,7 @@ struct DebugWindow<Content: View>: View {
 struct DailyChecklistView: View {
     @StateObject private var viewModel: DailyChecklistViewModel
     @State private var showingSettings = false
+    @State private var showingCalendar = false
     
     init() {
         // Load the current program and daily progress from storage
@@ -95,11 +96,32 @@ struct DailyChecklistView: View {
             .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    settingsLink
+                    HStack(spacing: 16) {
+                        calendarLink
+                        settingsLink
+                    }
                 }
             }
             .sheet(isPresented: $showingSettings) {
                 SettingsView(endOfDayTime: $viewModel.program.endOfDayTime)
+            }
+            .sheet(isPresented: $showingCalendar) {
+                NavigationView {
+                    ProgramCalendarView(
+                        startDate: viewModel.program.startDate,
+                        numberOfDays: viewModel.program.numberOfDays(),
+                        completedDates: viewModel.getCompletedDates()
+                    )
+                    .navigationTitle("Program Calendar")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button("Done") {
+                                showingCalendar = false
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -191,19 +213,38 @@ struct DailyChecklistView: View {
     }
     
     private var taskListView: some View {
-        ScrollView {
-            LazyVStack(spacing: 12) {
-                ForEach(viewModel.program.tasks(), id: \.id) { task in
-                    TaskRowView(
-                        task: task,
-                        isCompleted: viewModel.dailyProgress.completedTaskIDs.contains(task.id),
-                        onToggle: {
-                            toggleTask(task)
-                        }
-                    )
+        List {
+            ForEach(viewModel.program.tasks(), id: \.id) { task in
+                TaskRowView(
+                    task: task,
+                    isCompleted: viewModel.dailyProgress.completedTaskIDs.contains(task.id),
+                    onToggle: {
+                        toggleTask(task)
+                    },
+                    onSetReminder: {
+                        // TODO: Implement reminder functionality
+                        print("Set reminder for task: \(task.title)")
+                    }
+                )
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button("Reminder") {
+                        // TODO: Implement reminder functionality
+                        print("Set reminder for task: \(task.title)")
+                    }
+                    .tint(.orange)
                 }
             }
-            .padding()
+            .onMove(perform: moveTasks)
+        }
+        .listStyle(PlainListStyle())
+    }
+    
+    private var calendarLink: some View {
+        Button(action: {
+            showingCalendar = true
+        }) {
+            Image(systemName: "calendar")
+                .foregroundColor(.blue)
         }
     }
     
@@ -255,43 +296,66 @@ struct DailyChecklistView: View {
             viewModel.completeCurrentDay()
         }
     }
+    
+    private func moveTasks(from source: IndexSet, to destination: Int) {
+        // TODO: Implement task reordering
+        // This would require updating the program template to store task order
+        print("Move tasks from \(source) to \(destination)")
+    }
 }
 
 struct TaskRowView: View {
     let task: Task
     let isCompleted: Bool
     let onToggle: () -> Void
+    let onSetReminder: () -> Void
     
     var body: some View {
-        Button(action: onToggle) {
-            HStack(spacing: 12) {
+        HStack(spacing: 12) {
+            // Drag handle
+            Image(systemName: "line.3.horizontal")
+                .font(.caption)
+                .foregroundColor(.gray)
+                .padding(.trailing, 4)
+            
+            // Checkbox
+            Button(action: onToggle) {
                 Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
                     .font(.title2)
                     .foregroundColor(isCompleted ? .blue : .gray)
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(task.title)
-                        .font(.body)
-                        .fontWeight(.medium)
-                        .foregroundColor(.primary)
-                        .strikethrough(isCompleted)
-                    
-                    if let description = task.description {
-                        Text(description)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .strikethrough(isCompleted)
-                    }
-                }
-                
-                Spacer()
             }
-            .padding()
-            .background(Color(.systemBackground))
-            .cornerRadius(12)
-            .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
+            .buttonStyle(PlainButtonStyle())
+            
+            // Task content
+            VStack(alignment: .leading, spacing: 4) {
+                Text(task.title)
+                    .font(.body)
+                    .fontWeight(.medium)
+                    .foregroundColor(.primary)
+                    .strikethrough(isCompleted)
+                
+                if let description = task.description {
+                    Text(description)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .strikethrough(isCompleted)
+                }
+            }
+            
+            Spacer()
+            
+            // Reminder button
+            Button(action: onSetReminder) {
+                Image(systemName: "bell")
+                    .font(.caption)
+                    .foregroundColor(.orange)
+            }
+            .buttonStyle(PlainButtonStyle())
         }
-        .buttonStyle(PlainButtonStyle())
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+        .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
     }
 }
 
