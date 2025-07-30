@@ -708,6 +708,10 @@ struct FullPhotoViewer: View {
     let image: UIImage?
     let taskTitle: String
     @Environment(\.presentationMode) private var presentationMode
+    @State private var scale: CGFloat = 1.0
+    @State private var lastScale: CGFloat = 1.0
+    @State private var offset: CGSize = .zero
+    @State private var lastOffset: CGSize = .zero
     
     var body: some View {
         NavigationView {
@@ -718,6 +722,46 @@ struct FullPhotoViewer: View {
                     Image(uiImage: image)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
+                        .scaleEffect(scale)
+                        .offset(offset)
+                        .gesture(
+                            SimultaneousGesture(
+                                MagnificationGesture()
+                                    .onChanged { value in
+                                        let delta = value / lastScale
+                                        lastScale = value
+                                        scale = min(max(scale * delta, 1.0), 4.0)
+                                    }
+                                    .onEnded { _ in
+                                        lastScale = 1.0
+                                    },
+                                DragGesture()
+                                    .onChanged { value in
+                                        let delta = CGSize(
+                                            width: value.translation.width - lastOffset.width,
+                                            height: value.translation.height - lastOffset.height
+                                        )
+                                        lastOffset = value.translation
+                                        offset = CGSize(
+                                            width: offset.width + delta.width,
+                                            height: offset.height + delta.height
+                                        )
+                                    }
+                                    .onEnded { _ in
+                                        lastOffset = .zero
+                                    }
+                            )
+                        )
+                        .onTapGesture(count: 2) {
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                if scale > 1.0 {
+                                    scale = 1.0
+                                    offset = .zero
+                                } else {
+                                    scale = 2.0
+                                }
+                            }
+                        }
                         .ignoresSafeArea()
                 } else {
                     VStack {
