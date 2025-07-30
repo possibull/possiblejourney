@@ -98,10 +98,17 @@ struct ProgramTemplateSelectionView: View {
             }
 
             .sheet(item: $selectedTemplate) { template in
-                TemplateDetailView(template: template) { program in
-                    onProgramCreated(program)
-                    selectedTemplate = nil
-                }
+                TemplateDetailView(
+                    template: template,
+                    onStartProgram: { program in
+                        onProgramCreated(program)
+                        selectedTemplate = nil
+                    },
+                    onEdit: { template in
+                        editingTemplate = template
+                        selectedTemplate = nil
+                    }
+                )
             }
             .sheet(item: $editingTemplate) { template in
                 TemplateEditView(template: template) { updatedTemplate in
@@ -219,15 +226,18 @@ struct TemplateCardView: View {
 struct TemplateDetailView: View {
     let template: ProgramTemplate
     let onStartProgram: (Program) -> Void
+    let onEdit: (ProgramTemplate) -> Void
     
     @State private var startDate = Date()
     @State private var endOfDayTime = Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22) // Default 10pm
     @State private var numberOfDays: Int
     @State private var useCustomDays = false
+    @Environment(\.presentationMode) private var presentationMode
     
-    init(template: ProgramTemplate, onStartProgram: @escaping (Program) -> Void) {
+    init(template: ProgramTemplate, onStartProgram: @escaping (Program) -> Void, onEdit: @escaping (ProgramTemplate) -> Void) {
         self.template = template
         self.onStartProgram = onStartProgram
+        self.onEdit = onEdit
         self._numberOfDays = State(initialValue: template.defaultNumberOfDays)
     }
     
@@ -247,9 +257,17 @@ struct TemplateDetailView: View {
             .navigationTitle("Template Details")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
-                        // This will be handled by the sheet dismissal
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    if !template.isDefault {
+                        Button("Edit") {
+                            onEdit(template)
+                        }
                     }
                 }
             }
