@@ -160,13 +160,6 @@ struct CalendarMonthGrid: View {
                                         Text("\(calendar.component(.day, from: date))")
                                             .font(.system(size: 20, weight: isProgramDay ? .bold : .regular))
                                             .foregroundColor(isProgramDay ? .blue : Color(.systemGray3))
-                                        // Program day number for incomplete program days
-                                        if isProgramDay, let progNum = programDayNumbers[calendar.startOfDay(for: date)] {
-                                            Text("\(progNum)")
-                                                .font(.system(size: 12, weight: .medium))
-                                                .foregroundColor(.blue)
-                                                .offset(y: 12)
-                                        }
                                         // Today highlight
                                         if isToday {
                                             RoundedRectangle(cornerRadius: 12)
