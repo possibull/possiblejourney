@@ -334,7 +334,16 @@ struct TaskRowView: View {
         if let progress = currentProgress {
             print("DEBUG: Progress photoURLs count: \(progress.photoURLs.count)")
             print("DEBUG: Progress photoURLs keys: \(progress.photoURLs.keys.map { $0.uuidString.prefix(8) })")
+            print("DEBUG: Progress date: \(progress.date)")
+            print("DEBUG: Progress ID: \(progress.id)")
         }
+        
+        // Also check what the storage key would be
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        let dateString = formatter.string(from: today)
+        print("DEBUG: Storage key would be: dailyProgress_\(dateString)")
         
         return url
     }
@@ -567,6 +576,15 @@ struct TaskRowView: View {
                 
                 print("DEBUG: Saved progress with photoURLs count: \(currentProgress.photoURLs.count)")
                 print("DEBUG: Photo URL for task \(task.title): \(fileURL)")
+                
+                // Debug the storage key being used
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd"
+                formatter.timeZone = TimeZone(secondsFromGMT: 0)
+                let dateString = formatter.string(from: today)
+                print("DEBUG: Saving to storage key: dailyProgress_\(dateString)")
+                print("DEBUG: Progress date: \(currentProgress.date)")
+                print("DEBUG: Progress ID: \(currentProgress.id)")
                 
                 // Update both thumbnail and full image immediately
                 fullImage = image
