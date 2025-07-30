@@ -496,7 +496,36 @@ struct TemplateEditView: View {
                     }
                     .pickerStyle(MenuPickerStyle())
                     
-                    Stepper("Default Days: \(template.defaultNumberOfDays)", value: $template.defaultNumberOfDays, in: 1...365)
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Default Number of Days")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                        
+                        HStack {
+                            Text("days")
+                                .font(.body)
+                                .foregroundColor(.secondary)
+                            
+                            TextField("Days", value: $template.defaultNumberOfDays, format: .number)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .frame(width: 80)
+                                .keyboardType(.numberPad)
+                                .onChange(of: template.defaultNumberOfDays) { oldValue, newValue in
+                                    // Ensure the value stays within valid range
+                                    if newValue < 1 {
+                                        template.defaultNumberOfDays = 1
+                                    } else if newValue > 365 {
+                                        template.defaultNumberOfDays = 365
+                                    }
+                                }
+                            
+                            Stepper("", value: $template.defaultNumberOfDays, in: 1...365)
+                                .labelsHidden()
+                        }
+                        .padding()
+                        .background(Color(.systemGray6))
+                        .cornerRadius(8)
+                    }
                 }
                 
                 Section(header: Text("Tasks")) {
