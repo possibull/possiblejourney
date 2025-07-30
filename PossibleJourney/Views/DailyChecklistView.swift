@@ -360,6 +360,10 @@ struct DailyChecklistView: View {
         let allTasksCompleted = viewModel.program.tasks().allSatisfy { completed.contains($0.id) }
         if allTasksCompleted {
             viewModel.completeCurrentDay()
+        } else if viewModel.dailyProgress.isCompleted {
+            // If not all tasks are completed but the day was marked as completed, unmark it
+            viewModel.dailyProgress.isCompleted = false
+            DailyProgressStorage().save(progress: viewModel.dailyProgress)
         }
     }
     
