@@ -1,7 +1,13 @@
 import Foundation
 
-struct Task: Codable {
+struct Task: Codable, Identifiable {
     let id: UUID
-    let title: String
-    let description: String?
+    var title: String
+    var description: String?
+    
+    init(id: UUID = UUID(), title: String, description: String? = nil) {
+        self.id = id
+        self.title = title
+        self.description = description
+    }
 } 

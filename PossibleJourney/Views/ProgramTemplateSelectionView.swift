@@ -11,6 +11,7 @@ struct ProgramTemplateSelectionView: View {
     @StateObject private var viewModel = ProgramTemplateViewModel()
     @State private var selectedTemplate: ProgramTemplate?
     @State private var showingCustomSetup = false
+    @State private var editingTemplate: ProgramTemplate?
     
     let onTemplateSelected: (ProgramTemplate) -> Void
     let onProgramCreated: (Program) -> Void
@@ -63,9 +64,15 @@ struct ProgramTemplateSelectionView: View {
                     ScrollView {
                         LazyVStack(spacing: 16) {
                             ForEach(viewModel.filteredTemplates) { template in
-                                TemplateCardView(template: template) {
-                                    selectedTemplate = template
-                                }
+                                TemplateCardView(
+                                    template: template,
+                                    onTap: {
+                                        selectedTemplate = template
+                                    },
+                                    onEdit: {
+                                        editingTemplate = template
+                                    }
+                                )
                             }
                         }
                         .padding()
@@ -96,6 +103,12 @@ struct ProgramTemplateSelectionView: View {
                     selectedTemplate = nil
                 }
             }
+            .sheet(item: $editingTemplate) { template in
+                TemplateEditView(template: template) { updatedTemplate in
+                    viewModel.updateTemplate(updatedTemplate)
+                    editingTemplate = nil
+                }
+            }
         }
     }
 }
@@ -103,6 +116,7 @@ struct ProgramTemplateSelectionView: View {
 struct TemplateCardView: View {
     let template: ProgramTemplate
     let onTap: () -> Void
+    let onEdit: () -> Void
     @State private var isExpanded = false
     
     var body: some View {
@@ -137,6 +151,19 @@ struct TemplateCardView: View {
                         Text(template.category.displayName)
                             .font(.caption2)
                             .foregroundColor(.secondary)
+                    }
+                }
+                
+                // Edit button (only for non-default templates)
+                if !template.isDefault {
+                    HStack {
+                        Spacer()
+                        Button(action: onEdit) {
+                            Image(systemName: "pencil.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(.orange)
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
                 }
                 
@@ -388,6 +415,126 @@ struct TemplateDetailView: View {
             .cornerRadius(12)
         }
         .padding(.top)
+    }
+}
+
+struct TemplateEditView: View {
+    @State private var template: ProgramTemplate
+    @State private var showingAddTask = false
+    @State private var newTaskTitle = ""
+    @State private var newTaskDescription = ""
+    
+    let onSave: (ProgramTemplate) -> Void
+    @Environment(\.presentationMode) private var presentationMode
+    
+    init(template: ProgramTemplate, onSave: @escaping (ProgramTemplate) -> Void) {
+        self._template = State(initialValue: template)
+        self.onSave = onSave
+    }
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Template Details")) {
+                    TextField("Template Name", text: $template.name)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    
+                    TextField("Description", text: $template.description, axis: .vertical)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .lineLimit(3...6)
+                    
+                    Picker("Category", selection: $template.category) {
+                        ForEach(TemplateCategory.allCases, id: \.self) { category in
+                            Text(category.displayName).tag(category)
+                        }
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                    
+                    Stepper("Default Days: \(template.defaultNumberOfDays)", value: $template.defaultNumberOfDays, in: 1...365)
+                }
+                
+                Section(header: Text("Tasks")) {
+                    ForEach(template.tasks.indices, id: \.self) { index in
+                        TaskEditRow(task: $template.tasks[index])
+                    }
+                    .onDelete(perform: deleteTask)
+                    .onMove(perform: moveTask)
+                    
+                    Button(action: {
+                        showingAddTask = true
+                    }) {
+                        HStack {
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundColor(.blue)
+                            Text("Add Task")
+                                .foregroundColor(.blue)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Edit Template")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Save") {
+                        onSave(template)
+                    }
+                    .fontWeight(.semibold)
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    EditButton()
+                }
+            }
+            .alert("Add New Task", isPresented: $showingAddTask) {
+                TextField("Task Title", text: $newTaskTitle)
+                TextField("Task Description (Optional)", text: $newTaskDescription)
+                Button("Cancel", role: .cancel) { }
+                Button("Add") {
+                    addTask()
+                }
+            }
+        }
+    }
+    
+    private func addTask() {
+        let newTask = Task(title: newTaskTitle, description: newTaskDescription.isEmpty ? nil : newTaskDescription)
+        template.tasks.append(newTask)
+        newTaskTitle = ""
+        newTaskDescription = ""
+    }
+    
+    private func deleteTask(offsets: IndexSet) {
+        template.tasks.remove(atOffsets: offsets)
+    }
+    
+    private func moveTask(from source: IndexSet, to destination: Int) {
+        template.tasks.move(fromOffsets: source, toOffset: destination)
+    }
+}
+
+struct TaskEditRow: View {
+    @Binding var task: Task
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            TextField("Task Title", text: $task.title)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+            
+            TextField("Description (Optional)", text: Binding(
+                get: { task.description ?? "" },
+                set: { task.description = $0.isEmpty ? nil : $0 }
+            ))
+            .textFieldStyle(RoundedBorderTextFieldStyle())
+            .font(.caption)
+        }
+        .padding(.vertical, 4)
     }
 }
 

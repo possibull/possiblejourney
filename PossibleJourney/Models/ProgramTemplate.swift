@@ -9,11 +9,11 @@ import Foundation
 
 struct ProgramTemplate: Codable, Identifiable {
     let id: UUID
-    let name: String
-    let description: String
-    let category: TemplateCategory
-    let defaultNumberOfDays: Int
-    let tasks: [Task]
+    var name: String
+    var description: String
+    var category: TemplateCategory
+    var defaultNumberOfDays: Int
+    var tasks: [Task]
     let isDefault: Bool
     
     init(id: UUID = UUID(), name: String, description: String, category: TemplateCategory, defaultNumberOfDays: Int, tasks: [Task], isDefault: Bool = false) {
