@@ -238,6 +238,14 @@ struct DailyChecklistView: View {
             .onMove(perform: moveTasks)
         }
         .listStyle(PlainListStyle())
+        .onAppear {
+            // Debug: Print task information to help identify missing descriptions
+            print("=== Task Debug Info ===")
+            for (index, task) in viewModel.program.tasks().enumerated() {
+                print("Task \(index + 1): '\(task.title)' - Description: '\(task.description ?? "nil")'")
+            }
+            print("=======================")
+        }
     }
     
     private var calendarLink: some View {
@@ -328,20 +336,25 @@ struct TaskRowView: View {
             .buttonStyle(PlainButtonStyle())
             
             // Task content
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 6) {
                 Text(task.title)
                     .font(.body)
                     .fontWeight(.medium)
                     .foregroundColor(.primary)
                     .strikethrough(isCompleted)
+                    .multilineTextAlignment(.leading)
                 
-                if let description = task.description {
+                if let description = task.description, !description.isEmpty {
                     Text(description)
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .strikethrough(isCompleted)
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(nil)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             
             Spacer()
             
