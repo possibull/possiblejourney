@@ -46,7 +46,21 @@ class DailyChecklistViewModel: ObservableObject {
         if ignoreMissedDayForCurrentSession {
             return false
         }
-        return program.isCurrentAppDayMissed(now: now, completedTaskIDs: Set(dailyProgress.completedTaskIDs))
+        
+        // If we're viewing a specific date (not the current app day), check if that date is incomplete
+        let calendar = Calendar.current
+        let currentAppDay = program.currentAppDay
+        let viewingDate = selectedDate
+        
+        // If we're viewing a different date than the current app day, check if that date is incomplete
+        if !calendar.isDate(viewingDate, inSameDayAs: currentAppDay) {
+            let eod = program.endOfDay(for: viewingDate)
+            let allComplete = program.tasks().allSatisfy { dailyProgress.completedTaskIDs.contains($0.id) }
+            return !allComplete && now >= eod
+        } else {
+            // We're viewing the current app day, use the standard logic
+            return program.isCurrentAppDayMissed(now: now, completedTaskIDs: Set(dailyProgress.completedTaskIDs))
+        }
     }
 
     func completeCurrentDay() {
