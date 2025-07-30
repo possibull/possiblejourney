@@ -85,24 +85,6 @@ class ProgramTemplateStorage {
     /// Create default templates for first-time users
     private func createDefaultTemplates() -> [ProgramTemplate] {
         let defaultTemplates = [
-            // 75Hard Challenge
-            ProgramTemplate(
-                name: "75Hard",
-                description: "A 75-day mental toughness and fitness challenge",
-                category: .health,
-                defaultNumberOfDays: 75,
-                tasks: [
-                    Task(id: UUID(), title: "Follow a diet", description: "Choose a diet and stick to it - no cheat meals"),
-                    Task(id: UUID(), title: "No cheat meals and no alcohol", description: "Stick to your chosen diet with zero exceptions and complete abstinence from alcohol"),
-                    Task(id: UUID(), title: "Indoor workout (45 minutes)", description: "Complete a 45-minute workout indoors"),
-                    Task(id: UUID(), title: "Outdoor workout (45 minutes)", description: "Complete a 45-minute workout outdoors, regardless of weather"),
-                    Task(id: UUID(), title: "Drink 1 gallon of water", description: "Stay hydrated throughout the day"),
-                    Task(id: UUID(), title: "Read 10 pages", description: "Read from a non-fiction book"),
-                    Task(id: UUID(), title: "Take a progress photo", description: "Document your journey daily")
-                ],
-                isDefault: true
-            ),
-            
             // Health & Fitness
             ProgramTemplate(
                 name: "Morning Wellness",
@@ -189,6 +171,24 @@ class ProgramTemplateStorage {
                     Task(id: UUID(), title: "Review budget", description: "Check your financial plan"),
                     Task(id: UUID(), title: "Save something", description: "Put aside money, even if it's small"),
                     Task(id: UUID(), title: "Financial education", description: "Learn about money management")
+                ],
+                isDefault: true
+            ),
+            
+            // 75Hard Challenge (last so it appears first in the list)
+            ProgramTemplate(
+                name: "75Hard",
+                description: "A 75-day mental toughness and fitness challenge",
+                category: .health,
+                defaultNumberOfDays: 75,
+                tasks: [
+                    Task(id: UUID(), title: "Follow a diet", description: "Choose a diet and stick to it - no cheat meals"),
+                    Task(id: UUID(), title: "No cheat meals and no alcohol", description: "Stick to your chosen diet with zero exceptions and complete abstinence from alcohol"),
+                    Task(id: UUID(), title: "Indoor workout (45 minutes)", description: "Complete a 45-minute workout indoors"),
+                    Task(id: UUID(), title: "Outdoor workout (45 minutes)", description: "Complete a 45-minute workout outdoors, regardless of weather"),
+                    Task(id: UUID(), title: "Drink 1 gallon of water", description: "Stay hydrated throughout the day"),
+                    Task(id: UUID(), title: "Read 10 pages", description: "Read from a non-fiction book"),
+                    Task(id: UUID(), title: "Take a progress photo", description: "Document your journey daily")
                 ],
                 isDefault: true
             )
