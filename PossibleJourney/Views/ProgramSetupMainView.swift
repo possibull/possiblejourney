@@ -14,39 +14,37 @@ struct ProgramSetupMainView: View {
     let onProgramCreated: (Program) -> Void
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                if showingTemplateSelection {
-                    ProgramTemplateSelectionView(
-                        onTemplateSelected: { template in
-                            let program = template.createProgram(numberOfDays: nil)
-                            onProgramCreated(program)
-                        },
-                        onProgramCreated: { program in
-                            onProgramCreated(program)
-                        },
-                        onCustomProgram: {
-                            showingCustomSetup = true
-                        }
-                    )
-                } else if showingCustomSetup {
-                    ProgramSetupView(onSave: { program in
+        VStack(spacing: 0) {
+            if showingTemplateSelection {
+                ProgramTemplateSelectionView(
+                    onTemplateSelected: { template in
+                        let program = template.createProgram(numberOfDays: nil)
                         onProgramCreated(program)
-                    })
-                    .navigationTitle("Custom Program")
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarLeading) {
-                            Button("Back") {
-                                showingCustomSetup = false
-                            }
+                    },
+                    onProgramCreated: { program in
+                        onProgramCreated(program)
+                    },
+                    onCustomProgram: {
+                        showingCustomSetup = true
+                    }
+                )
+            } else if showingCustomSetup {
+                ProgramSetupView(onSave: { program in
+                    onProgramCreated(program)
+                })
+                .navigationTitle("Custom Program")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button("Back") {
+                            showingCustomSetup = false
                         }
                     }
                 }
             }
-            .navigationTitle("Create Program")
-            .navigationBarTitleDisplayMode(.large)
         }
+        .navigationTitle("Create Program")
+        .navigationBarTitleDisplayMode(.large)
     }
 }
 

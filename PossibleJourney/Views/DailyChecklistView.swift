@@ -81,45 +81,43 @@ struct DailyChecklistView: View {
     }
     
     var body: some View {
-        NavigationView {
-            ZStack {
-                // Light background
-                Color(.systemBackground)
-                    .ignoresSafeArea()
-                
-                if viewModel.isDayMissed {
-                    missedDayScreen
-                } else {
-                    checklistContent
+        ZStack {
+            // Light background
+            Color(.systemBackground)
+                .ignoresSafeArea()
+            
+            if viewModel.isDayMissed {
+                missedDayScreen
+            } else {
+                checklistContent
+            }
+        }
+        .navigationTitle("Daily Checklist")
+        .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                HStack(spacing: 16) {
+                    calendarLink
+                    settingsLink
                 }
             }
-            .navigationTitle("Daily Checklist")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    HStack(spacing: 16) {
-                        calendarLink
-                        settingsLink
-                    }
-                }
-            }
-            .sheet(isPresented: $showingSettings) {
-                SettingsView(endOfDayTime: $viewModel.program.endOfDayTime)
-            }
-            .sheet(isPresented: $showingCalendar) {
-                NavigationView {
-                    ProgramCalendarView(
-                        startDate: viewModel.program.startDate,
-                        numberOfDays: viewModel.program.numberOfDays(),
-                        completedDates: viewModel.getCompletedDates()
-                    )
-                    .navigationTitle("Program Calendar")
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarTrailing) {
-                            Button("Done") {
-                                showingCalendar = false
-                            }
+        }
+        .sheet(isPresented: $showingSettings) {
+            SettingsView(endOfDayTime: $viewModel.program.endOfDayTime)
+        }
+        .sheet(isPresented: $showingCalendar) {
+            NavigationView {
+                ProgramCalendarView(
+                    startDate: viewModel.program.startDate,
+                    numberOfDays: viewModel.program.numberOfDays(),
+                    completedDates: viewModel.getCompletedDates()
+                )
+                .navigationTitle("Program Calendar")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button("Done") {
+                            showingCalendar = false
                         }
                     }
                 }
