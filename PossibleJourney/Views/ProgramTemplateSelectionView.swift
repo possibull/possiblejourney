@@ -13,6 +13,7 @@ struct ProgramTemplateSelectionView: View {
     @State private var showingCustomSetup = false
     @State private var editingTemplate: ProgramTemplate?
     @State private var templateToDelete: ProgramTemplate?
+    @State private var showingTemplateCreate = false
     
     let onTemplateSelected: (ProgramTemplate) -> Void
     let onProgramCreated: (Program) -> Void
@@ -99,7 +100,7 @@ struct ProgramTemplateSelectionView: View {
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Custom") {
-                        onCustomProgram()
+                        showingTemplateCreate = true
                     }
                     .fontWeight(.medium)
                 }
@@ -149,6 +150,12 @@ struct ProgramTemplateSelectionView: View {
             } message: {
                 if let template = templateToDelete {
                     Text("Are you sure you want to delete '\(template.name)'? This action cannot be undone.")
+                }
+            }
+            .sheet(isPresented: $showingTemplateCreate) {
+                TemplateCreateView { newTemplate in
+                    viewModel.addTemplate(newTemplate)
+                    showingTemplateCreate = false
                 }
             }
         }
@@ -527,6 +534,152 @@ struct TemplateDetailView: View {
             .cornerRadius(12)
         }
         .padding(.top)
+    }
+}
+
+struct TemplateCreateView: View {
+    @State private var template: ProgramTemplate
+    @State private var showingAddTask = false
+    @State private var newTaskTitle = ""
+    @State private var newTaskDescription = ""
+    
+    let onSave: (ProgramTemplate) -> Void
+    @Environment(\.presentationMode) private var presentationMode
+    
+    init(onSave: @escaping (ProgramTemplate) -> Void) {
+        // Create a new template with reasonable defaults
+        let newTemplate = ProgramTemplate(
+            name: "New Template",
+            description: "A custom program template",
+            category: .custom,
+            defaultNumberOfDays: 30,
+            tasks: [],
+            isDefault: false
+        )
+        self._template = State(initialValue: newTemplate)
+        self.onSave = onSave
+    }
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Template Details")) {
+                    TextField("Template Name", text: $template.name)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    
+                    TextField("Description", text: $template.description, axis: .vertical)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .lineLimit(3...6)
+                    
+                    Picker("Category", selection: $template.category) {
+                        ForEach(TemplateCategory.allCases, id: \.self) { category in
+                            Text(category.displayName).tag(category)
+                        }
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Default Number of Days")
+                            .font(.headline)
+                            .fontWeight(.semibold)
+                        
+                        HStack {
+                            Text("days")
+                                .font(.body)
+                                .foregroundColor(.secondary)
+                            
+                            TextField("Days", value: $template.defaultNumberOfDays, format: .number)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .frame(width: 80)
+                                .keyboardType(.numberPad)
+                                .onChange(of: template.defaultNumberOfDays) { oldValue, newValue in
+                                    // Ensure the value stays within valid range
+                                    if newValue < 1 {
+                                        template.defaultNumberOfDays = 1
+                                    } else if newValue > 365 {
+                                        template.defaultNumberOfDays = 365
+                                    }
+                                }
+                            
+                            Stepper("", value: $template.defaultNumberOfDays, in: 1...365)
+                                .labelsHidden()
+                        }
+                        .padding()
+                        .background(Color(.systemGray6))
+                        .cornerRadius(8)
+                    }
+                }
+                
+                Section(header: Text("Tasks")) {
+                    if template.tasks.isEmpty {
+                        Text("No tasks yet. Tap 'Add Task' to get started.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .italic()
+                    } else {
+                        ForEach(template.tasks.indices, id: \.self) { index in
+                            TaskEditRow(task: $template.tasks[index])
+                        }
+                        .onDelete(perform: deleteTask)
+                        .onMove(perform: moveTask)
+                    }
+                    
+                    Button(action: {
+                        showingAddTask = true
+                    }) {
+                        HStack {
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundColor(.blue)
+                            Text("Add Task")
+                                .foregroundColor(.blue)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Create Template")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Create") {
+                        onSave(template)
+                    }
+                    .fontWeight(.semibold)
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    EditButton()
+                }
+            }
+            .alert("Add New Task", isPresented: $showingAddTask) {
+                TextField("Task Title", text: $newTaskTitle)
+                TextField("Task Description (Optional)", text: $newTaskDescription)
+                Button("Cancel", role: .cancel) { }
+                Button("Add") {
+                    addTask()
+                }
+            }
+        }
+    }
+    
+    private func addTask() {
+        let newTask = Task(title: newTaskTitle, description: newTaskDescription.isEmpty ? nil : newTaskDescription)
+        template.tasks.append(newTask)
+        newTaskTitle = ""
+        newTaskDescription = ""
+    }
+    
+    private func deleteTask(offsets: IndexSet) {
+        template.tasks.remove(atOffsets: offsets)
+    }
+    
+    private func moveTask(from source: IndexSet, to destination: Int) {
+        template.tasks.move(fromOffsets: source, toOffset: destination)
     }
 }
 
