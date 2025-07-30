@@ -141,10 +141,6 @@ struct ProgramTemplateSelectionView: View {
                         onProgramCreated(program)
                         selectedTemplate = nil
                     },
-                    onEdit: { template in
-                        editingTemplate = template
-                        selectedTemplate = nil
-                    },
                     onDuplicate: { template in
                         let copy = viewModel.duplicateTemplate(template)
                         editingTemplate = copy
@@ -309,7 +305,6 @@ struct TemplateCardView: View {
 struct TemplateDetailView: View {
     let template: ProgramTemplate
     let onStartProgram: (Program) -> Void
-    let onEdit: (ProgramTemplate) -> Void
     let onDuplicate: (ProgramTemplate) -> Void
     let onDelete: (ProgramTemplate) -> Void
     
@@ -319,10 +314,9 @@ struct TemplateDetailView: View {
     @State private var useCustomDays = false
     @Environment(\.presentationMode) private var presentationMode
     
-    init(template: ProgramTemplate, onStartProgram: @escaping (Program) -> Void, onEdit: @escaping (ProgramTemplate) -> Void, onDuplicate: @escaping (ProgramTemplate) -> Void, onDelete: @escaping (ProgramTemplate) -> Void) {
+    init(template: ProgramTemplate, onStartProgram: @escaping (Program) -> Void, onDuplicate: @escaping (ProgramTemplate) -> Void, onDelete: @escaping (ProgramTemplate) -> Void) {
         self.template = template
         self.onStartProgram = onStartProgram
-        self.onEdit = onEdit
         self.onDuplicate = onDuplicate
         self.onDelete = onDelete
         self._numberOfDays = State(initialValue: template.defaultNumberOfDays)
@@ -354,12 +348,6 @@ struct TemplateDetailView: View {
                     HStack {
                         Button("Duplicate") {
                             onDuplicate(template)
-                        }
-                        
-                        if !template.isDefault {
-                            Button("Edit") {
-                                onEdit(template)
-                            }
                         }
                         
                         Button("Delete") {
