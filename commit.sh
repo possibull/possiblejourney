@@ -5,11 +5,11 @@
 
 timestamp=$(date '+%Y-%m-%d %H:%M:%S')
 
-# Check if there are any changes
-if ! git diff --quiet; then
+# Check if there are any changes (including untracked files)
+if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git ls-files --others --exclude-standard)" ]; then
     echo "Changes detected at $timestamp"
     
-    # Stage all changes
+    # Stage all changes (including untracked files)
     git add .
     
     # Get list of changed files for commit message
