@@ -316,6 +316,7 @@ struct TaskRowView: View {
     @State private var showingImagePicker = false
     @State private var selectedImage: UIImage?
     @State private var imageSource: UIImagePickerController.SourceType = .photoLibrary
+    @State private var thumbnailImage: UIImage?
     
     // Check if photo exists for this task
     private var hasPhoto: Bool {
@@ -323,6 +324,14 @@ struct TaskRowView: View {
         let today = Date()
         let currentProgress = dailyProgressStorage.load(for: today)
         return currentProgress?.photoURLs[task.id] != nil
+    }
+    
+    // Get the photo URL for this task
+    private var photoURL: URL? {
+        let dailyProgressStorage = DailyProgressStorage()
+        let today = Date()
+        let currentProgress = dailyProgressStorage.load(for: today)
+        return currentProgress?.photoURLs[task.id]
     }
     
     var body: some View {
@@ -374,6 +383,19 @@ struct TaskRowView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             
             Spacer()
+            
+            // Photo thumbnail (if photo exists)
+            if let thumbnail = thumbnailImage {
+                Image(uiImage: thumbnail)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 40, height: 40)
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                    )
+            }
             
             // Photo button for tasks that require photos
             if task.requiresPhoto {
@@ -428,6 +450,12 @@ struct TaskRowView: View {
                 }
             }
         }
+        .onAppear {
+            loadThumbnail()
+        }
+        .onChange(of: hasPhoto) { _, _ in
+            loadThumbnail()
+        }
     }
     
     private func handleCheckboxTap() {
@@ -437,6 +465,30 @@ struct TaskRowView: View {
         } else {
             // Otherwise, just toggle the task completion
             onToggle()
+        }
+    }
+    
+    private func loadThumbnail() {
+        guard let url = photoURL else {
+            thumbnailImage = nil
+            return
+        }
+        
+        // Load image asynchronously to avoid blocking the UI
+        DispatchQueue.global(qos: .userInitiated).async {
+            if let imageData = try? Data(contentsOf: url),
+               let image = UIImage(data: imageData) {
+                // Create a smaller thumbnail for better performance
+                image.prepareThumbnail(of: CGSize(width: 80, height: 80)) { thumbnail in
+                    DispatchQueue.main.async {
+                        thumbnailImage = thumbnail ?? image
+                    }
+                }
+            } else {
+                DispatchQueue.main.async {
+                    thumbnailImage = nil
+                }
+            }
         }
     }
     
@@ -463,6 +515,13 @@ struct TaskRowView: View {
                 // Add the photo URL to the progress
                 currentProgress.photoURLs[task.id] = fileURL
                 dailyProgressStorage.save(progress: currentProgress)
+                
+                // Update thumbnail immediately
+                image.prepareThumbnail(of: CGSize(width: 80, height: 80)) { thumbnail in
+                    DispatchQueue.main.async {
+                        thumbnailImage = thumbnail ?? image
+                    }
+                }
                 
                 print("Photo saved for task: \(task.title) at \(fileURL)")
             } catch {
