@@ -81,6 +81,21 @@ struct ProgramTemplateSelectionView: View {
             }
             .navigationTitle("Choose Template")
             .navigationBarTitleDisplayMode(.large)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Reset") {
+                        viewModel.resetToDefaults()
+                    }
+                    .fontWeight(.medium)
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Custom") {
+                        onCustomProgram()
+                    }
+                    .fontWeight(.medium)
+                }
+            }
 
             .sheet(isPresented: $showingTemplateDetail, onDismiss: {
                 // Reset selected template when sheet is dismissed
