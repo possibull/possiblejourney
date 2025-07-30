@@ -34,14 +34,19 @@ if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git ls-files --o
     # Convert space-separated string to array and check each file
     IFS=' ' read -ra file_array <<< "$changed_files"
     for file in "${file_array[@]}"; do
+        echo "DEBUG: Checking file: '$file'"
         if [[ "$file" == *".swift" ]]; then
             has_swift=true
+            echo "DEBUG: Swift file detected: '$file'"
             if [[ "$file" == *"View.swift" ]]; then
                 has_view_swift=true
+                echo "DEBUG: View.swift pattern matched for: '$file'"
             elif [[ "$file" == *"ViewModel.swift" ]]; then
                 has_viewmodel_swift=true
+                echo "DEBUG: ViewModel.swift pattern matched for: '$file'"
             elif [[ "$file" == *"Model.swift" ]]; then
                 has_model_swift=true
+                echo "DEBUG: Model.swift pattern matched for: '$file'"
             fi
         elif [[ "$file" == *".xcodeproj" ]]; then
             has_xcodeproj=true
