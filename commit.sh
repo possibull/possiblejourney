@@ -21,33 +21,59 @@ if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git ls-files --o
     # Generate descriptive comment based on file types and changes
     comment=""
     
-    # Check for specific file types and generate appropriate comments
-    if echo "$changed_files" | grep -q "\.swift$"; then
-        echo "DEBUG: Swift files detected"
-        # Check if any Swift file ends with View.swift
-        if echo "$changed_files" | grep -q "View\.swift$"; then
-            echo "DEBUG: View.swift files detected"
-            comment="UI improvements and view updates"
-        # Check if any Swift file ends with ViewModel.swift
-        elif echo "$changed_files" | grep -q "ViewModel\.swift$"; then
-            echo "DEBUG: ViewModel.swift files detected"
-            comment="View model logic updates"
-        # Check if any Swift file ends with Model.swift
-        elif echo "$changed_files" | grep -q "Model\.swift$"; then
-            echo "DEBUG: Model.swift files detected"
-            comment="Data model changes"
-        # Any other Swift file
-        else
-            echo "DEBUG: Other Swift files detected"
-            comment="Swift code updates"
+    # Check each file individually for better pattern matching
+    has_view_swift=false
+    has_viewmodel_swift=false
+    has_model_swift=false
+    has_swift=false
+    has_xcodeproj=false
+    has_md=false
+    has_sh=false
+    has_json=false
+    
+    # Convert space-separated string to array and check each file
+    IFS=' ' read -ra file_array <<< "$changed_files"
+    for file in "${file_array[@]}"; do
+        if [[ "$file" == *".swift" ]]; then
+            has_swift=true
+            if [[ "$file" == *"View.swift" ]]; then
+                has_view_swift=true
+            elif [[ "$file" == *"ViewModel.swift" ]]; then
+                has_viewmodel_swift=true
+            elif [[ "$file" == *"Model.swift" ]]; then
+                has_model_swift=true
+            fi
+        elif [[ "$file" == *".xcodeproj" ]]; then
+            has_xcodeproj=true
+        elif [[ "$file" == *".md" ]]; then
+            has_md=true
+        elif [[ "$file" == *".sh" ]]; then
+            has_sh=true
+        elif [[ "$file" == *".json" ]]; then
+            has_json=true
         fi
-    elif echo "$changed_files" | grep -q "\.xcodeproj$"; then
+    done
+    
+    # Generate comment based on detected file types
+    if [ "$has_view_swift" = true ]; then
+        echo "DEBUG: View.swift files detected"
+        comment="UI improvements and view updates"
+    elif [ "$has_viewmodel_swift" = true ]; then
+        echo "DEBUG: ViewModel.swift files detected"
+        comment="View model logic updates"
+    elif [ "$has_model_swift" = true ]; then
+        echo "DEBUG: Model.swift files detected"
+        comment="Data model changes"
+    elif [ "$has_swift" = true ]; then
+        echo "DEBUG: Other Swift files detected"
+        comment="Swift code updates"
+    elif [ "$has_xcodeproj" = true ]; then
         comment="Xcode project configuration changes"
-    elif echo "$changed_files" | grep -q "\.md$"; then
+    elif [ "$has_md" = true ]; then
         comment="Documentation updates"
-    elif echo "$changed_files" | grep -q "\.sh$"; then
+    elif [ "$has_sh" = true ]; then
         comment="Script and automation updates"
-    elif echo "$changed_files" | grep -q "\.json$"; then
+    elif [ "$has_json" = true ]; then
         comment="Configuration and data updates"
     else
         comment="General project updates"
