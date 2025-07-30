@@ -334,7 +334,9 @@ struct TaskRowView: View {
                 .padding(.trailing, 4)
             
             // Checkbox
-            Button(action: onToggle) {
+            Button(action: {
+                handleCheckboxTap()
+            }) {
                 Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
                     .font(.title2)
                     .foregroundColor(isCompleted ? .blue : .gray)
@@ -420,7 +422,21 @@ struct TaskRowView: View {
         .onChange(of: selectedImage) { _, newImage in
             if let image = newImage {
                 savePhotoForTask(image: image)
+                // After saving photo, complete the task if it was being checked
+                if !isCompleted && task.requiresPhoto {
+                    onToggle()
+                }
             }
+        }
+    }
+    
+    private func handleCheckboxTap() {
+        // If task requires photo and doesn't have one yet, show photo picker
+        if task.requiresPhoto && !hasPhoto && !isCompleted {
+            showingPhotoPicker = true
+        } else {
+            // Otherwise, just toggle the task completion
+            onToggle()
         }
     }
     

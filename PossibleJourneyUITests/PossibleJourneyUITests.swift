@@ -483,6 +483,45 @@ final class PossibleJourneyUITests: XCTestCase {
         let photoIndicator = app.images["PhotoRequirementIndicator"]
         XCTAssertTrue(photoIndicator.exists, "Photo requirement indicator should be visible for task that requires photo")
     }
+    
+    func testCheckboxShowsPhotoPickerForPhotoRequiredTask() {
+        let app = launchAppWithReset()
+        // Navigate to template creation
+        app.buttons["Custom"].tap()
+        app.checkOnScreen(identifier: "TemplateCreationScreen", message: "Should be on template creation screen")
+        
+        // Add a task with photo requirement
+        app.addTaskWithPhotoRequirement(title: "Take Progress Photo", description: "Document your journey", requiresPhoto: true)
+        
+        // Save the template and create a program
+        let saveTemplateButton = app.buttons["Save Template"]
+        XCTAssertTrue(saveTemplateButton.exists)
+        saveTemplateButton.tap()
+        
+        // Select the template to create a program
+        let templateCell = app.staticTexts["Take Progress Photo"]
+        XCTAssertTrue(templateCell.waitForExistence(timeout: 2))
+        templateCell.tap()
+        
+        // Save the program
+        app.saveProgram()
+        
+        // Try to check the checkbox for the photo-required task
+        // This should show the photo picker instead of completing the task
+        let checkbox = app.buttons.matching(identifier: "circle").firstMatch
+        XCTAssertTrue(checkbox.exists, "Checkbox should exist for the task")
+        checkbox.tap()
+        
+        // Verify that the photo picker action sheet appears
+        let actionSheet = app.sheets.firstMatch
+        XCTAssertTrue(actionSheet.waitForExistence(timeout: 2), "Photo picker action sheet should appear when clicking checkbox on photo-required task")
+        
+        // Verify the action sheet has the expected options
+        let takePhotoButton = actionSheet.buttons["Take Photo"]
+        let chooseFromLibraryButton = actionSheet.buttons["Choose from Library"]
+        XCTAssertTrue(takePhotoButton.exists, "Take Photo button should be available")
+        XCTAssertTrue(chooseFromLibraryButton.exists, "Choose from Library button should be available")
+    }
 }
 
 extension XCUIApplication {
