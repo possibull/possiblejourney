@@ -228,6 +228,10 @@ struct DailyChecklistView: View {
                     onUpdateDailyProgress: { newProgress in
                         viewModel.dailyProgress = newProgress
                         DailyProgressStorage().save(progress: newProgress)
+                    },
+                    onPhotoRemoved: {
+                        // Clear photo state when task is unchecked
+                        print("DEBUG: Photo removed for task: \(task.title)")
                     }
                 )
                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
@@ -288,9 +292,25 @@ struct DailyChecklistView: View {
     
     private func toggleTask(_ task: Task) {
         var completed = viewModel.dailyProgress.completedTaskIDs
+        var photoURLs = viewModel.dailyProgress.photoURLs
+        
         if completed.contains(task.id) {
+            // Task is being unchecked - remove photo if it exists
             completed.remove(task.id)
+            if let photoURL = photoURLs[task.id] {
+                // Delete the photo file from storage
+                do {
+                    try FileManager.default.removeItem(at: photoURL)
+                    print("DEBUG: Deleted photo file for unchecked task: \(task.title)")
+                } catch {
+                    print("DEBUG: Error deleting photo file: \(error)")
+                }
+                // Remove photo URL from progress
+                photoURLs.removeValue(forKey: task.id)
+                print("DEBUG: Removed photo URL for unchecked task: \(task.title)")
+            }
         } else {
+            // Task is being checked - keep existing photo if any
             completed.insert(task.id)
         }
         
@@ -298,7 +318,7 @@ struct DailyChecklistView: View {
             id: viewModel.dailyProgress.id,
             date: viewModel.dailyProgress.date,
             completedTaskIDs: completed,
-            photoURLs: viewModel.dailyProgress.photoURLs
+            photoURLs: photoURLs
         )
         
         viewModel.dailyProgress = newProgress
@@ -319,6 +339,7 @@ struct TaskRowView: View {
     let onToggle: () -> Void
     let onSetReminder: () -> Void
     let onUpdateDailyProgress: (DailyProgress) -> Void // Add callback for updating daily progress
+    let onPhotoRemoved: () -> Void // Add callback for clearing photo state
     @State private var showingPhotoPicker = false
     @State private var showingImagePicker = false
     @State private var selectedImage: UIImage?
@@ -485,6 +506,16 @@ struct TaskRowView: View {
         }
         .onChange(of: currentDailyProgress.photoURLs) { _, _ in
             loadThumbnail()
+        }
+        .onChange(of: isCompleted) { _, newIsCompleted in
+            if !newIsCompleted {
+                // Task was unchecked - clear photo state
+                thumbnailImage = nil
+                fullImage = nil
+                hasPhoto = false
+                onPhotoRemoved()
+                print("DEBUG: Cleared photo state for unchecked task: \(task.title)")
+            }
         }
     }
     
