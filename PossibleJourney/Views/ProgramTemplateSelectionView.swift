@@ -86,6 +86,9 @@ struct ProgramTemplateSelectionView: View {
                         onProgramCreated(program)
                         showingTemplateDetail = false
                     }
+                } else {
+                    Text("No template selected")
+                        .padding()
                 }
             }
         }
@@ -189,7 +192,7 @@ struct TemplateDetailView: View {
     @State private var endOfDayTime = Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22) // Default 10pm
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
                 // Light background
                 Color(.systemBackground)
