@@ -38,13 +38,14 @@ if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git ls-files --o
         if [[ "$file" == *".swift" ]]; then
             has_swift=true
             echo "DEBUG: Swift file detected: '$file'"
-            if [[ "$file" == *"View.swift" ]]; then
+            # Check if file contains "View" and ends with ".swift"
+            if [[ "$file" == *"View"*".swift" ]]; then
                 has_view_swift=true
                 echo "DEBUG: View.swift pattern matched for: '$file'"
-            elif [[ "$file" == *"ViewModel.swift" ]]; then
+            elif [[ "$file" == *"ViewModel"*".swift" ]]; then
                 has_viewmodel_swift=true
                 echo "DEBUG: ViewModel.swift pattern matched for: '$file'"
-            elif [[ "$file" == *"Model.swift" ]]; then
+            elif [[ "$file" == *"Model"*".swift" ]]; then
                 has_model_swift=true
                 echo "DEBUG: Model.swift pattern matched for: '$file'"
             fi
