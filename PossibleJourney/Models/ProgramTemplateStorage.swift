@@ -39,7 +39,9 @@ class ProgramTemplateStorage {
     func update(_ template: ProgramTemplate) {
         var templates = loadAll()
         if let index = templates.firstIndex(where: { $0.id == template.id }) {
-            templates[index] = template
+            var updatedTemplate = template
+            updatedTemplate.lastModified = Date()
+            templates[index] = updatedTemplate
             save(templates)
         }
     }

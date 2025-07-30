@@ -15,8 +15,9 @@ struct ProgramTemplate: Codable, Identifiable {
     var defaultNumberOfDays: Int
     var tasks: [Task]
     let isDefault: Bool
+    var lastModified: Date
     
-    init(id: UUID = UUID(), name: String, description: String, category: TemplateCategory, defaultNumberOfDays: Int, tasks: [Task], isDefault: Bool = false) {
+    init(id: UUID = UUID(), name: String, description: String, category: TemplateCategory, defaultNumberOfDays: Int, tasks: [Task], isDefault: Bool = false, lastModified: Date = Date()) {
         self.id = id
         self.name = name
         self.description = description
@@ -24,6 +25,7 @@ struct ProgramTemplate: Codable, Identifiable {
         self.defaultNumberOfDays = defaultNumberOfDays
         self.tasks = tasks
         self.isDefault = isDefault
+        self.lastModified = lastModified
     }
 }
 

@@ -45,7 +45,8 @@ class ProgramTemplateViewModel: ObservableObject {
             }
         }
         
-        return filtered
+        // Sort by last modified date (most recent first)
+        return filtered.sorted { $0.lastModified > $1.lastModified }
     }
     
     /// Get templates grouped by category

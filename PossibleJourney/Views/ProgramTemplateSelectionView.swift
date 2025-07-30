@@ -136,6 +136,26 @@ struct TemplateCardView: View {
     let onDuplicate: () -> Void
     @State private var isExpanded = false
     
+    private func formatLastModified(_ date: Date) -> String {
+        let calendar = Calendar.current
+        let now = Date()
+        
+        if calendar.isDateInToday(date) {
+            return "Today"
+        } else if calendar.isDateInYesterday(date) {
+            return "Yesterday"
+        } else {
+            let daysAgo = calendar.dateComponents([.day], from: date, to: now).day ?? 0
+            if daysAgo < 7 {
+                return "\(daysAgo) days ago"
+            } else {
+                let formatter = DateFormatter()
+                formatter.dateStyle = .short
+                return formatter.string(from: date)
+            }
+        }
+    }
+    
     var body: some View {
         Button(action: onTap) {
             VStack(alignment: .leading, spacing: 12) {
@@ -166,6 +186,10 @@ struct TemplateCardView: View {
                             .fontWeight(.medium)
                         
                         Text(template.category.displayName)
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                        
+                        Text(formatLastModified(template.lastModified))
                             .font(.caption2)
                             .foregroundColor(.secondary)
                     }
