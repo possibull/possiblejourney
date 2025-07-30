@@ -44,6 +44,20 @@ class ProgramTemplateStorage {
         }
     }
     
+    /// Create a copy of a template (makes it editable)
+    func duplicate(_ template: ProgramTemplate) -> ProgramTemplate {
+        let copy = ProgramTemplate(
+            name: "\(template.name) (Copy)",
+            description: template.description,
+            category: template.category,
+            defaultNumberOfDays: template.defaultNumberOfDays,
+            tasks: template.tasks,
+            isDefault: false
+        )
+        add(copy)
+        return copy
+    }
+    
     /// Delete a template
     func delete(_ template: ProgramTemplate) {
         var templates = loadAll()

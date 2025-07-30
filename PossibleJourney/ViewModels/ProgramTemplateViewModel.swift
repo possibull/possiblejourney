@@ -75,6 +75,13 @@ class ProgramTemplateViewModel: ObservableObject {
         loadTemplates()
     }
     
+    /// Duplicate a template (creates an editable copy)
+    func duplicateTemplate(_ template: ProgramTemplate) -> ProgramTemplate {
+        let copy = storage.duplicate(template)
+        loadTemplates()
+        return copy
+    }
+    
     /// Delete a template
     func deleteTemplate(_ template: ProgramTemplate) {
         storage.delete(template)

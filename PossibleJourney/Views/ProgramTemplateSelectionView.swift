@@ -71,6 +71,10 @@ struct ProgramTemplateSelectionView: View {
                                     },
                                     onEdit: {
                                         editingTemplate = template
+                                    },
+                                    onDuplicate: {
+                                        let copy = viewModel.duplicateTemplate(template)
+                                        editingTemplate = copy
                                     }
                                 )
                             }
@@ -107,6 +111,11 @@ struct ProgramTemplateSelectionView: View {
                     onEdit: { template in
                         editingTemplate = template
                         selectedTemplate = nil
+                    },
+                    onDuplicate: { template in
+                        let copy = viewModel.duplicateTemplate(template)
+                        editingTemplate = copy
+                        selectedTemplate = nil
                     }
                 )
             }
@@ -124,6 +133,7 @@ struct TemplateCardView: View {
     let template: ProgramTemplate
     let onTap: () -> Void
     let onEdit: () -> Void
+    let onDuplicate: () -> Void
     @State private var isExpanded = false
     
     var body: some View {
@@ -161,10 +171,20 @@ struct TemplateCardView: View {
                     }
                 }
                 
-                // Edit button (only for non-default templates)
-                if !template.isDefault {
-                    HStack {
-                        Spacer()
+                // Action buttons
+                HStack {
+                    Spacer()
+                    
+                    // Duplicate button (for all templates)
+                    Button(action: onDuplicate) {
+                        Image(systemName: "plus.square.on.square")
+                            .font(.title2)
+                            .foregroundColor(.blue)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    
+                    // Edit button (only for non-default templates)
+                    if !template.isDefault {
                         Button(action: onEdit) {
                             Image(systemName: "pencil.circle.fill")
                                 .font(.title2)
@@ -227,6 +247,7 @@ struct TemplateDetailView: View {
     let template: ProgramTemplate
     let onStartProgram: (Program) -> Void
     let onEdit: (ProgramTemplate) -> Void
+    let onDuplicate: (ProgramTemplate) -> Void
     
     @State private var startDate = Date()
     @State private var endOfDayTime = Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22) // Default 10pm
@@ -234,10 +255,11 @@ struct TemplateDetailView: View {
     @State private var useCustomDays = false
     @Environment(\.presentationMode) private var presentationMode
     
-    init(template: ProgramTemplate, onStartProgram: @escaping (Program) -> Void, onEdit: @escaping (ProgramTemplate) -> Void) {
+    init(template: ProgramTemplate, onStartProgram: @escaping (Program) -> Void, onEdit: @escaping (ProgramTemplate) -> Void, onDuplicate: @escaping (ProgramTemplate) -> Void) {
         self.template = template
         self.onStartProgram = onStartProgram
         self.onEdit = onEdit
+        self.onDuplicate = onDuplicate
         self._numberOfDays = State(initialValue: template.defaultNumberOfDays)
     }
     
@@ -264,9 +286,15 @@ struct TemplateDetailView: View {
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    if !template.isDefault {
-                        Button("Edit") {
-                            onEdit(template)
+                    HStack {
+                        Button("Duplicate") {
+                            onDuplicate(template)
+                        }
+                        
+                        if !template.isDefault {
+                            Button("Edit") {
+                                onEdit(template)
+                            }
                         }
                     }
                 }
