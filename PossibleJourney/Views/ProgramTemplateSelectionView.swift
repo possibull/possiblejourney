@@ -74,7 +74,7 @@ struct ProgramTemplateSelectionView: View {
                             .listRowInsets(EdgeInsets())
                             .listRowSeparator(.hidden)
                             .listRowBackground(Color.clear)
-                            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                 // Duplicate action (for all templates)
                                 Button {
                                     let copy = viewModel.duplicateTemplate(template)
@@ -94,7 +94,7 @@ struct ProgramTemplateSelectionView: View {
                                     .tint(.orange)
                                 }
                                 
-                                // Delete action (for all templates)
+                                // Delete action (for all templates) - full swipe triggers with confirmation
                                 Button {
                                     templateToDelete = template
                                 } label: {
