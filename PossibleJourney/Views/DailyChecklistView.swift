@@ -217,12 +217,17 @@ struct DailyChecklistView: View {
                 TaskRowView(
                     task: task,
                     isCompleted: viewModel.dailyProgress.completedTaskIDs.contains(task.id),
+                    currentDailyProgress: viewModel.dailyProgress,
                     onToggle: {
                         toggleTask(task)
                     },
                     onSetReminder: {
                         // TODO: Implement reminder functionality
                         print("Set reminder for task: \(task.title)")
+                    },
+                    onUpdateDailyProgress: { newProgress in
+                        viewModel.dailyProgress = newProgress
+                        DailyProgressStorage().save(progress: newProgress)
                     }
                 )
                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
@@ -310,8 +315,10 @@ struct DailyChecklistView: View {
 struct TaskRowView: View {
     let task: Task
     let isCompleted: Bool
+    let currentDailyProgress: DailyProgress // Add current daily progress
     let onToggle: () -> Void
     let onSetReminder: () -> Void
+    let onUpdateDailyProgress: (DailyProgress) -> Void // Add callback for updating daily progress
     @State private var showingPhotoPicker = false
     @State private var showingImagePicker = false
     @State private var selectedImage: UIImage?
@@ -322,28 +329,14 @@ struct TaskRowView: View {
     @State private var hasPhoto: Bool = false
     
     // Get the photo URL for this task
-    private var photoURL: URL? {
-        let dailyProgressStorage = DailyProgressStorage()
-        let today = Date()
-        let currentProgress = dailyProgressStorage.load(for: today)
-        let url = currentProgress?.photoURLs[task.id]
+    private func photoURL(from dailyProgress: DailyProgress) -> URL? {
+        let url = dailyProgress.photoURLs[task.id]
         
         print("DEBUG: photoURL for task '\(task.title)': \(url?.absoluteString ?? "nil")")
-        print("DEBUG: Date being used: \(today)")
-        print("DEBUG: DailyProgress loaded: \(currentProgress != nil)")
-        if let progress = currentProgress {
-            print("DEBUG: Progress photoURLs count: \(progress.photoURLs.count)")
-            print("DEBUG: Progress photoURLs keys: \(progress.photoURLs.keys.map { $0.uuidString.prefix(8) })")
-            print("DEBUG: Progress date: \(progress.date)")
-            print("DEBUG: Progress ID: \(progress.id)")
-        }
-        
-        // Also check what the storage key would be
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-        let dateString = formatter.string(from: today)
-        print("DEBUG: Storage key would be: dailyProgress_\(dateString)")
+        print("DEBUG: Progress photoURLs count: \(dailyProgress.photoURLs.count)")
+        print("DEBUG: Progress photoURLs keys: \(dailyProgress.photoURLs.keys.map { $0.uuidString.prefix(8) })")
+        print("DEBUG: Progress date: \(dailyProgress.date)")
+        print("DEBUG: Progress ID: \(dailyProgress.id)")
         
         return url
     }
@@ -490,6 +483,9 @@ struct TaskRowView: View {
         .onChange(of: hasPhoto) { _, _ in
             loadThumbnail()
         }
+        .onChange(of: currentDailyProgress.photoURLs) { _, _ in
+            loadThumbnail()
+        }
     }
     
     private func handleCheckboxTap() {
@@ -506,7 +502,7 @@ struct TaskRowView: View {
         print("DEBUG: loadThumbnail called for task: \(task.title)")
         print("DEBUG: fullImage before loadThumbnail: \(fullImage == nil ? "nil" : "not nil")")
         
-        guard let url = photoURL else {
+        guard let url = photoURL(from: currentDailyProgress) else {
             print("DEBUG: No photo URL found for task: \(task.title)")
             thumbnailImage = nil
             fullImage = nil
@@ -577,7 +573,7 @@ struct TaskRowView: View {
                 try imageData.write(to: fileURL)
                 print("DEBUG: Successfully wrote image data to file")
                 
-                // Update the daily progress with the photo URL
+                // Get the current daily progress from storage to ensure we have the latest
                 let dailyProgressStorage = DailyProgressStorage()
                 let today = Date()
                 var currentProgress = dailyProgressStorage.load(for: today) ?? DailyProgress(
@@ -591,9 +587,11 @@ struct TaskRowView: View {
                 
                 // Add the photo URL to the progress
                 currentProgress.photoURLs[task.id] = fileURL
-                dailyProgressStorage.save(progress: currentProgress)
                 
-                print("DEBUG: Saved progress with photoURLs count: \(currentProgress.photoURLs.count)")
+                // Use the callback to update the view model and save to storage
+                onUpdateDailyProgress(currentProgress)
+                
+                print("DEBUG: Updated progress with photoURLs count: \(currentProgress.photoURLs.count)")
                 print("DEBUG: Photo URL for task \(task.title): \(fileURL)")
                 
                 // Debug the storage key being used
