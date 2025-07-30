@@ -15,9 +15,6 @@ if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git ls-files --o
     # Get list of changed files for commit message
     changed_files=$(git diff --cached --name-only | head -5 | tr '\n' ' ')
     
-    # Debug: Print the changed files
-    echo "DEBUG: Changed files: '$changed_files'"
-    
     # Generate descriptive comment based on file types and changes
     comment=""
     
@@ -34,20 +31,15 @@ if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git ls-files --o
     # Convert space-separated string to array and check each file
     IFS=' ' read -ra file_array <<< "$changed_files"
     for file in "${file_array[@]}"; do
-        echo "DEBUG: Checking file: '$file'"
         if [[ "$file" == *".swift" ]]; then
             has_swift=true
-            echo "DEBUG: Swift file detected: '$file'"
             # Check if file contains "View" and ends with ".swift"
             if [[ "$file" == *"View"*".swift" ]]; then
                 has_view_swift=true
-                echo "DEBUG: View.swift pattern matched for: '$file'"
             elif [[ "$file" == *"ViewModel"*".swift" ]]; then
                 has_viewmodel_swift=true
-                echo "DEBUG: ViewModel.swift pattern matched for: '$file'"
             elif [[ "$file" == *"Model"*".swift" ]]; then
                 has_model_swift=true
-                echo "DEBUG: Model.swift pattern matched for: '$file'"
             fi
         elif [[ "$file" == *".xcodeproj" ]]; then
             has_xcodeproj=true
@@ -62,16 +54,12 @@ if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git ls-files --o
     
     # Generate comment based on detected file types
     if [ "$has_view_swift" = true ]; then
-        echo "DEBUG: View.swift files detected"
         comment="UI improvements and view updates"
     elif [ "$has_viewmodel_swift" = true ]; then
-        echo "DEBUG: ViewModel.swift files detected"
         comment="View model logic updates"
     elif [ "$has_model_swift" = true ]; then
-        echo "DEBUG: Model.swift files detected"
         comment="Data model changes"
     elif [ "$has_swift" = true ]; then
-        echo "DEBUG: Other Swift files detected"
         comment="Swift code updates"
     elif [ "$has_xcodeproj" = true ]; then
         comment="Xcode project configuration changes"
@@ -84,8 +72,6 @@ if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git ls-files --o
     else
         comment="General project updates"
     fi
-    
-    echo "DEBUG: Selected comment: '$comment'"
     
     # Create commit message with timestamp, comment, and files
     commit_msg="Auto-commit: $timestamp - $comment - $changed_files"
