@@ -10,7 +10,6 @@ import SwiftUI
 struct ProgramTemplateSelectionView: View {
     @StateObject private var viewModel = ProgramTemplateViewModel()
     @State private var selectedTemplate: ProgramTemplate?
-    @State private var showingTemplateDetail = false
     @State private var showingCustomSetup = false
     
     let onTemplateSelected: (ProgramTemplate) -> Void
@@ -68,10 +67,6 @@ struct ProgramTemplateSelectionView: View {
                                     print("DEBUG: Template tapped: \(template.name)")
                                     selectedTemplate = template
                                     print("DEBUG: selectedTemplate set to: \(selectedTemplate?.name ?? "nil")")
-                                    DispatchQueue.main.async {
-                                        showingTemplateDetail = true
-                                        print("DEBUG: showingTemplateDetail set to: \(showingTemplateDetail)")
-                                    }
                                 }
                             }
                         }
@@ -97,24 +92,10 @@ struct ProgramTemplateSelectionView: View {
                 }
             }
 
-            .sheet(isPresented: $showingTemplateDetail, onDismiss: {
-                // Reset selected template when sheet is dismissed
-                selectedTemplate = nil
-            }) {
-                if let template = selectedTemplate {
-                    TemplateDetailView(template: template) { program in
-                        onProgramCreated(program)
-                        showingTemplateDetail = false
-                    }
-                } else {
-                    VStack {
-                        Text("No template selected")
-                            .padding()
-                        Button("Dismiss") {
-                            showingTemplateDetail = false
-                        }
-                        .padding()
-                    }
+            .sheet(item: $selectedTemplate) { template in
+                TemplateDetailView(template: template) { program in
+                    onProgramCreated(program)
+                    selectedTemplate = nil
                 }
             }
         }
