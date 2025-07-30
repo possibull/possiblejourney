@@ -58,19 +58,10 @@ class DailyChecklistViewModel: ObservableObject {
 
     func resetProgramToToday() {
         // Called when user taps 'I Missed It'
-        // Mark the missed day as completed so user can continue from the next day
-        // This allows the user to skip the missed day and continue their program
-        program.lastCompletedDay = currentActiveDay
-        ProgramStorage().save(program)
-        
-        // Also update the current daily progress to reflect the new day
-        let nextDay = Calendar.current.date(byAdding: .day, value: 1, to: currentActiveDay)!
-        let nextDayProgress = DailyProgress(
-            id: UUID(),
-            date: nextDay,
-            completedTaskIDs: []
-        )
-        updateDailyProgress(nextDayProgress)
+        // Clear the loaded program to navigate back to Program Template page
+        // This preserves the historical program data and allows starting fresh
+        ProgramStorage().clear()
+        DailyProgressStorage().clearAll()
     }
     
     func updateDailyProgress(_ newProgress: DailyProgress) {

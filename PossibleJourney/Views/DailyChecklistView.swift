@@ -52,6 +52,7 @@ struct DailyChecklistView: View {
     @StateObject private var viewModel: DailyChecklistViewModel
     @State private var showingSettings = false
     @State private var showingCalendar = false
+    @EnvironmentObject var appState: ProgramAppState
     
     init() {
         // Load the current program and daily progress from storage
@@ -170,6 +171,7 @@ struct DailyChecklistView: View {
             HStack(spacing: 16) {
                 Button("I Missed It") {
                     viewModel.resetProgramToToday()
+                    appState.loadedProgram = nil
                 }
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
