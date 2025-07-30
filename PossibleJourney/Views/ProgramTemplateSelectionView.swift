@@ -12,6 +12,7 @@ struct ProgramTemplateSelectionView: View {
     @State private var selectedTemplate: ProgramTemplate?
     @State private var showingCustomSetup = false
     @State private var editingTemplate: ProgramTemplate?
+    @State private var templateToDelete: ProgramTemplate?
     
     let onTemplateSelected: (ProgramTemplate) -> Void
     let onProgramCreated: (Program) -> Void
@@ -75,6 +76,9 @@ struct ProgramTemplateSelectionView: View {
                                     onDuplicate: {
                                         let copy = viewModel.duplicateTemplate(template)
                                         editingTemplate = copy
+                                    },
+                                    onDelete: {
+                                        templateToDelete = template
                                     }
                                 )
                             }
@@ -116,6 +120,10 @@ struct ProgramTemplateSelectionView: View {
                         let copy = viewModel.duplicateTemplate(template)
                         editingTemplate = copy
                         selectedTemplate = nil
+                    },
+                    onDelete: { template in
+                        templateToDelete = template
+                        selectedTemplate = nil
                     }
                 )
             }
@@ -123,6 +131,24 @@ struct ProgramTemplateSelectionView: View {
                 TemplateEditView(template: template) { updatedTemplate in
                     viewModel.updateTemplate(updatedTemplate)
                     editingTemplate = nil
+                }
+            }
+            .alert("Delete Template", isPresented: Binding(
+                get: { templateToDelete != nil },
+                set: { if !$0 { templateToDelete = nil } }
+            )) {
+                Button("Cancel", role: .cancel) {
+                    templateToDelete = nil
+                }
+                Button("Delete", role: .destructive) {
+                    if let template = templateToDelete {
+                        viewModel.deleteTemplate(template)
+                    }
+                    templateToDelete = nil
+                }
+            } message: {
+                if let template = templateToDelete {
+                    Text("Are you sure you want to delete '\(template.name)'? This action cannot be undone.")
                 }
             }
         }
@@ -134,6 +160,7 @@ struct TemplateCardView: View {
     let onTap: () -> Void
     let onEdit: () -> Void
     let onDuplicate: () -> Void
+    let onDelete: () -> Void
     @State private var isExpanded = false
     
     private func formatLastModified(_ date: Date) -> String {
@@ -216,6 +243,14 @@ struct TemplateCardView: View {
                         }
                         .buttonStyle(PlainButtonStyle())
                     }
+                    
+                    // Delete button (for all templates)
+                    Button(action: onDelete) {
+                        Image(systemName: "trash.circle.fill")
+                            .font(.title2)
+                            .foregroundColor(.red)
+                    }
+                    .buttonStyle(PlainButtonStyle())
                 }
                 
                 // Tasks preview
@@ -272,6 +307,7 @@ struct TemplateDetailView: View {
     let onStartProgram: (Program) -> Void
     let onEdit: (ProgramTemplate) -> Void
     let onDuplicate: (ProgramTemplate) -> Void
+    let onDelete: (ProgramTemplate) -> Void
     
     @State private var startDate = Date()
     @State private var endOfDayTime = Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22) // Default 10pm
@@ -279,11 +315,12 @@ struct TemplateDetailView: View {
     @State private var useCustomDays = false
     @Environment(\.presentationMode) private var presentationMode
     
-    init(template: ProgramTemplate, onStartProgram: @escaping (Program) -> Void, onEdit: @escaping (ProgramTemplate) -> Void, onDuplicate: @escaping (ProgramTemplate) -> Void) {
+    init(template: ProgramTemplate, onStartProgram: @escaping (Program) -> Void, onEdit: @escaping (ProgramTemplate) -> Void, onDuplicate: @escaping (ProgramTemplate) -> Void, onDelete: @escaping (ProgramTemplate) -> Void) {
         self.template = template
         self.onStartProgram = onStartProgram
         self.onEdit = onEdit
         self.onDuplicate = onDuplicate
+        self.onDelete = onDelete
         self._numberOfDays = State(initialValue: template.defaultNumberOfDays)
     }
     
@@ -320,6 +357,11 @@ struct TemplateDetailView: View {
                                 onEdit(template)
                             }
                         }
+                        
+                        Button("Delete") {
+                            onDelete(template)
+                        }
+                        .foregroundColor(.red)
                     }
                 }
             }
