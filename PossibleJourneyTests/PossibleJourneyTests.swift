@@ -8,6 +8,16 @@ final class TaskModelTests: XCTestCase {
         XCTAssertEqual(task.id, id)
         XCTAssertEqual(task.title, "Exercise")
     }
+    
+    func testTaskWithPhotoRequirement() {
+        let task = Task(id: UUID(), title: "Take Progress Photo", description: "Document your journey", requiresPhoto: true)
+        XCTAssertTrue(task.requiresPhoto)
+    }
+    
+    func testTaskWithoutPhotoRequirement() {
+        let task = Task(id: UUID(), title: "Read", description: "Read 10 pages")
+        XCTAssertFalse(task.requiresPhoto)
+    }
 }
 
 final class ProgramModelTests: XCTestCase {

@@ -465,6 +465,24 @@ final class PossibleJourneyUITests: XCTestCase {
         let completedTasks = app.buttons.matching(identifier: "checkmark")
         XCTAssertEqual(completedTasks.count, 0, "No tasks should be completed on new day")
     }
+    
+    func testTaskWithPhotoRequirementInTemplate() {
+        let app = launchAppWithReset()
+        // Navigate to template creation
+        app.buttons["Custom"].tap()
+        app.checkOnScreen(identifier: "TemplateCreationScreen", message: "Should be on template creation screen")
+        
+        // Add a task with photo requirement
+        app.addTaskWithPhotoRequirement(title: "Take Progress Photo", description: "Document your journey", requiresPhoto: true)
+        
+        // Verify the task appears with photo requirement indicator
+        let taskCell = app.staticTexts["Take Progress Photo"]
+        XCTAssertTrue(taskCell.waitForExistence(timeout: 1))
+        
+        // Check for photo requirement indicator
+        let photoIndicator = app.images["PhotoRequirementIndicator"]
+        XCTAssertTrue(photoIndicator.exists, "Photo requirement indicator should be visible for task that requires photo")
+    }
 }
 
 extension XCUIApplication {
@@ -488,6 +506,29 @@ extension XCUIApplication {
         XCTAssertTrue(descriptionField.exists)
         descriptionField.tap()
         descriptionField.typeText(description)
+        let addButton = self.buttons["Add Task"]
+        XCTAssertTrue(addButton.exists)
+        addButton.tap()
+    }
+    
+    func addTaskWithPhotoRequirement(title: String, description: String, requiresPhoto: Bool) {
+        checkOnScreen(identifier: "TemplateCreationScreen", message: "Should be on Template Creation screen before adding a task with photo requirement")
+        let titleField = self.textFields["Task Title"]
+        XCTAssertTrue(titleField.exists)
+        titleField.tap()
+        titleField.typeText(title)
+        let descriptionField = self.textFields["Task Description"]
+        XCTAssertTrue(descriptionField.exists)
+        descriptionField.tap()
+        descriptionField.typeText(description)
+        
+        // Toggle photo requirement
+        let photoRequirementToggle = self.switches["Photo Requirement"]
+        XCTAssertTrue(photoRequirementToggle.exists)
+        if requiresPhoto != (photoRequirementToggle.value as? String == "1") {
+            photoRequirementToggle.tap()
+        }
+        
         let addButton = self.buttons["Add Task"]
         XCTAssertTrue(addButton.exists)
         addButton.tap()

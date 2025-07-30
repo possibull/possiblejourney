@@ -520,6 +520,7 @@ struct TemplateCreateView: View {
     @State private var showingAddTask = false
     @State private var newTaskTitle = ""
     @State private var newTaskDescription = ""
+    @State private var newTaskRequiresPhoto = false
     
     let onSave: (ProgramTemplate) -> Void
     @Environment(\.presentationMode) private var presentationMode
@@ -640,6 +641,8 @@ struct TemplateCreateView: View {
             .alert("Add New Task", isPresented: $showingAddTask) {
                 TextField("Task Title", text: $newTaskTitle)
                 TextField("Task Description (Optional)", text: $newTaskDescription)
+                Toggle("Photo Requirement", isOn: $newTaskRequiresPhoto)
+                    .accessibilityIdentifier("Photo Requirement")
                 Button("Cancel", role: .cancel) { }
                 Button("Add") {
                     addTask()
@@ -649,10 +652,11 @@ struct TemplateCreateView: View {
     }
     
     private func addTask() {
-        let newTask = Task(title: newTaskTitle, description: newTaskDescription.isEmpty ? nil : newTaskDescription)
+        let newTask = Task(title: newTaskTitle, description: newTaskDescription.isEmpty ? nil : newTaskDescription, requiresPhoto: newTaskRequiresPhoto)
         template.tasks.append(newTask)
         newTaskTitle = ""
         newTaskDescription = ""
+        newTaskRequiresPhoto = false
     }
     
     private func deleteTask(offsets: IndexSet) {
@@ -669,6 +673,7 @@ struct TemplateEditView: View {
     @State private var showingAddTask = false
     @State private var newTaskTitle = ""
     @State private var newTaskDescription = ""
+    @State private var newTaskRequiresPhoto = false
     
     let onSave: (ProgramTemplate) -> Void
     @Environment(\.presentationMode) private var presentationMode
@@ -773,6 +778,8 @@ struct TemplateEditView: View {
             .alert("Add New Task", isPresented: $showingAddTask) {
                 TextField("Task Title", text: $newTaskTitle)
                 TextField("Task Description (Optional)", text: $newTaskDescription)
+                Toggle("Photo Requirement", isOn: $newTaskRequiresPhoto)
+                    .accessibilityIdentifier("Photo Requirement")
                 Button("Cancel", role: .cancel) { }
                 Button("Add") {
                     addTask()
@@ -782,10 +789,11 @@ struct TemplateEditView: View {
     }
     
     private func addTask() {
-        let newTask = Task(title: newTaskTitle, description: newTaskDescription.isEmpty ? nil : newTaskDescription)
+        let newTask = Task(title: newTaskTitle, description: newTaskDescription.isEmpty ? nil : newTaskDescription, requiresPhoto: newTaskRequiresPhoto)
         template.tasks.append(newTask)
         newTaskTitle = ""
         newTaskDescription = ""
+        newTaskRequiresPhoto = false
     }
     
     private func deleteTask(offsets: IndexSet) {
@@ -803,12 +811,14 @@ struct TaskEditRow: View {
     
     @State private var title: String
     @State private var description: String
+    @State private var requiresPhoto: Bool
     
     init(task: Task, onUpdate: @escaping (Task) -> Void) {
         self.task = task
         self.onUpdate = onUpdate
         self._title = State(initialValue: task.title)
         self._description = State(initialValue: task.description ?? "")
+        self._requiresPhoto = State(initialValue: task.requiresPhoto)
     }
     
     var body: some View {
@@ -820,16 +830,31 @@ struct TaskEditRow: View {
                 .padding(.trailing, 8)
             
             VStack(alignment: .leading, spacing: 8) {
-                TextField("Task Title", text: $title)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .onChange(of: title) { _, newValue in
-                        updateTask()
+                HStack {
+                    TextField("Task Title", text: $title)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .onChange(of: title) { _, newValue in
+                            updateTask()
+                        }
+                    
+                    // Photo requirement indicator
+                    if requiresPhoto {
+                        Image(systemName: "camera.fill")
+                            .foregroundColor(.blue)
+                            .accessibilityIdentifier("PhotoRequirementIndicator")
                     }
+                }
                 
                 TextField("Description (Optional)", text: $description)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .font(.caption)
                     .onChange(of: description) { _, newValue in
+                        updateTask()
+                    }
+                
+                Toggle("Requires Photo", isOn: $requiresPhoto)
+                    .font(.caption)
+                    .onChange(of: requiresPhoto) { _, newValue in
                         updateTask()
                     }
             }
@@ -839,6 +864,7 @@ struct TaskEditRow: View {
             // Update local state when task changes
             title = task.title
             description = task.description ?? ""
+            requiresPhoto = task.requiresPhoto
         }
     }
     
@@ -846,7 +872,8 @@ struct TaskEditRow: View {
         let updatedTask = Task(
             id: task.id,
             title: title,
-            description: description.isEmpty ? nil : description
+            description: description.isEmpty ? nil : description,
+            requiresPhoto: requiresPhoto
         )
         onUpdate(updatedTask)
     }

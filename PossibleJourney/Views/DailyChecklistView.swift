@@ -282,7 +282,7 @@ struct DailyChecklistView: View {
     }
     
     private func toggleTask(_ task: Task) {
-        var completed = Set(viewModel.dailyProgress.completedTaskIDs)
+        var completed = viewModel.dailyProgress.completedTaskIDs
         if completed.contains(task.id) {
             completed.remove(task.id)
         } else {
@@ -292,16 +292,12 @@ struct DailyChecklistView: View {
         let newProgress = DailyProgress(
             id: viewModel.dailyProgress.id,
             date: viewModel.dailyProgress.date,
-            completedTaskIDs: Array(completed)
+            completedTaskIDs: completed,
+            photoURLs: viewModel.dailyProgress.photoURLs
         )
         
         viewModel.dailyProgress = newProgress
         DailyProgressStorage().save(progress: newProgress)
-        
-        // If all tasks are now complete, update lastCompletedDay
-        if viewModel.program.tasks().allSatisfy({ completed.contains($0.id) }) {
-            viewModel.completeCurrentDay()
-        }
     }
     
     private func moveTasks(from source: IndexSet, to destination: Int) {
@@ -316,6 +312,9 @@ struct TaskRowView: View {
     let isCompleted: Bool
     let onToggle: () -> Void
     let onSetReminder: () -> Void
+    @State private var showingPhotoPicker = false
+    @State private var showingImagePicker = false
+    @State private var selectedImage: UIImage?
     
     var body: some View {
         HStack(spacing: 12) {
@@ -335,12 +334,21 @@ struct TaskRowView: View {
             
             // Task content
             VStack(alignment: .leading, spacing: 6) {
-                Text(task.title)
-                    .font(.body)
-                    .fontWeight(.medium)
-                    .foregroundColor(.primary)
-                    .strikethrough(isCompleted)
-                    .multilineTextAlignment(.leading)
+                HStack {
+                    Text(task.title)
+                        .font(.body)
+                        .fontWeight(.medium)
+                        .foregroundColor(.primary)
+                        .strikethrough(isCompleted)
+                        .multilineTextAlignment(.leading)
+                    
+                    // Photo requirement indicator
+                    if task.requiresPhoto {
+                        Image(systemName: "camera.fill")
+                            .foregroundColor(.blue)
+                            .font(.caption)
+                    }
+                }
                 
                 if let description = task.description, !description.isEmpty {
                     Text(description)
@@ -356,6 +364,33 @@ struct TaskRowView: View {
             
             Spacer()
             
+            // Photo button for tasks that require photos
+            if task.requiresPhoto {
+                Button(action: {
+                    showingPhotoPicker = true
+                }) {
+                    Image(systemName: "camera")
+                        .font(.caption)
+                        .foregroundColor(.blue)
+                }
+                .buttonStyle(PlainButtonStyle())
+                .actionSheet(isPresented: $showingPhotoPicker) {
+                    ActionSheet(
+                        title: Text("Add Photo"),
+                        message: Text("Choose how to add a photo for this task"),
+                        buttons: [
+                            .default(Text("Take Photo")) {
+                                showingImagePicker = true
+                            },
+                            .default(Text("Choose from Library")) {
+                                showingImagePicker = true
+                            },
+                            .cancel()
+                        ]
+                    )
+                }
+            }
+            
             // Reminder button
             Button(action: onSetReminder) {
                 Image(systemName: "bell")
@@ -368,12 +403,56 @@ struct TaskRowView: View {
         .background(Color(.systemBackground))
         .cornerRadius(12)
         .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
+        .sheet(isPresented: $showingImagePicker) {
+            ImagePicker(selectedImage: $selectedImage)
+        }
     }
 }
 
 #Preview {
     DailyChecklistView()
-} 
+}
+
+// ImagePicker for photo selection
+struct ImagePicker: UIViewControllerRepresentable {
+    @Binding var selectedImage: UIImage?
+    @Environment(\.presentationMode) private var presentationMode
+    
+    func makeUIViewController(context: Context) -> UIImagePickerController {
+        let picker = UIImagePickerController()
+        picker.delegate = context.coordinator
+        picker.sourceType = .photoLibrary
+        picker.allowsEditing = true
+        return picker
+    }
+    
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+    
+    class Coordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+        let parent: ImagePicker
+        
+        init(_ parent: ImagePicker) {
+            self.parent = parent
+        }
+        
+        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+            if let editedImage = info[.editedImage] as? UIImage {
+                parent.selectedImage = editedImage
+            } else if let originalImage = info[.originalImage] as? UIImage {
+                parent.selectedImage = originalImage
+            }
+            parent.presentationMode.wrappedValue.dismiss()
+        }
+        
+        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            parent.presentationMode.wrappedValue.dismiss()
+        }
+    }
+}
 
 // Dedicated subview for editing notes
 struct TaskNotesSheet: View {
@@ -405,7 +484,7 @@ struct TaskNotesSheet: View {
         }
         .padding()
     }
-} 
+}
 
 // Add MissedDayScreen struct at the end of the file
 struct MissedDayScreen: View {

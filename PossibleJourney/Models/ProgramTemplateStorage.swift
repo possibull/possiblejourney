@@ -194,7 +194,7 @@ class ProgramTemplateStorage {
                     Task(id: UUID(), title: "Outdoor workout (45 minutes)", description: "Complete a 45-minute workout outdoors, regardless of weather"),
                     Task(id: UUID(), title: "Drink 1 gallon of water", description: "Stay hydrated throughout the day"),
                     Task(id: UUID(), title: "Read 10 pages", description: "Read from a non-fiction book"),
-                    Task(id: UUID(), title: "Take a progress photo", description: "Document your journey daily")
+                    Task(id: UUID(), title: "Take a progress photo", description: "Document your journey daily", requiresPhoto: true)
                 ],
                 isDefault: true
             )
