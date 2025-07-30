@@ -336,7 +336,15 @@ struct TaskRowView: View {
         let today = Date()
         let currentProgress = dailyProgressStorage.load(for: today)
         let url = currentProgress?.photoURLs[task.id]
+        
         print("DEBUG: photoURL for task '\(task.title)': \(url?.absoluteString ?? "nil")")
+        print("DEBUG: Date being used: \(today)")
+        print("DEBUG: DailyProgress loaded: \(currentProgress != nil)")
+        if let progress = currentProgress {
+            print("DEBUG: Progress photoURLs count: \(progress.photoURLs.count)")
+            print("DEBUG: Progress photoURLs keys: \(progress.photoURLs.keys.map { $0.uuidString.prefix(8) })")
+        }
+        
         return url
     }
     
@@ -532,14 +540,19 @@ struct TaskRowView: View {
     }
     
     private func savePhotoForTask(image: UIImage) {
+        print("DEBUG: Starting to save photo for task: \(task.title)")
+        
         // Save the image to documents directory and store the URL
         if let imageData = image.jpegData(compressionQuality: 0.8) {
             let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
             let fileName = "\(task.id.uuidString)_\(Date().timeIntervalSince1970).jpg"
             let fileURL = documentsDirectory.appendingPathComponent(fileName)
             
+            print("DEBUG: Saving photo to: \(fileURL)")
+            
             do {
                 try imageData.write(to: fileURL)
+                print("DEBUG: Successfully wrote image data to file")
                 
                 // Update the daily progress with the photo URL
                 let dailyProgressStorage = DailyProgressStorage()
@@ -551,22 +564,30 @@ struct TaskRowView: View {
                     photoURLs: [:]
                 )
                 
+                print("DEBUG: Current progress photoURLs count: \(currentProgress.photoURLs.count)")
+                
                 // Add the photo URL to the progress
                 currentProgress.photoURLs[task.id] = fileURL
                 dailyProgressStorage.save(progress: currentProgress)
+                
+                print("DEBUG: Saved progress with photoURLs count: \(currentProgress.photoURLs.count)")
+                print("DEBUG: Photo URL for task \(task.title): \(fileURL)")
                 
                 // Update both thumbnail and full image immediately
                 fullImage = image
                 image.prepareThumbnail(of: CGSize(width: 80, height: 80)) { thumbnail in
                     DispatchQueue.main.async {
                         thumbnailImage = thumbnail ?? image
+                        print("DEBUG: Set thumbnail for task: \(task.title)")
                     }
                 }
                 
-                print("Photo saved for task: \(task.title) at \(fileURL)")
+                print("DEBUG: Photo saved for task: \(task.title) at \(fileURL)")
             } catch {
-                print("Error saving photo: \(error)")
+                print("DEBUG: Error saving photo: \(error)")
             }
+        } else {
+            print("DEBUG: Failed to create JPEG data from image")
         }
     }
 }
