@@ -35,19 +35,15 @@ commit_changes
 
 # Watch for file changes and commit automatically
 while true; do
-    # Wait for file changes (using inotifywait on Linux or fswatch on macOS)
+    # Wait for file changes (using fswatch on macOS)
     if command -v fswatch >/dev/null 2>&1; then
-        # macOS
+        # macOS - use fswatch
         fswatch -o . | while read f; do
             commit_changes
         done
-    elif command -v inotifywait >/dev/null 2>&1; then
-        # Linux
-        inotifywait -r -e modify,create,delete,move . >/dev/null 2>&1
-        commit_changes
     else
-        # Fallback: check every 5 seconds
-        sleep 5
+        # Fallback: check every 10 seconds
+        sleep 10
         commit_changes
     fi
 done 

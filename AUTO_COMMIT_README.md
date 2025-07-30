@@ -10,7 +10,13 @@ Run this command to auto-commit all changes:
 git auto-commit
 ```
 
-### 2. File Watcher Script
+### 2. Simple Manual Script
+Run this command to auto-commit all changes:
+```bash
+./commit.sh
+```
+
+### 3. File Watcher Script (Continuous)
 Start the auto-commit watcher that monitors file changes:
 ```bash
 ./auto-commit.sh
@@ -21,14 +27,11 @@ This will:
 - Show commit messages with timestamps
 - Continue running until you press Ctrl+C
 
-### 3. Pre-commit Hook
-A git hook is installed that will automatically commit staged changes before each manual commit.
-
 ## How It Works
 
 - **Git Alias**: Quick manual auto-commit with timestamp and file list
-- **File Watcher**: Continuous monitoring using `fswatch` (macOS) or `inotifywait` (Linux)
-- **Pre-commit Hook**: Automatic commits of staged changes before manual commits
+- **Simple Script**: Manual auto-commit with timestamp and file list
+- **File Watcher**: Continuous monitoring using `fswatch` (macOS) or polling fallback
 
 ## Commit Messages
 
@@ -39,14 +42,26 @@ Auto-commit: YYYY-MM-DD HH:MM:SS - file1.swift file2.swift file3.swift
 
 ## Requirements
 
-- **macOS**: `fswatch` (install with `brew install fswatch`)
-- **Linux**: `inotifywait` (usually pre-installed)
+- **macOS**: `fswatch` (install with `brew install fswatch`) for file watching
+- **Fallback**: Works without fswatch using polling every 10 seconds
+
+## Usage Examples
+
+```bash
+# Quick auto-commit
+git auto-commit
+
+# Manual auto-commit
+./commit.sh
+
+# Start continuous auto-commit
+./auto-commit.sh
+```
 
 ## Stopping Auto-Commit
 
 - **File Watcher**: Press `Ctrl+C` in the terminal running `./auto-commit.sh`
-- **Git Alias**: No action needed (runs once per command)
-- **Pre-commit Hook**: Remove `.git/hooks/pre-commit` file
+- **Git Alias/Script**: No action needed (runs once per command)
 
 ## Manual Override
 
