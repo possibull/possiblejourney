@@ -47,38 +47,8 @@ class DailyChecklistViewModel: ObservableObject {
             return false
         }
         
-        // Check if any previous days in the program were missed
-        let calendar = Calendar.current
-        let startDate = program.startDate
-        let viewingDate = selectedDate
-        
-        // Check all days from start date up to (but not including) the viewing date
-        var currentDate = startDate
-        while currentDate < viewingDate {
-            let eod = program.endOfDay(for: currentDate)
-            
-            // If this day is past its end-of-day, check if it was completed
-            if now >= eod {
-                let dailyProgressStorage = DailyProgressStorage()
-                let dayProgress = dailyProgressStorage.load(for: currentDate) ?? DailyProgress(
-                    id: UUID(),
-                    date: currentDate,
-                    completedTaskIDs: []
-                )
-                
-                let allComplete = program.tasks().allSatisfy { dayProgress.completedTaskIDs.contains($0.id) }
-                if !allComplete {
-                    // Found a missed day, trigger missed day screen
-                    return true
-                }
-            }
-            
-            // Move to next day
-            currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate)!
-        }
-        
-        // No missed days found
-        return false
+        // Simply check if the current day's progress indicates it was missed
+        return dailyProgress.isMissed
     }
 
     func completeCurrentDay() {
@@ -86,6 +56,10 @@ class DailyChecklistViewModel: ObservableObject {
         program.lastCompletedDay = currentActiveDay
         // Save program with updated lastCompletedDay
         ProgramStorage().save(program)
+        
+        // Mark the day as not missed since it's now completed
+        dailyProgress.isMissed = false
+        DailyProgressStorage().save(progress: dailyProgress)
     }
 
     func resetProgramToToday() {
@@ -110,7 +84,8 @@ class DailyChecklistViewModel: ObservableObject {
         let progress = dailyProgressStorage.load(for: date) ?? DailyProgress(
             id: UUID(),
             date: date,
-            completedTaskIDs: []
+            completedTaskIDs: [],
+            isMissed: true // Default to missed until completed
         )
         updateDailyProgress(progress)
     }

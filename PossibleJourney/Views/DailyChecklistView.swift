@@ -142,7 +142,8 @@ struct DailyChecklistView: View {
         let dailyProgress = dailyProgressStorage.load(for: date) ?? DailyProgress(
             id: UUID(),
             date: date,
-            completedTaskIDs: []
+            completedTaskIDs: [],
+            isMissed: true // Default to missed until completed
         )
         viewModel.updateDailyProgress(dailyProgress)
         
@@ -348,11 +349,18 @@ struct DailyChecklistView: View {
             id: viewModel.dailyProgress.id,
             date: viewModel.dailyProgress.date,
             completedTaskIDs: completed,
-            photoURLs: photoURLs
+            photoURLs: photoURLs,
+            isMissed: viewModel.dailyProgress.isMissed // Preserve current missed status
         )
         
         viewModel.dailyProgress = newProgress
         DailyProgressStorage().save(progress: newProgress)
+        
+        // Check if all tasks are completed and mark day as completed if so
+        let allTasksCompleted = viewModel.program.tasks().allSatisfy { completed.contains($0.id) }
+        if allTasksCompleted {
+            viewModel.completeCurrentDay()
+        }
     }
     
     private func moveTasks(from source: IndexSet, to destination: Int) {
