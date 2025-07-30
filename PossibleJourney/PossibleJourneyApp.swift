@@ -59,8 +59,6 @@ struct PossibleJourneyApp: App {
                     NavigationStack {
                         if let program = appState.loadedProgram {
                             let now = currentTimeOverride ?? Date()
-                            let activeDay = program.nextActiveDay(currentDate: now) ?? Calendar.current.startOfDay(for: now)
-                            let dailyProgress = DailyProgressStorage().load(for: activeDay) ?? DailyProgress(id: UUID(), date: activeDay, completedTaskIDs: [])
                             AnyView(
                                 DailyChecklistView()
                                 .environmentObject(debugState)

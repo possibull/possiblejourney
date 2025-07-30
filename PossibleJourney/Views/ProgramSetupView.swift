@@ -63,7 +63,7 @@ struct ProgramSetupView: View {
             .clipped()
             .background(RoundedRectangle(cornerRadius: 12).fill(Color.white))
             .padding(.vertical, 4)
-            .onChange(of: numberOfDays) { newValue in
+            .onChange(of: numberOfDays) { oldValue, newValue in
                 numberOfDaysText = "\(newValue)"
             }
             HStack {
@@ -74,7 +74,7 @@ struct ProgramSetupView: View {
                     .font(.system(size: 28, weight: .heavy)) // Reduced font size
                     .foregroundColor(.hardRed)
                     .frame(width: 70)
-                    .onChange(of: numberOfDaysText) { newValue in
+                    .onChange(of: numberOfDaysText) { oldValue, newValue in
                         let filtered = newValue.filter { $0.isNumber }
                         if let value = Int(filtered), value >= 1, value <= 365 {
                             numberOfDays = value

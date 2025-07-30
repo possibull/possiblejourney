@@ -603,7 +603,12 @@ struct TemplateCreateView: View {
                             .italic()
                     } else {
                         ForEach(template.tasks.indices, id: \.self) { index in
-                            TaskEditRow(task: $template.tasks[index])
+                            TaskEditRow(
+                                task: template.tasks[index],
+                                onUpdate: { updatedTask in
+                                    template.tasks[index] = updatedTask
+                                }
+                            )
                         }
                         .onDelete(perform: deleteTask)
                         .onMove(perform: moveTask)
@@ -730,7 +735,12 @@ struct TemplateEditView: View {
                 
                 Section(header: Text("Tasks")) {
                     ForEach(template.tasks.indices, id: \.self) { index in
-                        TaskEditRow(task: $template.tasks[index])
+                        TaskEditRow(
+                            task: template.tasks[index],
+                            onUpdate: { updatedTask in
+                                template.tasks[index] = updatedTask
+                            }
+                        )
                     }
                     .onDelete(perform: deleteTask)
                     .onMove(perform: moveTask)
@@ -791,7 +801,18 @@ struct TemplateEditView: View {
 }
 
 struct TaskEditRow: View {
-    @Binding var task: Task
+    let task: Task
+    let onUpdate: (Task) -> Void
+    
+    @State private var title: String
+    @State private var description: String
+    
+    init(task: Task, onUpdate: @escaping (Task) -> Void) {
+        self.task = task
+        self.onUpdate = onUpdate
+        self._title = State(initialValue: task.title)
+        self._description = State(initialValue: task.description ?? "")
+    }
     
     var body: some View {
         HStack {
@@ -802,18 +823,40 @@ struct TaskEditRow: View {
                 .padding(.trailing, 8)
             
             VStack(alignment: .leading, spacing: 8) {
-                TextField("Task Title", text: $task.title)
+                TextField("Task Title", text: $title)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .onChange(of: title) { _, newValue in
+                        updateTask()
+                    }
                 
-                TextField("Description (Optional)", text: Binding(
-                    get: { task.description ?? "" },
-                    set: { task.description = $0.isEmpty ? nil : $0 }
-                ))
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .font(.caption)
+                TextField("Description (Optional)", text: $description)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .font(.caption)
+                    .onChange(of: description) { _, newValue in
+                        updateTask()
+                    }
             }
         }
         .padding(.vertical, 4)
+        .onAppear {
+            // Update local state when task changes
+            title = task.title
+            description = task.description ?? ""
+        }
+        .onChange(of: task) { _, newTask in
+            // Update local state when task changes
+            title = newTask.title
+            description = newTask.description ?? ""
+        }
+    }
+    
+    private func updateTask() {
+        let updatedTask = Task(
+            id: task.id,
+            title: title,
+            description: description.isEmpty ? nil : description
+        )
+        onUpdate(updatedTask)
     }
 }
 
