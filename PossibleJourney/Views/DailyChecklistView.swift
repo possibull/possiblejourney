@@ -463,6 +463,18 @@ struct TaskRowView: View {
         .sheet(isPresented: $showingFullPhoto) {
             FullPhotoViewer(image: fullImage, taskTitle: task.title)
         }
+        .onChange(of: showingFullPhoto) { _, isShowing in
+            if isShowing {
+                print("DEBUG: Opening FullPhotoViewer for task: \(task.title)")
+                print("DEBUG: fullImage is nil: \(fullImage == nil)")
+                if let image = fullImage {
+                    print("DEBUG: fullImage size: \(image.size)")
+                }
+            } else {
+                print("DEBUG: Closing FullPhotoViewer for task: \(task.title)")
+                print("DEBUG: fullImage is nil: \(fullImage == nil)")
+            }
+        }
         .onChange(of: selectedImage) { _, newImage in
             if let image = newImage {
                 savePhotoForTask(image: image)
@@ -491,11 +503,15 @@ struct TaskRowView: View {
     }
     
     private func loadThumbnail() {
+        print("DEBUG: loadThumbnail called for task: \(task.title)")
+        print("DEBUG: fullImage before loadThumbnail: \(fullImage == nil ? "nil" : "not nil")")
+        
         guard let url = photoURL else {
             print("DEBUG: No photo URL found for task: \(task.title)")
             thumbnailImage = nil
             fullImage = nil
             hasPhoto = false
+            print("DEBUG: fullImage after clearing: \(fullImage == nil ? "nil" : "not nil")")
             return
         }
         
@@ -515,6 +531,7 @@ struct TaskRowView: View {
                         fullImage = image
                         hasPhoto = true
                         print("DEBUG: Set full image for task: \(task.title)")
+                        print("DEBUG: fullImage after setting: \(fullImage == nil ? "nil" : "not nil")")
                     }
                     
                     // Create a smaller thumbnail for better performance
@@ -530,6 +547,7 @@ struct TaskRowView: View {
                         thumbnailImage = nil
                         fullImage = nil
                         hasPhoto = false
+                        print("DEBUG: fullImage after clearing (failed): \(fullImage == nil ? "nil" : "not nil")")
                     }
                 }
             } catch {
@@ -538,6 +556,7 @@ struct TaskRowView: View {
                     thumbnailImage = nil
                     fullImage = nil
                     hasPhoto = false
+                    print("DEBUG: fullImage after clearing (error): \(fullImage == nil ? "nil" : "not nil")")
                 }
             }
         }
