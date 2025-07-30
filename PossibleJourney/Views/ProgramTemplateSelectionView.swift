@@ -636,10 +636,6 @@ struct TemplateCreateView: View {
                     }
                     .fontWeight(.semibold)
                 }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
             }
             .alert("Add New Task", isPresented: $showingAddTask) {
                 TextField("Task Title", text: $newTaskTitle)
@@ -765,10 +761,6 @@ struct TemplateEditView: View {
                         onSave(template)
                     }
                     .fontWeight(.semibold)
-                }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
                 }
             }
             .alert("Add New Task", isPresented: $showingAddTask) {
