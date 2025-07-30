@@ -35,7 +35,7 @@ class DailyChecklistViewModel: ObservableObject {
     @Published var dailyProgress: DailyProgress
     @Published var now: Date
     @Published var ignoreMissedDayForCurrentSession: Bool = false
-    @Published var selectedDate: Date = Date() // Add selected date
+    @Published var selectedDate: Date // Add selected date
 
     // The current active day is determined by program.nextActiveDay(now)
     var currentActiveDay: Date {

@@ -77,7 +77,8 @@ struct DailyChecklistView: View {
         
         _viewModel = StateObject(wrappedValue: DailyChecklistViewModel(
             program: program,
-            dailyProgress: dailyProgress
+            dailyProgress: dailyProgress,
+            now: today
         ))
     }
     
