@@ -47,8 +47,41 @@ class DailyChecklistViewModel: ObservableObject {
             return false
         }
         
-        // Simply check if the current day's progress indicates it was missed
-        return dailyProgress.isMissed
+        // Check if any previous days in the program were missed
+        let calendar = Calendar.current
+        let startDate = calendar.startOfDay(for: program.startDate)
+        let viewingDate = calendar.startOfDay(for: selectedDate)
+        
+        // Check all days from start date up to (but not including) the viewing date
+        var currentDate = startDate
+        let dailyProgressStorage = DailyProgressStorage()
+        
+        while currentDate < viewingDate {
+            // Skip if we're past the program duration
+            let dayNumber = calendar.dateComponents([.day], from: startDate, to: currentDate).day ?? 0
+            if dayNumber >= program.numberOfDays() {
+                break
+            }
+            
+            // Load the progress for this day and check if it was missed
+            let dayProgress = dailyProgressStorage.load(for: currentDate) ?? DailyProgress(
+                id: UUID(),
+                date: currentDate,
+                completedTaskIDs: [],
+                isMissed: true // Default to missed if no progress exists
+            )
+            
+            if dayProgress.isMissed {
+                // Found a missed day, trigger missed day screen
+                return true
+            }
+            
+            // Move to next day
+            currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate)!
+        }
+        
+        // No missed days found
+        return false
     }
 
     func completeCurrentDay() {
