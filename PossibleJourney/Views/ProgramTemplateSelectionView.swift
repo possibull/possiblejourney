@@ -93,9 +93,45 @@ struct ProgramTemplateSelectionView: View {
             }
 
             .sheet(item: $selectedTemplate) { template in
-                TemplateDetailView(template: template) { program in
-                    onProgramCreated(program)
-                    selectedTemplate = nil
+                NavigationStack {
+                    VStack(spacing: 20) {
+                        Text("Template: \(template.name)")
+                            .font(.title)
+                            .padding()
+                        
+                        Text("Start Date")
+                            .font(.headline)
+                        
+                        DatePicker("Start Date", selection: .constant(Date()), displayedComponents: .date)
+                            .datePickerStyle(CompactDatePickerStyle())
+                            .padding()
+                        
+                        Text("End of Day Time")
+                            .font(.headline)
+                        
+                        DatePicker("End of Day Time", selection: .constant(Date()), displayedComponents: .hourAndMinute)
+                            .datePickerStyle(CompactDatePickerStyle())
+                            .padding()
+                        
+                        Button("Start Program") {
+                            let program = template.createProgram()
+                            onProgramCreated(program)
+                            selectedTemplate = nil
+                        }
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(Color.blue)
+                        .cornerRadius(10)
+                        
+                        Button("Cancel") {
+                            selectedTemplate = nil
+                        }
+                        .foregroundColor(.red)
+                        .padding()
+                    }
+                    .padding()
+                    .navigationTitle("Template Details")
+                    .navigationBarTitleDisplayMode(.inline)
                 }
             }
         }
