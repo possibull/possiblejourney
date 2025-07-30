@@ -74,15 +74,6 @@ struct ProgramTemplateSelectionView: View {
                             .listRowInsets(EdgeInsets())
                             .listRowSeparator(.hidden)
                             .listRowBackground(Color.clear)
-                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                // Delete action (for all templates) - full swipe triggers with confirmation
-                                Button {
-                                    templateToDelete = template
-                                } label: {
-                                    Label("Delete", systemImage: "trash")
-                                }
-                                .tint(.red)
-                            }
                             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                 // Edit action (only for non-default templates)
                                 if !template.isDefault {
@@ -102,6 +93,15 @@ struct ProgramTemplateSelectionView: View {
                                     Label("Duplicate", systemImage: "plus.square.on.square")
                                 }
                                 .tint(.blue)
+                            }
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                // Delete action (for all templates) - full swipe triggers with confirmation
+                                Button {
+                                    templateToDelete = template
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                                .tint(.red)
                             }
                         }
                     }
