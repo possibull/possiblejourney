@@ -561,11 +561,20 @@ struct TaskRowView: View {
     private func savePhotoForTask(image: UIImage) {
         print("DEBUG: Starting to save photo for task: \(task.title)")
         
-        // Save the image to documents directory and store the URL
+        // Save the image to Application Support directory for persistence across app launches
         if let imageData = image.jpegData(compressionQuality: 0.8) {
-            let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            let applicationSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
+            let photosDirectory = applicationSupportDirectory.appendingPathComponent("Photos", isDirectory: true)
+            
+            // Create the Photos directory if it doesn't exist
+            do {
+                try FileManager.default.createDirectory(at: photosDirectory, withIntermediateDirectories: true, attributes: nil)
+            } catch {
+                print("DEBUG: Error creating Photos directory: \(error)")
+            }
+            
             let fileName = "\(task.id.uuidString)_\(Date().timeIntervalSince1970).jpg"
-            let fileURL = documentsDirectory.appendingPathComponent(fileName)
+            let fileURL = photosDirectory.appendingPathComponent(fileName)
             
             print("DEBUG: Saving photo to: \(fileURL)")
             
