@@ -325,8 +325,25 @@ struct TemplateDetailView: View {
                 Spacer()
                 
                 if useCustomDays {
-                    Stepper("\(numberOfDays) days", value: $numberOfDays, in: 1...365)
+                    Text("days")
                         .font(.body)
+                        .foregroundColor(.secondary)
+                    
+                    TextField("Days", value: $numberOfDays, format: .number)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .frame(width: 80)
+                        .keyboardType(.numberPad)
+                        .onChange(of: numberOfDays) { oldValue, newValue in
+                            // Ensure the value stays within valid range
+                            if newValue < 1 {
+                                numberOfDays = 1
+                            } else if newValue > 365 {
+                                numberOfDays = 365
+                            }
+                        }
+                    
+                    Stepper("", value: $numberOfDays, in: 1...365)
+                        .labelsHidden()
                 } else {
                     Text("\(template.defaultNumberOfDays) days (default)")
                         .font(.body)
