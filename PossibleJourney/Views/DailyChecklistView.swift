@@ -317,6 +317,7 @@ struct TaskRowView: View {
     @State private var selectedImage: UIImage?
     @State private var imageSource: UIImagePickerController.SourceType = .photoLibrary
     @State private var thumbnailImage: UIImage?
+    @State private var fullImage: UIImage?
     @State private var showingFullPhoto = false
     
     // Check if photo exists for this task
@@ -448,7 +449,7 @@ struct TaskRowView: View {
             ImagePicker(selectedImage: $selectedImage, sourceType: imageSource)
         }
         .sheet(isPresented: $showingFullPhoto) {
-            FullPhotoViewer(photoURL: photoURL, taskTitle: task.title)
+            FullPhotoViewer(image: fullImage, taskTitle: task.title)
         }
         .onChange(of: selectedImage) { _, newImage in
             if let image = newImage {
@@ -480,6 +481,7 @@ struct TaskRowView: View {
     private func loadThumbnail() {
         guard let url = photoURL else {
             thumbnailImage = nil
+            fullImage = nil
             return
         }
         
@@ -487,6 +489,11 @@ struct TaskRowView: View {
         DispatchQueue.global(qos: .userInitiated).async {
             if let imageData = try? Data(contentsOf: url),
                let image = UIImage(data: imageData) {
+                // Store the full image for the viewer
+                DispatchQueue.main.async {
+                    fullImage = image
+                }
+                
                 // Create a smaller thumbnail for better performance
                 image.prepareThumbnail(of: CGSize(width: 80, height: 80)) { thumbnail in
                     DispatchQueue.main.async {
@@ -496,6 +503,7 @@ struct TaskRowView: View {
             } else {
                 DispatchQueue.main.async {
                     thumbnailImage = nil
+                    fullImage = nil
                 }
             }
         }
@@ -525,7 +533,8 @@ struct TaskRowView: View {
                 currentProgress.photoURLs[task.id] = fileURL
                 dailyProgressStorage.save(progress: currentProgress)
                 
-                // Update thumbnail immediately
+                // Update both thumbnail and full image immediately
+                fullImage = image
                 image.prepareThumbnail(of: CGSize(width: 80, height: 80)) { thumbnail in
                     DispatchQueue.main.async {
                         thumbnailImage = thumbnail ?? image
@@ -542,22 +551,16 @@ struct TaskRowView: View {
 
 // Full-screen photo viewer
 struct FullPhotoViewer: View {
-    let photoURL: URL?
+    let image: UIImage?
     let taskTitle: String
     @Environment(\.presentationMode) private var presentationMode
-    @State private var fullImage: UIImage?
-    @State private var isLoading = true
     
     var body: some View {
         NavigationView {
             ZStack {
                 Color.black.ignoresSafeArea()
                 
-                if isLoading {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        .scaleEffect(1.5)
-                } else if let image = fullImage {
+                if let image = image {
                     Image(uiImage: image)
                         .resizable()
                         .aspectRatio(contentMode: .fit)
@@ -582,33 +585,8 @@ struct FullPhotoViewer: View {
                 }
                 .foregroundColor(.white)
             )
-            .onAppear {
-                loadFullImage()
-            }
         }
         .navigationViewStyle(StackNavigationViewStyle())
-    }
-    
-    private func loadFullImage() {
-        guard let url = photoURL else {
-            isLoading = false
-            return
-        }
-        
-        DispatchQueue.global(qos: .userInitiated).async {
-            if let imageData = try? Data(contentsOf: url),
-               let image = UIImage(data: imageData) {
-                DispatchQueue.main.async {
-                    fullImage = image
-                    isLoading = false
-                }
-            } else {
-                DispatchQueue.main.async {
-                    fullImage = nil
-                    isLoading = false
-                }
-            }
-        }
     }
 }
 
