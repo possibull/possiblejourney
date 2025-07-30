@@ -315,6 +315,15 @@ struct TaskRowView: View {
     @State private var showingPhotoPicker = false
     @State private var showingImagePicker = false
     @State private var selectedImage: UIImage?
+    @State private var imageSource: UIImagePickerController.SourceType = .photoLibrary
+    
+    // Check if photo exists for this task
+    private var hasPhoto: Bool {
+        let dailyProgressStorage = DailyProgressStorage()
+        let today = Date()
+        let currentProgress = dailyProgressStorage.load(for: today)
+        return currentProgress?.photoURLs[task.id] != nil
+    }
     
     var body: some View {
         HStack(spacing: 12) {
@@ -344,8 +353,8 @@ struct TaskRowView: View {
                     
                     // Photo requirement indicator
                     if task.requiresPhoto {
-                        Image(systemName: "camera.fill")
-                            .foregroundColor(.blue)
+                        Image(systemName: hasPhoto ? "camera.fill" : "camera")
+                            .foregroundColor(hasPhoto ? .green : .blue)
                             .font(.caption)
                     }
                 }
@@ -369,20 +378,22 @@ struct TaskRowView: View {
                 Button(action: {
                     showingPhotoPicker = true
                 }) {
-                    Image(systemName: "camera")
+                    Image(systemName: hasPhoto ? "photo.fill" : "camera")
                         .font(.caption)
-                        .foregroundColor(.blue)
+                        .foregroundColor(hasPhoto ? .green : .blue)
                 }
                 .buttonStyle(PlainButtonStyle())
                 .actionSheet(isPresented: $showingPhotoPicker) {
                     ActionSheet(
-                        title: Text("Add Photo"),
-                        message: Text("Choose how to add a photo for this task"),
+                        title: Text(hasPhoto ? "Update Photo" : "Add Photo"),
+                        message: Text("Choose how to \(hasPhoto ? "update" : "add") a photo for this task"),
                         buttons: [
                             .default(Text("Take Photo")) {
+                                imageSource = .camera
                                 showingImagePicker = true
                             },
                             .default(Text("Choose from Library")) {
+                                imageSource = .photoLibrary
                                 showingImagePicker = true
                             },
                             .cancel()
@@ -404,7 +415,43 @@ struct TaskRowView: View {
         .cornerRadius(12)
         .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
         .sheet(isPresented: $showingImagePicker) {
-            ImagePicker(selectedImage: $selectedImage)
+            ImagePicker(selectedImage: $selectedImage, sourceType: imageSource)
+        }
+        .onChange(of: selectedImage) { _, newImage in
+            if let image = newImage {
+                savePhotoForTask(image: image)
+            }
+        }
+    }
+    
+    private func savePhotoForTask(image: UIImage) {
+        // Save the image to documents directory and store the URL
+        if let imageData = image.jpegData(compressionQuality: 0.8) {
+            let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            let fileName = "\(task.id.uuidString)_\(Date().timeIntervalSince1970).jpg"
+            let fileURL = documentsDirectory.appendingPathComponent(fileName)
+            
+            do {
+                try imageData.write(to: fileURL)
+                
+                // Update the daily progress with the photo URL
+                let dailyProgressStorage = DailyProgressStorage()
+                let today = Date()
+                var currentProgress = dailyProgressStorage.load(for: today) ?? DailyProgress(
+                    id: UUID(),
+                    date: today,
+                    completedTaskIDs: [],
+                    photoURLs: [:]
+                )
+                
+                // Add the photo URL to the progress
+                currentProgress.photoURLs[task.id] = fileURL
+                dailyProgressStorage.save(progress: currentProgress)
+                
+                print("Photo saved for task: \(task.title) at \(fileURL)")
+            } catch {
+                print("Error saving photo: \(error)")
+            }
         }
     }
 }
@@ -417,11 +464,17 @@ struct TaskRowView: View {
 struct ImagePicker: UIViewControllerRepresentable {
     @Binding var selectedImage: UIImage?
     @Environment(\.presentationMode) private var presentationMode
+    let sourceType: UIImagePickerController.SourceType
+    
+    init(selectedImage: Binding<UIImage?>, sourceType: UIImagePickerController.SourceType = .photoLibrary) {
+        self._selectedImage = selectedImage
+        self.sourceType = sourceType
+    }
     
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
         picker.delegate = context.coordinator
-        picker.sourceType = .photoLibrary
+        picker.sourceType = sourceType
         picker.allowsEditing = true
         return picker
     }
