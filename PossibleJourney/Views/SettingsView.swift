@@ -10,6 +10,7 @@ struct SettingsView: View {
     var onReset: (() -> Void)? = nil
     @Binding var endOfDayTime: Date
     @EnvironmentObject var debugState: DebugState
+    @EnvironmentObject var appState: ProgramAppState
     // Minimal test-only toggle for UI test isolation
     @State private var testDebug = false
     @Environment(\.presentationMode) private var presentationMode
@@ -106,9 +107,21 @@ struct SettingsView: View {
                 // Reset Button
                 VStack(spacing: 16) {
                     Button(action: {
+                        // Clear all program data
                         ProgramStorage().clear()
-                        endOfDayTime = Calendar.current.startOfDay(for: Date()) // Set to 12:00AM
+                        DailyProgressStorage().clearAll()
+                        
+                        // Clear the program from app state to trigger navigation back to template selection
+                        appState.loadedProgram = nil
+                        
+                        // Reset end of day time to default
+                        endOfDayTime = Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22) // Default 10pm
+                        
+                        // Call the onReset callback if provided
                         onReset?()
+                        
+                        // Dismiss the settings sheet
+                        presentationMode.wrappedValue.dismiss()
                     }) {
                         HStack(spacing: 8) {
                             Image(systemName: "arrow.clockwise")
