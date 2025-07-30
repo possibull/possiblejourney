@@ -317,6 +317,7 @@ struct TaskRowView: View {
     @State private var selectedImage: UIImage?
     @State private var imageSource: UIImagePickerController.SourceType = .photoLibrary
     @State private var thumbnailImage: UIImage?
+    @State private var showingFullPhoto = false
     
     // Check if photo exists for this task
     private var hasPhoto: Bool {
@@ -386,15 +387,20 @@ struct TaskRowView: View {
             
             // Photo thumbnail (if photo exists)
             if let thumbnail = thumbnailImage {
-                Image(uiImage: thumbnail)
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .frame(width: 40, height: 40)
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                    )
+                Button(action: {
+                    showingFullPhoto = true
+                }) {
+                    Image(uiImage: thumbnail)
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 40, height: 40)
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 6)
+                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                        )
+                }
+                .buttonStyle(PlainButtonStyle())
             }
             
             // Photo button for tasks that require photos
@@ -440,6 +446,9 @@ struct TaskRowView: View {
         .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
         .sheet(isPresented: $showingImagePicker) {
             ImagePicker(selectedImage: $selectedImage, sourceType: imageSource)
+        }
+        .sheet(isPresented: $showingFullPhoto) {
+            FullPhotoViewer(photoURL: photoURL, taskTitle: task.title)
         }
         .onChange(of: selectedImage) { _, newImage in
             if let image = newImage {
@@ -526,6 +535,78 @@ struct TaskRowView: View {
                 print("Photo saved for task: \(task.title) at \(fileURL)")
             } catch {
                 print("Error saving photo: \(error)")
+            }
+        }
+    }
+}
+
+// Full-screen photo viewer
+struct FullPhotoViewer: View {
+    let photoURL: URL?
+    let taskTitle: String
+    @Environment(\.presentationMode) private var presentationMode
+    @State private var fullImage: UIImage?
+    @State private var isLoading = true
+    
+    var body: some View {
+        NavigationView {
+            ZStack {
+                Color.black.ignoresSafeArea()
+                
+                if isLoading {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        .scaleEffect(1.5)
+                } else if let image = fullImage {
+                    Image(uiImage: image)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .ignoresSafeArea()
+                } else {
+                    VStack {
+                        Image(systemName: "photo")
+                            .font(.system(size: 60))
+                            .foregroundColor(.white.opacity(0.6))
+                        Text("Photo not available")
+                            .foregroundColor(.white.opacity(0.6))
+                            .font(.headline)
+                            .padding(.top)
+                    }
+                }
+            }
+            .navigationTitle(taskTitle)
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarItems(
+                trailing: Button("Done") {
+                    presentationMode.wrappedValue.dismiss()
+                }
+                .foregroundColor(.white)
+            )
+            .onAppear {
+                loadFullImage()
+            }
+        }
+        .navigationViewStyle(StackNavigationViewStyle())
+    }
+    
+    private func loadFullImage() {
+        guard let url = photoURL else {
+            isLoading = false
+            return
+        }
+        
+        DispatchQueue.global(qos: .userInitiated).async {
+            if let imageData = try? Data(contentsOf: url),
+               let image = UIImage(data: imageData) {
+                DispatchQueue.main.async {
+                    fullImage = image
+                    isLoading = false
+                }
+            } else {
+                DispatchQueue.main.async {
+                    fullImage = nil
+                    isLoading = false
+                }
             }
         }
     }
