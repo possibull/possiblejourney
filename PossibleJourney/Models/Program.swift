@@ -140,12 +140,4 @@ extension Program {
         let allComplete = tasks().allSatisfy { completedTaskIDs.contains($0.id) }
         return !allComplete && now >= eod
     }
-    
-    /// Returns true if the active day for the given current date is missed
-    func isActiveDayMissed(currentDate: Date, completedTaskIDs: Set<UUID>) -> Bool {
-        let activeDay = nextActiveDay(currentDate: currentDate) ?? startDate
-        let eod = endOfDay(for: activeDay)
-        let allComplete = tasks().allSatisfy { completedTaskIDs.contains($0.id) }
-        return !allComplete && currentDate >= eod
-    }
 } 

@@ -39,14 +39,14 @@ class DailyChecklistViewModel: ObservableObject {
 
     // The current active day is determined by program.nextActiveDay(now)
     var currentActiveDay: Date {
-        program.nextActiveDay(currentDate: now) ?? program.startDate
+        program.currentAppDay
     }
 
     var isDayMissed: Bool {
         if ignoreMissedDayForCurrentSession {
             return false
         }
-        return program.isActiveDayMissed(currentDate: now, completedTaskIDs: Set(dailyProgress.completedTaskIDs))
+        return program.isCurrentAppDayMissed(now: now, completedTaskIDs: Set(dailyProgress.completedTaskIDs))
     }
 
     func completeCurrentDay() {
