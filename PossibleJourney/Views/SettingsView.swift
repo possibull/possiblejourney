@@ -53,10 +53,10 @@ struct SettingsView: View {
                         }
                         .padding(.vertical, 4)
                         
-                        DatePicker("End of Day", selection: $endOfDayTime, displayedComponents: .hourAndMinute)
-                            .datePickerStyle(.wheel)
+                        DatePicker("End of Day Time", selection: $endOfDayTime, displayedComponents: .hourAndMinute)
+                            .datePickerStyle(CompactDatePickerStyle())
                             .accessibilityIdentifier("EndOfDayTimePicker")
-                            .onChange(of: endOfDayTime) { newValue in
+                            .onChange(of: endOfDayTime) { oldValue, newValue in
                                 let calendar = Calendar.current
                                 let comps = calendar.dateComponents([.hour, .minute], from: newValue)
                                 // Always use today's date for storage
@@ -89,7 +89,7 @@ struct SettingsView: View {
                             
                             Toggle("", isOn: $debugState.debug)
                                 .accessibilityIdentifier("DebugToggle")
-                                .onChange(of: debugState.debug) { newValue in
+                                .onChange(of: debugState.debug) { oldValue, newValue in
                                     print("DEBUG TOGGLE: \(newValue)")
                                 }
                         }
