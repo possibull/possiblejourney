@@ -82,6 +82,12 @@ class ProgramTemplateStorage {
         userDefaults.removeObject(forKey: templatesKey)
     }
     
+    /// Reset templates to default order (75Hard first)
+    func resetToDefaults() {
+        clear()
+        _ = createDefaultTemplates()
+    }
+    
     /// Create default templates for first-time users
     private func createDefaultTemplates() -> [ProgramTemplate] {
         let defaultTemplates = [

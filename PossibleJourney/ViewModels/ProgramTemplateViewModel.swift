@@ -102,7 +102,7 @@ class ProgramTemplateViewModel: ObservableObject {
     
     /// Reset to default templates
     func resetToDefaults() {
-        storage.clear()
+        storage.resetToDefaults()
         loadTemplates() // This will recreate default templates
     }
 } 
