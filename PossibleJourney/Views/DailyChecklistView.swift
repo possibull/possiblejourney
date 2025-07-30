@@ -143,7 +143,7 @@ struct DailyChecklistView: View {
             id: UUID(),
             date: date,
             completedTaskIDs: [],
-            isMissed: true // Default to missed until completed
+            isCompleted: false // Default to not completed until completed
         )
         viewModel.updateDailyProgress(dailyProgress)
         
@@ -350,7 +350,7 @@ struct DailyChecklistView: View {
             date: viewModel.dailyProgress.date,
             completedTaskIDs: completed,
             photoURLs: photoURLs,
-            isMissed: viewModel.dailyProgress.isMissed // Preserve current missed status
+            isCompleted: viewModel.dailyProgress.isCompleted // Preserve current completion status
         )
         
         viewModel.dailyProgress = newProgress

@@ -63,16 +63,16 @@ class DailyChecklistViewModel: ObservableObject {
                 break
             }
             
-            // Load the progress for this day and check if it was missed
+            // Load the progress for this day and check if it was completed
             let dayProgress = dailyProgressStorage.load(for: currentDate) ?? DailyProgress(
                 id: UUID(),
                 date: currentDate,
                 completedTaskIDs: [],
-                isMissed: true // Default to missed if no progress exists
+                isCompleted: false // Default to not completed if no progress exists
             )
             
-            if dayProgress.isMissed {
-                // Found a missed day, trigger missed day screen
+            if !dayProgress.isCompleted {
+                // Found an incomplete day, trigger missed day screen
                 return true
             }
             
@@ -90,8 +90,8 @@ class DailyChecklistViewModel: ObservableObject {
         // Save program with updated lastCompletedDay
         ProgramStorage().save(program)
         
-        // Mark the day as not missed since it's now completed
-        dailyProgress.isMissed = false
+        // Mark the day as completed since all tasks are done
+        dailyProgress.isCompleted = true
         DailyProgressStorage().save(progress: dailyProgress)
     }
 
@@ -118,7 +118,7 @@ class DailyChecklistViewModel: ObservableObject {
             id: UUID(),
             date: date,
             completedTaskIDs: [],
-            isMissed: true // Default to missed until completed
+            isCompleted: false // Default to not completed until completed
         )
         updateDailyProgress(progress)
     }
