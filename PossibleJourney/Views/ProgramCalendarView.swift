@@ -4,6 +4,8 @@ struct ProgramCalendarView: View {
     let startDate: Date
     let numberOfDays: Int
     let completedDates: Set<Date>
+    let selectedDate: Date
+    let onDateSelected: (Date) -> Void
     
     @State private var selectedMonthIndex: Int = 0
     private var calendar: Calendar { Calendar.current }
@@ -56,7 +58,13 @@ struct ProgramCalendarView: View {
                     }
                     .padding(.bottom, 16)
                     
-                    CalendarMonthGrid(monthDates: month.dates, startDate: startDate, completedDates: completedDates)
+                    CalendarMonthGrid(
+                        monthDates: month.dates, 
+                        startDate: startDate, 
+                        completedDates: completedDates,
+                        selectedDate: selectedDate,
+                        onDateSelected: onDateSelected
+                    )
                         .padding(.vertical, 12)
                         .background(Color(.systemGray6))
                         .cornerRadius(20)
@@ -81,6 +89,8 @@ struct CalendarMonthGrid: View {
     let monthDates: [Date]
     let startDate: Date
     let completedDates: Set<Date>
+    let selectedDate: Date
+    let onDateSelected: (Date) -> Void
     private var calendar: Calendar { Calendar.current }
     
     var body: some View {
@@ -113,6 +123,7 @@ struct CalendarMonthGrid: View {
             return dict
         }()
         let today = calendar.startOfDay(for: Date())
+        let selectedDay = calendar.startOfDay(for: selectedDate)
         return AnyView(
             VStack(spacing: 12) {
                 // Day of week headers
@@ -131,6 +142,7 @@ struct CalendarMonthGrid: View {
                                 let isProgramDay = programDaySet.contains(calendar.startOfDay(for: date))
                                 let isCompleted = completedDates.contains { calendar.isDate($0, inSameDayAs: date) }
                                 let isToday = calendar.isDate(today, inSameDayAs: date)
+                                let isSelected = calendar.isDate(selectedDay, inSameDayAs: date)
                                 if isProgramDay && isCompleted, let progNum = programDayNumbers[calendar.startOfDay(for: date)] {
                                     ZStack {
                                         // Blue circle for completed days
@@ -152,8 +164,17 @@ struct CalendarMonthGrid: View {
                                                 .stroke(Color.blue, lineWidth: 2)
                                                 .frame(width: 48, height: 48)
                                         }
+                                        // Selected date highlight
+                                        if isSelected && !isToday {
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .stroke(Color.orange, lineWidth: 3)
+                                                .frame(width: 48, height: 48)
+                                        }
                                     }
                                     .frame(maxWidth: .infinity, minHeight: 48, maxHeight: 48)
+                                    .onTapGesture {
+                                        onDateSelected(date)
+                                    }
                                 } else {
                                     ZStack {
                                         // Day of month (blue if program day, gray otherwise)
@@ -166,8 +187,19 @@ struct CalendarMonthGrid: View {
                                                 .stroke(Color.blue, lineWidth: 2)
                                                 .frame(width: 48, height: 48)
                                         }
+                                        // Selected date highlight
+                                        if isSelected && !isToday {
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .stroke(Color.orange, lineWidth: 3)
+                                                .frame(width: 48, height: 48)
+                                        }
                                     }
                                     .frame(maxWidth: .infinity, minHeight: 48, maxHeight: 48)
+                                    .onTapGesture {
+                                        if isProgramDay {
+                                            onDateSelected(date)
+                                        }
+                                    }
                                 }
                             } else {
                                 Text("").frame(maxWidth: .infinity, minHeight: 48, maxHeight: 48)
@@ -185,5 +217,11 @@ struct CalendarMonthGrid: View {
 #Preview {
     let today = Calendar.current.startOfDay(for: Date())
     let completed = Set([0, 1, 2, 10, 15].compactMap { Calendar.current.date(byAdding: .day, value: $0, to: today) })
-    ProgramCalendarView(startDate: today, numberOfDays: 75, completedDates: completed)
+    ProgramCalendarView(
+        startDate: today, 
+        numberOfDays: 75, 
+        completedDates: completed,
+        selectedDate: today,
+        onDateSelected: { _ in }
+    )
 } 

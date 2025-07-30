@@ -35,6 +35,7 @@ class DailyChecklistViewModel: ObservableObject {
     @Published var dailyProgress: DailyProgress
     @Published var now: Date
     @Published var ignoreMissedDayForCurrentSession: Bool = false
+    @Published var selectedDate: Date = Date() // Add selected date
 
     // The current active day is determined by program.nextActiveDay(now)
     var currentActiveDay: Date {
@@ -57,9 +58,24 @@ class DailyChecklistViewModel: ObservableObject {
 
     func resetProgramToToday() {
         // Called when user taps 'I Missed It'
-        program.startDate = Calendar.current.startOfDay(for: now)
-        program.lastCompletedDay = nil
+        // Mark the missed day as completed so user can continue from the next day
+        // This allows the user to skip the missed day and continue their program
+        program.lastCompletedDay = currentActiveDay
         ProgramStorage().save(program)
+        
+        // Also update the current daily progress to reflect the new day
+        let nextDay = Calendar.current.date(byAdding: .day, value: 1, to: currentActiveDay)!
+        let nextDayProgress = DailyProgress(
+            id: UUID(),
+            date: nextDay,
+            completedTaskIDs: []
+        )
+        updateDailyProgress(nextDayProgress)
+    }
+    
+    func updateDailyProgress(_ newProgress: DailyProgress) {
+        dailyProgress = newProgress
+        selectedDate = newProgress.date
     }
     
     func getCompletedDates() -> Set<Date> {
@@ -85,5 +101,6 @@ class DailyChecklistViewModel: ObservableObject {
         self.program = program
         self.dailyProgress = dailyProgress
         self.now = now
+        self.selectedDate = dailyProgress.date
     }
 } 

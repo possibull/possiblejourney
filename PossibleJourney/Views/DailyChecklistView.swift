@@ -110,7 +110,12 @@ struct DailyChecklistView: View {
                 ProgramCalendarView(
                     startDate: viewModel.program.startDate,
                     numberOfDays: viewModel.program.numberOfDays(),
-                    completedDates: viewModel.getCompletedDates()
+                    completedDates: viewModel.getCompletedDates(),
+                    selectedDate: viewModel.selectedDate,
+                    onDateSelected: { date in
+                        loadDailyProgressForDate(date)
+                        showingCalendar = false
+                    }
                 )
                 .navigationTitle("Program Calendar")
                 .navigationBarTitleDisplayMode(.inline)
@@ -122,6 +127,26 @@ struct DailyChecklistView: View {
                     }
                 }
             }
+        }
+        .onAppear {
+            // Load progress for the selected date (initially today)
+            loadDailyProgressForDate(viewModel.selectedDate)
+        }
+    }
+    
+    // Add function to load daily progress for a specific date
+    private func loadDailyProgressForDate(_ date: Date) {
+        let dailyProgressStorage = DailyProgressStorage()
+        let dailyProgress = dailyProgressStorage.load(for: date) ?? DailyProgress(
+            id: UUID(),
+            date: date,
+            completedTaskIDs: []
+        )
+        viewModel.updateDailyProgress(dailyProgress)
+        
+        // Force UI update by triggering objectWillChange
+        DispatchQueue.main.async {
+            self.viewModel.objectWillChange.send()
         }
     }
     
@@ -264,6 +289,8 @@ struct DailyChecklistView: View {
         }
     }
     
+
+    
     private var settingsLink: some View {
         Button(action: {
             showingSettings = true
@@ -276,8 +303,8 @@ struct DailyChecklistView: View {
     // Computed properties
     private var currentDay: Int {
         let start = Calendar.current.startOfDay(for: viewModel.program.startDate)
-        let today = Calendar.current.startOfDay(for: Date())
-        let diff = Calendar.current.dateComponents([.day], from: start, to: today).day ?? 0
+        let selectedDay = Calendar.current.startOfDay(for: viewModel.selectedDate)
+        let diff = Calendar.current.dateComponents([.day], from: start, to: selectedDay).day ?? 0
         return min(max(diff + 1, 1), viewModel.program.numberOfDays())
     }
     

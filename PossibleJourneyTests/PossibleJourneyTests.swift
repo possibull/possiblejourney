@@ -433,3 +433,275 @@ final class TemplateCardMoreTasksTests: XCTestCase {
         XCTAssertEqual(expandedTasks[4].title, "Task 5")
     }
 } 
+
+final class DailyChecklistViewModelTests: XCTestCase {
+    func testViewingDifferentDaysShowsCorrectDayNumber() {
+        // Given: A program that starts today
+        let today = Calendar.current.startOfDay(for: Date())
+        let program = Program(
+            id: UUID(),
+            startDate: today,
+            endOfDayTime: Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22),
+            lastCompletedDay: nil,
+            templateID: UUID(),
+            customNumberOfDays: 7
+        )
+        
+        // When: Viewing day 2 (tomorrow)
+        let day2 = Calendar.current.date(byAdding: .day, value: 1, to: today)!
+        let day2Progress = DailyProgress(
+            id: UUID(),
+            date: day2,
+            completedTaskIDs: []
+        )
+        
+        let viewModel = DailyChecklistViewModel(
+            program: program,
+            dailyProgress: day2Progress,
+            now: day2
+        )
+        
+        // Then: The day number should be 2
+        let expectedDay = 2
+        let actualDay = viewModel.program.appDay(for: day2)
+        XCTAssertEqual(actualDay, expectedDay, "Day 2 should show as day 2, but got day \(actualDay)")
+    }
+    
+    func testDailyProgressLoadsCorrectDataForDifferentDays() {
+        // Given: A program with different progress for different days
+        let today = Calendar.current.startOfDay(for: Date())
+        let day1 = today
+        let day2 = Calendar.current.date(byAdding: .day, value: 1, to: today)!
+        let day3 = Calendar.current.date(byAdding: .day, value: 2, to: today)!
+        
+        let program = Program(
+            id: UUID(),
+            startDate: day1,
+            endOfDayTime: Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22),
+            lastCompletedDay: nil,
+            templateID: UUID(),
+            customNumberOfDays: 7
+        )
+        
+        let storage = DailyProgressStorage()
+        
+        // Create different progress for each day
+        let day1Progress = DailyProgress(
+            id: UUID(),
+            date: day1,
+            completedTaskIDs: [UUID()]
+        )
+        
+        let day2Progress = DailyProgress(
+            id: UUID(),
+            date: day2,
+            completedTaskIDs: [UUID(), UUID()]
+        )
+        
+        let day3Progress = DailyProgress(
+            id: UUID(),
+            date: day3,
+            completedTaskIDs: []
+        )
+        
+        // Save progress for each day
+        storage.save(progress: day1Progress)
+        storage.save(progress: day2Progress)
+        storage.save(progress: day3Progress)
+        
+        // When: Loading progress for day 2
+        let loadedDay2Progress = storage.load(for: day2)
+        
+        // Then: Should get day 2's progress, not day 1's
+        XCTAssertNotNil(loadedDay2Progress, "Day 2 progress should be loaded")
+        XCTAssertEqual(loadedDay2Progress?.date, day2, "Loaded progress should be for day 2")
+        XCTAssertEqual(loadedDay2Progress?.completedTaskIDs.count, 2, "Day 2 should have 2 completed tasks")
+        
+        // When: Loading progress for day 1
+        let loadedDay1Progress = storage.load(for: day1)
+        
+        // Then: Should get day 1's progress
+        XCTAssertNotNil(loadedDay1Progress, "Day 1 progress should be loaded")
+        XCTAssertEqual(loadedDay1Progress?.date, day1, "Loaded progress should be for day 1")
+        XCTAssertEqual(loadedDay1Progress?.completedTaskIDs.count, 1, "Day 1 should have 1 completed task")
+    }
+
+    func testDay2ShowsCorrectInfoNotDay1Info() {
+        // Given: A program that starts today with different progress for each day
+        let today = Calendar.current.startOfDay(for: Date())
+        let day1 = today
+        let day2 = Calendar.current.date(byAdding: .day, value: 1, to: today)!
+        let day3 = Calendar.current.date(byAdding: .day, value: 2, to: today)!
+        
+        let program = Program(
+            id: UUID(),
+            startDate: day1,
+            endOfDayTime: Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22),
+            lastCompletedDay: nil,
+            templateID: UUID(),
+            customNumberOfDays: 7
+        )
+        
+        let storage = DailyProgressStorage()
+        
+        // Create different progress for each day
+        let day1Progress = DailyProgress(
+            id: UUID(),
+            date: day1,
+            completedTaskIDs: [UUID()]
+        )
+        
+        let day2Progress = DailyProgress(
+            id: UUID(),
+            date: day2,
+            completedTaskIDs: [UUID(), UUID()] // Different number of completed tasks
+        )
+        
+        let day3Progress = DailyProgress(
+            id: UUID(),
+            date: day3,
+            completedTaskIDs: []
+        )
+        
+        // Save progress for each day
+        storage.save(progress: day1Progress)
+        storage.save(progress: day2Progress)
+        storage.save(progress: day3Progress)
+        
+        // When: Creating a view model for day 2
+        let loadedDay2Progress = storage.load(for: day2)!
+        let viewModel = DailyChecklistViewModel(
+            program: program,
+            dailyProgress: loadedDay2Progress,
+            now: day2
+        )
+        
+        // Then: The view model should show day 2 info, not day 1 info
+        XCTAssertEqual(viewModel.selectedDate, day2, "Selected date should be day 2")
+        XCTAssertEqual(viewModel.dailyProgress.date, day2, "Daily progress should be for day 2")
+        XCTAssertEqual(viewModel.dailyProgress.completedTaskIDs.count, 2, "Day 2 should have 2 completed tasks")
+        
+        // Verify the day number calculation
+        let dayNumber = program.appDay(for: day2)
+        XCTAssertEqual(dayNumber, 2, "Day 2 should be calculated as day 2")
+    }
+
+    func testDayCalculationForSpecificDates() {
+        // Given: A program that starts on July 29th
+        let calendar = Calendar.current
+        let july29 = calendar.date(from: DateComponents(year: 2024, month: 7, day: 29))!
+        let july30 = calendar.date(from: DateComponents(year: 2024, month: 7, day: 30))!
+        let july31 = calendar.date(from: DateComponents(year: 2024, month: 7, day: 31))!
+        
+        let program = Program(
+            id: UUID(),
+            startDate: july29,
+            endOfDayTime: calendar.startOfDay(for: july29).addingTimeInterval(60*60*22),
+            lastCompletedDay: nil,
+            templateID: UUID(),
+            customNumberOfDays: 7
+        )
+        
+        // Test day calculation for each date
+        let day1 = calculateDayNumber(startDate: july29, selectedDate: july29)
+        let day2 = calculateDayNumber(startDate: july29, selectedDate: july30)
+        let day3 = calculateDayNumber(startDate: july29, selectedDate: july31)
+        
+        // Assertions
+        XCTAssertEqual(day1, 1, "July 29th should be DAY 1")
+        XCTAssertEqual(day2, 2, "July 30th should be DAY 2")
+        XCTAssertEqual(day3, 3, "July 31st should be DAY 3")
+        
+        print("Day calculations: July 29th = Day \(day1), July 30th = Day \(day2), July 31st = Day \(day3)")
+    }
+    
+    private func calculateDayNumber(startDate: Date, selectedDate: Date) -> Int {
+        let start = Calendar.current.startOfDay(for: startDate)
+        let selectedDay = Calendar.current.startOfDay(for: selectedDate)
+        let diff = Calendar.current.dateComponents([.day], from: start, to: selectedDay).day ?? 0
+        return min(max(diff + 1, 1), 7) // Assuming 7 days program
+    }
+
+    func testDailyChecklistViewModelSelectedDateUpdate() {
+        // Given: A program that starts on July 29th
+        let calendar = Calendar.current
+        let july29 = calendar.date(from: DateComponents(year: 2024, month: 7, day: 29))!
+        let july30 = calendar.date(from: DateComponents(year: 2024, month: 7, day: 30))!
+        let july31 = calendar.date(from: DateComponents(year: 2024, month: 7, day: 31))!
+        
+        let program = Program(
+            id: UUID(),
+            startDate: july29,
+            endOfDayTime: calendar.startOfDay(for: july29).addingTimeInterval(60*60*22),
+            lastCompletedDay: nil,
+            templateID: UUID(),
+            customNumberOfDays: 7
+        )
+        
+        let initialProgress = DailyProgress(id: UUID(), date: july29, completedTaskIDs: [])
+        let viewModel = DailyChecklistViewModel(program: program, dailyProgress: initialProgress)
+        
+        // Test initial state
+        XCTAssertEqual(viewModel.selectedDate, july29, "Initial selected date should be start date")
+        
+        // Test updating to July 30th
+        let progress30 = DailyProgress(id: UUID(), date: july30, completedTaskIDs: [])
+        viewModel.updateDailyProgress(progress30)
+        
+        XCTAssertEqual(viewModel.selectedDate, july30, "Selected date should be updated to July 30th")
+        XCTAssertEqual(viewModel.dailyProgress.date, july30, "Daily progress date should be July 30th")
+        
+        // Test updating to July 31st
+        let progress31 = DailyProgress(id: UUID(), date: july31, completedTaskIDs: [])
+        viewModel.updateDailyProgress(progress31)
+        
+        XCTAssertEqual(viewModel.selectedDate, july31, "Selected date should be updated to July 31st")
+        XCTAssertEqual(viewModel.dailyProgress.date, july31, "Daily progress date should be July 31st")
+        
+        print("Test passed: ViewModel correctly updates selectedDate")
+    }
+
+    func testMarkingDayAsMissedPreservesStartDate() {
+        // Given: A program that starts on July 29th
+        let calendar = Calendar.current
+        let july29 = calendar.date(from: DateComponents(year: 2024, month: 7, day: 29))!
+        let july30 = calendar.date(from: DateComponents(year: 2024, month: 7, day: 30))!
+        let july31 = calendar.date(from: DateComponents(year: 2024, month: 7, day: 31))!
+        
+        let program = Program(
+            id: UUID(),
+            startDate: july29,
+            endOfDayTime: calendar.startOfDay(for: july29).addingTimeInterval(60*60*22),
+            lastCompletedDay: nil,
+            templateID: UUID(),
+            customNumberOfDays: 7
+        )
+        
+        let initialProgress = DailyProgress(id: UUID(), date: july29, completedTaskIDs: [])
+        let viewModel = DailyChecklistViewModel(program: program, dailyProgress: initialProgress)
+        
+        // Verify initial state
+        XCTAssertEqual(viewModel.program.startDate, july29)
+        XCTAssertEqual(viewModel.currentActiveDay, july29)
+        
+        // When: Marking the day as missed (July 29th)
+        viewModel.resetProgramToToday()
+        
+        // Then: Start date should remain July 29th, but current active day should be July 30th
+        XCTAssertEqual(viewModel.program.startDate, july29, "Start date should not change")
+        XCTAssertEqual(viewModel.program.lastCompletedDay, july29, "Last completed day should be July 29th")
+        XCTAssertEqual(viewModel.currentActiveDay, july30, "Current active day should be July 30th")
+        XCTAssertEqual(viewModel.selectedDate, july30, "Selected date should be July 30th")
+        
+        // Verify day calculation still works correctly
+        let day1 = calculateDayNumber(startDate: july29, selectedDate: july29)
+        let day2 = calculateDayNumber(startDate: july29, selectedDate: july30)
+        let day3 = calculateDayNumber(startDate: july29, selectedDate: july31)
+        
+        XCTAssertEqual(day1, 1, "July 29th should be Day 1")
+        XCTAssertEqual(day2, 2, "July 30th should be Day 2")
+        XCTAssertEqual(day3, 3, "July 31st should be Day 3")
+    }
+    
+
+} 
