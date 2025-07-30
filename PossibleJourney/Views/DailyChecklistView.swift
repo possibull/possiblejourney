@@ -131,10 +131,16 @@ struct DailyChecklistView: View {
             }
         }
         .onAppear {
-            // Always start with current date unless a calendar date was explicitly selected
-            // Reset to current date to ensure we're not showing a persistent calendar selection
-            viewModel.selectedDate = viewModel.now
-            loadDailyProgressForDate(viewModel.now)
+            // Only reset to current date if we're not already showing a selected date
+            // This allows calendar selections to persist while viewing the page
+            if Calendar.current.isDate(viewModel.selectedDate, inSameDayAs: viewModel.now) {
+                // If we're showing today's date, make sure it's the current time
+                viewModel.selectedDate = viewModel.now
+                loadDailyProgressForDate(viewModel.now)
+            } else {
+                // If we're showing a different date (from calendar), load that date's progress
+                loadDailyProgressForDate(viewModel.selectedDate)
+            }
         }
     }
     
@@ -213,7 +219,7 @@ struct DailyChecklistView: View {
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
                     
-                    Text(viewModel.program.startDate, style: .date)
+                    Text(viewModel.selectedDate, style: .date)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
