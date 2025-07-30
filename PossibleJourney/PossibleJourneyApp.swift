@@ -38,7 +38,6 @@ struct PossibleJourneyApp: App {
     @State private var showSplash = true
     
     init() {
-        print("DEBUG: PossibleJourneyApp init")
         resetForUITestingIfNeeded()
         // Always minimize debug window on launch
         UserDefaults.standard.set(false, forKey: "debugWindowExpanded")
@@ -52,7 +51,6 @@ struct PossibleJourneyApp: App {
         return nil
     }
     var body: some Scene {
-        print("DEBUG: Launching DailyChecklistView with now = \(currentTimeOverride ?? Date())")
         return WindowGroup {
             if showSplash {
                 SplashView(showSplash: $showSplash)

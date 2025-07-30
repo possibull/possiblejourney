@@ -64,9 +64,7 @@ struct ProgramTemplateSelectionView: View {
                         LazyVStack(spacing: 16) {
                             ForEach(viewModel.filteredTemplates) { template in
                                 TemplateCardView(template: template) {
-                                    print("DEBUG: Template tapped: \(template.name)")
                                     selectedTemplate = template
-                                    print("DEBUG: selectedTemplate set to: \(selectedTemplate?.name ?? "nil")")
                                 }
                             }
                         }
@@ -220,7 +218,7 @@ struct TemplateDetailView: View {
                 }
             }
             .onAppear {
-                print("DEBUG: TemplateDetailView appeared for template: \(template.name)")
+                // Template detail view appeared
             }
         }
     }
