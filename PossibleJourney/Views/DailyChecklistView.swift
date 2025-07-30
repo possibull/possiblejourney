@@ -514,9 +514,7 @@ struct TaskRowView: View {
         print("DEBUG: Loading thumbnail for task: \(task.title) from URL: \(url)")
         
         // Try to load the image, and if it fails, try to find it in other possible locations
-        loadImageFromURL(url) { [weak self] image in
-            guard let self = self else { return }
-            
+        loadImageFromURL(url) { image in
             if let image = image {
                 print("DEBUG: Successfully loaded image for task: \(self.task.title)")
                 DispatchQueue.main.async {
@@ -545,7 +543,10 @@ struct TaskRowView: View {
     }
     
     private func loadImageFromURL(_ url: URL, completion: @escaping (UIImage?) -> Void) {
-        // First try the original URL
+        // On real devices, app directories are stable, so we can directly load from the URL
+        // On simulator, directories change between sessions, so we need fallback logic
+        #if targetEnvironment(simulator)
+        // Simulator: Try original URL first, then search other locations
         loadImageFromSpecificURL(url) { image in
             if image != nil {
                 completion(image)
@@ -557,6 +558,12 @@ struct TaskRowView: View {
                 completion(foundImage)
             }
         }
+        #else
+        // Real device: Direct loading should work
+        loadImageFromSpecificURL(url) { image in
+            completion(image)
+        }
+        #endif
     }
     
     private func loadImageFromSpecificURL(_ url: URL, completion: @escaping (UIImage?) -> Void) {
