@@ -25,12 +25,16 @@ commit_changes() {
         
         # Check for specific file types and generate appropriate comments
         if echo "$changed_files" | grep -q "\.swift$"; then
+            # Check if any Swift file ends with View.swift
             if echo "$changed_files" | grep -q "View\.swift$"; then
                 comment="UI improvements and view updates"
+            # Check if any Swift file ends with ViewModel.swift
             elif echo "$changed_files" | grep -q "ViewModel\.swift$"; then
                 comment="View model logic updates"
+            # Check if any Swift file ends with Model.swift
             elif echo "$changed_files" | grep -q "Model\.swift$"; then
                 comment="Data model changes"
+            # Any other Swift file
             else
                 comment="Swift code updates"
             fi
