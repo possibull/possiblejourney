@@ -325,7 +325,9 @@ struct TaskRowView: View {
         let dailyProgressStorage = DailyProgressStorage()
         let today = Date()
         let currentProgress = dailyProgressStorage.load(for: today)
-        return currentProgress?.photoURLs[task.id] != nil
+        let hasPhoto = currentProgress?.photoURLs[task.id] != nil
+        print("DEBUG: hasPhoto for task '\(task.title)': \(hasPhoto)")
+        return hasPhoto
     }
     
     // Get the photo URL for this task
@@ -333,7 +335,9 @@ struct TaskRowView: View {
         let dailyProgressStorage = DailyProgressStorage()
         let today = Date()
         let currentProgress = dailyProgressStorage.load(for: today)
-        return currentProgress?.photoURLs[task.id]
+        let url = currentProgress?.photoURLs[task.id]
+        print("DEBUG: photoURL for task '\(task.title)': \(url?.absoluteString ?? "nil")")
+        return url
     }
     
     var body: some View {
@@ -480,27 +484,45 @@ struct TaskRowView: View {
     
     private func loadThumbnail() {
         guard let url = photoURL else {
+            print("DEBUG: No photo URL found for task: \(task.title)")
             thumbnailImage = nil
             fullImage = nil
             return
         }
         
+        print("DEBUG: Loading thumbnail for task: \(task.title) from URL: \(url)")
+        
         // Load image asynchronously to avoid blocking the UI
         DispatchQueue.global(qos: .userInitiated).async {
-            if let imageData = try? Data(contentsOf: url),
-               let image = UIImage(data: imageData) {
-                // Store the full image for the viewer
-                DispatchQueue.main.async {
-                    fullImage = image
-                }
+            do {
+                let imageData = try Data(contentsOf: url)
+                print("DEBUG: Successfully loaded image data for task: \(task.title), size: \(imageData.count) bytes")
                 
-                // Create a smaller thumbnail for better performance
-                image.prepareThumbnail(of: CGSize(width: 80, height: 80)) { thumbnail in
+                if let image = UIImage(data: imageData) {
+                    print("DEBUG: Successfully created UIImage for task: \(task.title)")
+                    
+                    // Store the full image for the viewer
                     DispatchQueue.main.async {
-                        thumbnailImage = thumbnail ?? image
+                        fullImage = image
+                        print("DEBUG: Set full image for task: \(task.title)")
+                    }
+                    
+                    // Create a smaller thumbnail for better performance
+                    image.prepareThumbnail(of: CGSize(width: 80, height: 80)) { thumbnail in
+                        DispatchQueue.main.async {
+                            thumbnailImage = thumbnail ?? image
+                            print("DEBUG: Set thumbnail for task: \(task.title)")
+                        }
+                    }
+                } else {
+                    print("DEBUG: Failed to create UIImage from data for task: \(task.title)")
+                    DispatchQueue.main.async {
+                        thumbnailImage = nil
+                        fullImage = nil
                     }
                 }
-            } else {
+            } catch {
+                print("DEBUG: Error loading image for task: \(task.title) - \(error)")
                 DispatchQueue.main.async {
                     thumbnailImage = nil
                     fullImage = nil
