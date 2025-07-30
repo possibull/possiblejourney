@@ -22,6 +22,9 @@ struct ProgramSetupMainView: View {
                             let program = template.createProgram()
                             onProgramCreated(program)
                         },
+                        onProgramCreated: { program in
+                            onProgramCreated(program)
+                        },
                         onCustomProgram: {
                             showingCustomSetup = true
                         }

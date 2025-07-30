@@ -138,4 +138,45 @@ final class ProgramTemplateTests: XCTestCase {
         let deletedTemplate = storage.get(by: originalTemplate.id)
         XCTAssertNil(deletedTemplate)
     }
+    
+    func testTemplateSelectionFlow() {
+        // Arrange
+        let storage = ProgramTemplateStorage()
+        storage.clear() // Ensure clean state
+        
+        let template = ProgramTemplate(
+            name: "Test Template",
+            description: "A template for testing.",
+            category: .learning,
+            defaultNumberOfDays: 10,
+            tasks: [
+                Task(id: UUID(), title: "Test Task 1", description: "Desc 1"),
+                Task(id: UUID(), title: "Test Task 2", description: "Desc 2")
+            ],
+            isDefault: false
+        )
+        storage.add(template)
+        
+        let startDate = Date()
+        let endOfDayTime = Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22) // 10pm
+        
+        // Act - Simulate the template selection flow
+        let program = template.createProgram(startDate: startDate, endOfDayTime: endOfDayTime)
+        
+        // Assert - Verify the program was created correctly
+        XCTAssertEqual(program.templateID, template.id)
+        XCTAssertEqual(program.startDate, startDate)
+        XCTAssertEqual(program.endOfDayTime, endOfDayTime)
+        XCTAssertNil(program.lastCompletedDay)
+        
+        // Verify the program can resolve its template and tasks
+        let resolvedTemplate = program.template(using: storage)
+        let resolvedTasks = program.tasks(using: storage)
+        let resolvedNumberOfDays = program.numberOfDays(using: storage)
+        
+        XCTAssertNotNil(resolvedTemplate)
+        XCTAssertEqual(resolvedTemplate?.id, template.id)
+        XCTAssertEqual(resolvedTasks.count, 2)
+        XCTAssertEqual(resolvedNumberOfDays, 10)
+    }
 } 

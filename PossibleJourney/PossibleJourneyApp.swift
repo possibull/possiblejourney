@@ -55,11 +55,7 @@ struct PossibleJourneyApp: App {
         print("DEBUG: Launching DailyChecklistView with now = \(currentTimeOverride ?? Date())")
         return WindowGroup {
             if showSplash {
-                SplashView {
-                    withAnimation(.easeInOut(duration: 0.5)) {
-                        showSplash = false
-                    }
-                }
+                SplashView(showSplash: $showSplash)
             } else {
                 ZStack(alignment: .top) {
                     NavigationStack {
@@ -68,18 +64,7 @@ struct PossibleJourneyApp: App {
                             let activeDay = program.nextActiveDay(currentDate: now) ?? Calendar.current.startOfDay(for: now)
                             let dailyProgress = DailyProgressStorage().load(for: activeDay) ?? DailyProgress(id: UUID(), date: activeDay, completedTaskIDs: [])
                             AnyView(
-                                DailyChecklistView(
-                                    viewModel: DailyChecklistViewModel(
-                                        program: program,
-                                        dailyProgress: dailyProgress,
-                                        now: now
-                                    ),
-                                    onReset: {
-                                        appState.loadedProgram = nil
-                                        ProgramStorage().clear()
-                                    },
-                                    currentTimeOverride: currentTimeOverride
-                                )
+                                DailyChecklistView()
                                 .environmentObject(debugState)
                             )
                         } else {

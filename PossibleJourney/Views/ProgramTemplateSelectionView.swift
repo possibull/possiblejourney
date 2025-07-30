@@ -14,155 +14,80 @@ struct ProgramTemplateSelectionView: View {
     @State private var showingCustomSetup = false
     
     let onTemplateSelected: (ProgramTemplate) -> Void
+    let onProgramCreated: (Program) -> Void
     let onCustomProgram: () -> Void
+    
+
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 0) {
-                // Search bar
-                searchBar
+            ZStack {
+                // Light background
+                Color(.systemBackground)
+                    .ignoresSafeArea()
                 
-                // Category filter
-                categoryFilter
-                
-                // Templates list
-                templatesList
-            }
-            .navigationTitle("Choose a Template")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Custom") {
-                        onCustomProgram()
+                VStack(spacing: 0) {
+                    // Search bar
+                    HStack {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundColor(.gray)
+                        TextField("Search templates...", text: $viewModel.searchText)
+                            .textFieldStyle(PlainTextFieldStyle())
                     }
-                    .fontWeight(.medium)
-                }
-            }
-        }
-        .sheet(isPresented: $showingTemplateDetail) {
-            if let template = selectedTemplate {
-                TemplateDetailView(template: template) { program in
-                    onTemplateSelected(template)
-                    showingTemplateDetail = false
-                }
-            }
-        }
-    }
-    
-    private var searchBar: some View {
-        HStack {
-            Image(systemName: "magnifyingglass")
-                .foregroundColor(.gray)
-            
-            TextField("Search templates...", text: $viewModel.searchText)
-                .textFieldStyle(PlainTextFieldStyle())
-            
-            if !viewModel.searchText.isEmpty {
-                Button(action: {
-                    viewModel.searchText = ""
-                }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundColor(.gray)
-                }
-            }
-        }
-        .padding(.horizontal)
-        .padding(.vertical, 8)
-        .background(Color(.systemGray6))
-        .cornerRadius(10)
-        .padding(.horizontal)
-        .padding(.top)
-    }
-    
-    private var categoryFilter: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
-                // All categories button
-                CategoryButton(
-                    title: "All",
-                    icon: "square.grid.2x2",
-                    isSelected: viewModel.selectedCategory == nil
-                ) {
-                    viewModel.selectedCategory = nil
-                }
-                
-                // Category buttons
-                ForEach(TemplateCategory.allCases, id: \.self) { category in
-                    CategoryButton(
-                        title: category.displayName,
-                        icon: category.icon,
-                        isSelected: viewModel.selectedCategory == category
-                    ) {
-                        viewModel.selectedCategory = category
-                    }
-                }
-            }
-            .padding(.horizontal)
-        }
-        .padding(.vertical, 8)
-    }
-    
-    private var templatesList: some View {
-        ScrollView {
-            LazyVStack(spacing: 16) {
-                if viewModel.isLoading {
-                    ProgressView("Loading templates...")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .padding(.top, 50)
-                } else if viewModel.filteredTemplates.isEmpty {
-                    emptyStateView
-                } else {
-                    ForEach(viewModel.filteredTemplates) { template in
-                        TemplateCardView(template: template) {
-                            selectedTemplate = template
-                            showingTemplateDetail = true
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(10)
+                    .padding(.horizontal)
+                    
+                    // Category filter
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
+                            ForEach(TemplateCategory.allCases, id: \.self) { category in
+                                Button(action: {
+                                    viewModel.selectedCategory = viewModel.selectedCategory == category ? nil : category
+                                }) {
+                                    Text(category.displayName)
+                                        .font(.caption)
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 8)
+                                        .background(viewModel.selectedCategory == category ? Color.blue : Color(.systemGray5))
+                                        .foregroundColor(viewModel.selectedCategory == category ? .white : .primary)
+                                        .cornerRadius(20)
+                                }
+                            }
                         }
+                        .padding(.horizontal)
+                    }
+                    .padding(.vertical, 8)
+                    
+                    // Templates list
+                    ScrollView {
+                        LazyVStack(spacing: 16) {
+                            ForEach(viewModel.filteredTemplates) { template in
+                                TemplateCardView(template: template) {
+                                    print("DEBUG: Template tapped: \(template.name)")
+                                    selectedTemplate = template
+                                    print("DEBUG: selectedTemplate set to: \(selectedTemplate?.name ?? "nil")")
+                                    showingTemplateDetail = true
+                                    print("DEBUG: showingTemplateDetail set to: \(showingTemplateDetail)")
+                                }
+                            }
+                        }
+                        .padding()
                     }
                 }
             }
-            .padding()
-        }
-    }
-    
-    private var emptyStateView: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "doc.text.magnifyingglass")
-                .font(.system(size: 50))
-                .foregroundColor(.gray)
-            
-            Text("No templates found")
-                .font(.title2)
-                .fontWeight(.medium)
-            
-            Text("Try adjusting your search or category filter")
-                .font(.body)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding(.top, 50)
-    }
-}
+            .navigationTitle("Choose Template")
+            .navigationBarTitleDisplayMode(.large)
 
-struct CategoryButton: View {
-    let title: String
-    let icon: String
-    let isSelected: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 6) {
-                Image(systemName: icon)
-                    .font(.system(size: 14))
-                Text(title)
-                    .font(.system(size: 14, weight: .medium))
+            .sheet(isPresented: $showingTemplateDetail) {
+                if let template = selectedTemplate {
+                    TemplateDetailView(template: template) { program in
+                        onProgramCreated(program)
+                        showingTemplateDetail = false
+                    }
+                }
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(isSelected ? Color.blue : Color(.systemGray5))
-            .foregroundColor(isSelected ? .white : .primary)
-            .cornerRadius(20)
         }
     }
 }
@@ -170,6 +95,7 @@ struct CategoryButton: View {
 struct TemplateCardView: View {
     let template: ProgramTemplate
     let onTap: () -> Void
+    @State private var isExpanded = false
     
     var body: some View {
         Button(action: onTap) {
@@ -186,57 +112,70 @@ struct TemplateCardView: View {
                             .font(.headline)
                             .foregroundColor(.primary)
                         
-                        Text(template.category.displayName)
+                        Text(template.description)
                             .font(.caption)
                             .foregroundColor(.secondary)
+                            .lineLimit(2)
                     }
                     
                     Spacer()
                     
-                    Image(systemName: "chevron.right")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text("\(template.defaultNumberOfDays) days")
+                            .font(.caption)
+                            .foregroundColor(.blue)
+                            .fontWeight(.medium)
+                        
+                        Text(template.category.displayName)
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
                 }
                 
-                // Description
-                Text(template.description)
-                    .font(.body)
-                    .foregroundColor(.secondary)
-                    .lineLimit(2)
-                
-                // Task preview
+                // Tasks preview
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("\(template.tasks.count) tasks • \(template.defaultNumberOfDays) days")
+                    Text("Tasks:")
                         .font(.caption)
                         .foregroundColor(.secondary)
+                        .fontWeight(.medium)
                     
-                    // Show first 3 tasks
-                    ForEach(Array(template.tasks.prefix(3)), id: \.id) { task in
-                        HStack(spacing: 8) {
+                    let visibleTasks = isExpanded ? template.tasks : Array(template.tasks.prefix(3))
+                    
+                    ForEach(visibleTasks, id: \.id) { task in
+                        HStack {
                             Image(systemName: "circle.fill")
                                 .font(.system(size: 4))
                                 .foregroundColor(.blue)
-                            
                             Text(task.title)
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.primary)
                                 .lineLimit(1)
-                            
                             Spacer()
                         }
                     }
                     
+                    // Show "more tasks" button if there are more than 3 tasks
                     if template.tasks.count > 3 {
-                        Text("+ \(template.tasks.count - 3) more tasks")
-                            .font(.caption)
+                        Button(action: {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                isExpanded.toggle()
+                            }
+                        }) {
+                            HStack {
+                                Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
+                                    .font(.caption)
+                                Text(isExpanded ? "Show less" : "+ \(template.tasks.count - 3) more tasks")
+                                    .font(.caption)
+                            }
                             .foregroundColor(.blue)
+                        }
                     }
                 }
             }
             .padding()
             .background(Color(.systemBackground))
             .cornerRadius(12)
-            .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+            .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -251,33 +190,39 @@ struct TemplateDetailView: View {
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    // Template header
-                    templateHeader
-                    
-                    // Program settings
-                    programSettings
-                    
-                    // Start button
-                    startButton
+            ZStack {
+                // Light background
+                Color(.systemBackground)
+                    .ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        headerSection
+                        tasksSection
+                        startDateSection
+                        endOfDaySection
+                        startButton
+                    }
+                    .padding()
                 }
-                .padding()
             }
             .navigationTitle("Template Details")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Cancel") {
-                        // Dismiss sheet
+                        // This will be handled by the sheet dismissal
                     }
                 }
+            }
+            .onAppear {
+                print("DEBUG: TemplateDetailView appeared for template: \(template.name)")
             }
         }
     }
     
-    private var templateHeader: some View {
-        VStack(alignment: .leading, spacing: 12) {
+    private var headerSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemName: template.category.icon)
                     .font(.title)
@@ -285,49 +230,89 @@ struct TemplateDetailView: View {
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(template.name)
-                        .font(.title2)
+                        .font(.title)
                         .fontWeight(.bold)
                     
-                    Text(template.category.displayName)
-                        .font(.subheadline)
+                    Text(template.description)
+                        .font(.body)
                         .foregroundColor(.secondary)
                 }
                 
                 Spacer()
             }
             
-            Text(template.description)
-                .font(.body)
-                .foregroundColor(.secondary)
+            HStack {
+                Label("\(template.defaultNumberOfDays) days", systemImage: "calendar")
+                Spacer()
+                Label(template.category.displayName, systemImage: "tag")
+            }
+            .font(.caption)
+            .foregroundColor(.secondary)
         }
         .padding()
         .background(Color(.systemGray6))
         .cornerRadius(12)
     }
     
-    private var programSettings: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Program Settings")
+    private var tasksSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Daily Tasks")
                 .font(.headline)
+                .fontWeight(.semibold)
             
-            VStack(spacing: 12) {
-                HStack {
-                    Text("Start Date")
+            ForEach(template.tasks, id: \.id) { task in
+                HStack(alignment: .top, spacing: 12) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.blue)
+                        .font(.title3)
+                    
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(task.title)
+                            .font(.body)
+                            .fontWeight(.medium)
+                        
+                        if let description = task.description {
+                            Text(description)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    
                     Spacer()
-                    DatePicker("", selection: $startDate, displayedComponents: .date)
-                        .labelsHidden()
                 }
-                HStack {
-                    Text("End of Day Time")
-                    Spacer()
-                    DatePicker("", selection: $endOfDayTime, displayedComponents: .hourAndMinute)
-                        .labelsHidden()
-                }
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(8)
             }
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
+    }
+    
+    private var startDateSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Start Date")
+                .font(.headline)
+                .fontWeight(.semibold)
+            
+            DatePicker("Start Date", selection: $startDate, displayedComponents: .date)
+                .datePickerStyle(CompactDatePickerStyle())
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(8)
+        }
+    }
+    
+    private var endOfDaySection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("End of Day Time")
+                .font(.headline)
+                .fontWeight(.semibold)
+            
+            DatePicker("End of Day Time", selection: $endOfDayTime, displayedComponents: .hourAndMinute)
+                .datePickerStyle(CompactDatePickerStyle())
+                .padding()
+                .background(Color(.systemGray6))
+                .cornerRadius(8)
+        }
     }
     
     private var startButton: some View {
@@ -340,12 +325,13 @@ struct TemplateDetailView: View {
                 Text("Start Program")
                     .fontWeight(.semibold)
             }
+            .foregroundColor(.white)
             .frame(maxWidth: .infinity)
             .padding()
             .background(Color.blue)
-            .foregroundColor(.white)
             .cornerRadius(12)
         }
+        .padding(.top)
     }
 }
 
@@ -384,6 +370,7 @@ struct TaskSelectionRow: View {
 #Preview {
     ProgramTemplateSelectionView(
         onTemplateSelected: { _ in },
+        onProgramCreated: { _ in },
         onCustomProgram: {}
     )
 } 
