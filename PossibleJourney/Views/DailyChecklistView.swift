@@ -319,16 +319,7 @@ struct TaskRowView: View {
     @State private var thumbnailImage: UIImage?
     @State private var fullImage: UIImage?
     @State private var showingFullPhoto = false
-    
-    // Check if photo exists for this task
-    private var hasPhoto: Bool {
-        let dailyProgressStorage = DailyProgressStorage()
-        let today = Date()
-        let currentProgress = dailyProgressStorage.load(for: today)
-        let hasPhoto = currentProgress?.photoURLs[task.id] != nil
-        print("DEBUG: hasPhoto for task '\(task.title)': \(hasPhoto)")
-        return hasPhoto
-    }
+    @State private var hasPhoto: Bool = false
     
     // Get the photo URL for this task
     private var photoURL: URL? {
@@ -495,6 +486,7 @@ struct TaskRowView: View {
             print("DEBUG: No photo URL found for task: \(task.title)")
             thumbnailImage = nil
             fullImage = nil
+            hasPhoto = false
             return
         }
         
@@ -512,6 +504,7 @@ struct TaskRowView: View {
                     // Store the full image for the viewer
                     DispatchQueue.main.async {
                         fullImage = image
+                        hasPhoto = true
                         print("DEBUG: Set full image for task: \(task.title)")
                     }
                     
@@ -527,6 +520,7 @@ struct TaskRowView: View {
                     DispatchQueue.main.async {
                         thumbnailImage = nil
                         fullImage = nil
+                        hasPhoto = false
                     }
                 }
             } catch {
@@ -534,6 +528,7 @@ struct TaskRowView: View {
                 DispatchQueue.main.async {
                     thumbnailImage = nil
                     fullImage = nil
+                    hasPhoto = false
                 }
             }
         }
@@ -575,6 +570,7 @@ struct TaskRowView: View {
                 
                 // Update both thumbnail and full image immediately
                 fullImage = image
+                hasPhoto = true
                 image.prepareThumbnail(of: CGSize(width: 80, height: 80)) { thumbnail in
                     DispatchQueue.main.async {
                         thumbnailImage = thumbnail ?? image
