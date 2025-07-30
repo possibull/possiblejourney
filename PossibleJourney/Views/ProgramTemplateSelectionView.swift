@@ -68,8 +68,10 @@ struct ProgramTemplateSelectionView: View {
                                     print("DEBUG: Template tapped: \(template.name)")
                                     selectedTemplate = template
                                     print("DEBUG: selectedTemplate set to: \(selectedTemplate?.name ?? "nil")")
-                                    showingTemplateDetail = true
-                                    print("DEBUG: showingTemplateDetail set to: \(showingTemplateDetail)")
+                                    DispatchQueue.main.async {
+                                        showingTemplateDetail = true
+                                        print("DEBUG: showingTemplateDetail set to: \(showingTemplateDetail)")
+                                    }
                                 }
                             }
                         }
@@ -80,15 +82,24 @@ struct ProgramTemplateSelectionView: View {
             .navigationTitle("Choose Template")
             .navigationBarTitleDisplayMode(.large)
 
-            .sheet(isPresented: $showingTemplateDetail) {
+            .sheet(isPresented: $showingTemplateDetail, onDismiss: {
+                // Reset selected template when sheet is dismissed
+                selectedTemplate = nil
+            }) {
                 if let template = selectedTemplate {
                     TemplateDetailView(template: template) { program in
                         onProgramCreated(program)
                         showingTemplateDetail = false
                     }
                 } else {
-                    Text("No template selected")
+                    VStack {
+                        Text("No template selected")
+                            .padding()
+                        Button("Dismiss") {
+                            showingTemplateDetail = false
+                        }
                         .padding()
+                    }
                 }
             }
         }
