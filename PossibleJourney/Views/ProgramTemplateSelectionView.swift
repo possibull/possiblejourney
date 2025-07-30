@@ -636,10 +636,6 @@ struct TemplateCreateView: View {
                     }
                     .fontWeight(.semibold)
                 }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
             }
             .alert("Add New Task", isPresented: $showingAddTask) {
                 TextField("Task Title", text: $newTaskTitle)
@@ -766,10 +762,6 @@ struct TemplateEditView: View {
                     }
                     .fontWeight(.semibold)
                 }
-                
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
             }
             .alert("Add New Task", isPresented: $showingAddTask) {
                 TextField("Task Title", text: $newTaskTitle)
@@ -802,16 +794,24 @@ struct TaskEditRow: View {
     @Binding var task: Task
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            TextField("Task Title", text: $task.title)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
+        HStack {
+            // Drag handle
+            Image(systemName: "line.3.horizontal")
+                .font(.caption)
+                .foregroundColor(.gray)
+                .padding(.trailing, 8)
             
-            TextField("Description (Optional)", text: Binding(
-                get: { task.description ?? "" },
-                set: { task.description = $0.isEmpty ? nil : $0 }
-            ))
-            .textFieldStyle(RoundedBorderTextFieldStyle())
-            .font(.caption)
+            VStack(alignment: .leading, spacing: 8) {
+                TextField("Task Title", text: $task.title)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                
+                TextField("Description (Optional)", text: Binding(
+                    get: { task.description ?? "" },
+                    set: { task.description = $0.isEmpty ? nil : $0 }
+                ))
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .font(.caption)
+            }
         }
         .padding(.vertical, 4)
     }
