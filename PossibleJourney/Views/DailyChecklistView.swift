@@ -225,7 +225,7 @@ struct DailyChecklistView: View {
                         print("Set reminder for task: \(task.title)")
                     }
                 )
-                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                     Button("Reminder") {
                         // TODO: Implement reminder functionality
                         print("Set reminder for task: \(task.title)")
