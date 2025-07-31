@@ -563,6 +563,7 @@ struct TaskRowView: View {
     @State private var showingFullPhoto = false
     @State private var hasPhoto: Bool = false
     @State private var currentLoadingProgressID: UUID?
+    @State private var isLoadingThumbnail: Bool = false
     
     // Get the photo URL for this task
     private func photoURL(from dailyProgress: DailyProgress) -> URL? {
@@ -727,13 +728,6 @@ struct TaskRowView: View {
         }
         .id(currentDailyProgress.id) // Force view recreation when daily progress changes
 
-        .onChange(of: hasPhoto) { _, _ in
-            loadThumbnail()
-        }
-        .onChange(of: currentDailyProgress.photoURLs) { _, _ in
-            loadThumbnail()
-        }
-
         .onChange(of: isCompleted) { _, newIsCompleted in
             if !newIsCompleted {
                 // Task was unchecked - clear photo state
@@ -757,6 +751,12 @@ struct TaskRowView: View {
     }
     
     private func loadThumbnail() {
+        // Prevent multiple simultaneous loading operations
+        guard !isLoadingThumbnail else {
+            print("DEBUG: Skipping loadThumbnail for task: \(task.title) - already loading")
+            return
+        }
+        
         print("DEBUG: loadThumbnail called for task: \(task.title)")
         print("DEBUG: fullImage before loadThumbnail: \(fullImage == nil ? "nil" : "not nil")")
         print("DEBUG: currentDailyProgress photoURLs count: \(currentDailyProgress.photoURLs.count)")
@@ -764,6 +764,7 @@ struct TaskRowView: View {
         // Track which daily progress we're loading for to prevent race conditions
         let progressID = currentDailyProgress.id
         currentLoadingProgressID = progressID
+        isLoadingThumbnail = true
         
         // Clear any existing images immediately to prevent showing wrong image
         thumbnailImage = nil
@@ -792,6 +793,7 @@ struct TaskRowView: View {
                 DispatchQueue.main.async {
                     self.fullImage = image
                     self.hasPhoto = true
+                    self.isLoadingThumbnail = false
                     print("DEBUG: Set full image for task: \(self.task.title)")
                     print("DEBUG: fullImage after setting: \(self.fullImage == nil ? "nil" : "not nil")")
                 }
@@ -821,6 +823,7 @@ struct TaskRowView: View {
                     self.thumbnailImage = nil
                     self.fullImage = nil
                     self.hasPhoto = false
+                    self.isLoadingThumbnail = false
                     print("DEBUG: fullImage after clearing (failed): \(self.fullImage == nil ? "nil" : "not nil")")
                 }
                 
@@ -832,6 +835,7 @@ struct TaskRowView: View {
                         return
                     }
                     print("DEBUG: Retrying thumbnail load for task: \(self.task.title)")
+                    self.isLoadingThumbnail = false // Reset for retry
                     self.loadThumbnail()
                 }
             }
