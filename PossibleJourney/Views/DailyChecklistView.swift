@@ -486,17 +486,26 @@ struct TaskRowView: View {
                     ActionSheet(
                         title: Text(hasPhoto ? "Update Photo" : "Add Photo"),
                         message: Text("Choose how to \(hasPhoto ? "update" : "add") a photo for this task"),
-                        buttons: [
-                            .default(Text("Take Photo")) {
-                                imageSource = .camera
-                                showingImagePicker = true
-                            },
-                            .default(Text("Choose from Library")) {
+                        buttons: {
+                            var buttons: [ActionSheet.Button] = []
+                            
+                            // Only show camera option if camera is available
+                            if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                                buttons.append(.default(Text("Take Photo")) {
+                                    imageSource = .camera
+                                    showingImagePicker = true
+                                })
+                            }
+                            
+                            // Always show photo library option
+                            buttons.append(.default(Text("Choose from Library")) {
                                 imageSource = .photoLibrary
                                 showingImagePicker = true
-                            },
-                            .cancel()
-                        ]
+                            })
+                            
+                            buttons.append(.cancel())
+                            return buttons
+                        }()
                     )
                 }
             }
@@ -880,7 +889,15 @@ struct ImagePicker: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
         picker.delegate = context.coordinator
-        picker.sourceType = sourceType
+        
+        // Check if camera is available when trying to use camera
+        if sourceType == .camera && !UIImagePickerController.isSourceTypeAvailable(.camera) {
+            // Fallback to photo library if camera is not available
+            picker.sourceType = .photoLibrary
+        } else {
+            picker.sourceType = sourceType
+        }
+        
         picker.allowsEditing = true
         return picker
     }
