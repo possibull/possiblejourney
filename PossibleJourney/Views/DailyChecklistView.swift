@@ -848,10 +848,8 @@ struct TaskRowView: View {
     }
     
     private func loadImageFromURL(_ url: URL, completion: @escaping (UIImage?) -> Void) {
-        // On real devices, app directories are stable, so we can directly load from the URL
-        // On simulator, directories change between sessions, so we need fallback logic
-        #if targetEnvironment(simulator)
-        // Simulator: Try original URL first, then search other locations
+        // Always try original URL first, then search other locations if needed
+        // This handles both simulator directory changes and app upgrade path changes
         loadImageFromSpecificURL(url) { image in
             if image != nil {
                 completion(image)
@@ -860,15 +858,13 @@ struct TaskRowView: View {
             
             // If that fails, try to find the file in other possible locations
             self.findImageInOtherLocations(url) { foundImage in
+                if let foundImage = foundImage {
+                    // If we found the image in a different location, update the stored URL
+                    self.updatePhotoURLIfNeeded(oldURL: url, foundImage: foundImage)
+                }
                 completion(foundImage)
             }
         }
-        #else
-        // Real device: Direct loading should work
-        loadImageFromSpecificURL(url) { image in
-            completion(image)
-        }
-        #endif
     }
     
     private func loadImageFromSpecificURL(_ url: URL, completion: @escaping (UIImage?) -> Void) {
@@ -932,6 +928,53 @@ struct TaskRowView: View {
                 }
             }
         }
+    }
+    
+    private func updatePhotoURLIfNeeded(oldURL: URL, foundImage: UIImage) {
+        // Extract the filename from the original URL
+        let fileName = oldURL.lastPathComponent
+        
+        // Find where the image actually exists
+        let possibleDirectories = [
+            FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first,
+            FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first,
+            FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first
+        ].compactMap { $0 }
+        
+        for directory in possibleDirectories {
+            let directPath = directory.appendingPathComponent(fileName)
+            let photosPath = directory.appendingPathComponent("Photos").appendingPathComponent(fileName)
+            
+            if FileManager.default.fileExists(atPath: directPath.path) {
+                updateStoredPhotoURL(from: oldURL, to: directPath)
+                return
+            } else if FileManager.default.fileExists(atPath: photosPath.path) {
+                updateStoredPhotoURL(from: oldURL, to: photosPath)
+                return
+            }
+        }
+    }
+    
+    private func updateStoredPhotoURL(from oldURL: URL, to newURL: URL) {
+        print("DEBUG: Updating stored photo URL from \(oldURL) to \(newURL)")
+        
+        // Get the current daily progress and update the photo URL
+        let dailyProgressStorage = DailyProgressStorage()
+        let targetDate = currentDailyProgress.date
+        var currentProgress = dailyProgressStorage.load(for: targetDate) ?? currentDailyProgress
+        
+        // Find the task ID that has the old URL and update it
+        for (taskID, url) in currentProgress.photoURLs {
+            if url == oldURL {
+                currentProgress.photoURLs[taskID] = newURL
+                print("DEBUG: Updated photo URL for task ID \(taskID)")
+                break
+            }
+        }
+        
+        // Save the updated progress
+        dailyProgressStorage.save(progress: currentProgress)
+        print("DEBUG: Saved updated progress with corrected photo URL")
     }
     
     private func savePhotoForTask(image: UIImage) {
