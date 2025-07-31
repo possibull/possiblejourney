@@ -1,0 +1,143 @@
+2025-07-31 00:12:42 +0000 [MT] Initial pipeline context: <IDEDistributionProcessingPipelineContext: 0x9f52d1b00; archive(resolved)="<IDEArchive: 0x9f46b2990>", distributionTask(resolved)="2", distributionDestination(resolved)="1", distributionMethod(resolved)="<IDEDistributionMethodiOSAppStoreDistribution: 0x9f57ea350>", team(resolved)="<IDEProvisioningBasicTeam: 0x9f3c4b000; teamID='C63QY5NNJS', teamName='(null)'>">
+	Chain (15, self inclusive):
+	<IDEDistributionProcessingPipelineContext: 0x9f52d1b00; archive = "<IDEArchive: 0x9f46b2990>", distributionMethod="<IDEDistributionMethodiOSAppStoreDistribution: 0x9f57ea350>", team="<IDEProvisioningBasicTeam: 0x9f3c4b000; teamID='C63QY5NNJS', teamName='(null)'>">
+	<IDEDistributionProcessingPipelineContext: 0x9f52d1800; archive = "<IDEArchive: 0x9f46b2990>", distributionMethod="<IDEDistributionMethodiOSAppStoreDistribution: 0x9f57ea350>", team="<IDEProvisioningBasicTeam: 0x9f3c4b000; teamID='C63QY5NNJS', teamName='(null)'>">
+	<IDEDistributionContext: 0x9f3c1ad00; archive = "<IDEArchive: 0x9f46b2990>", distributionMethod="<IDEDistributionMethodiOSAppStoreDistribution: 0x9f57ea350>", team="<IDEProvisioningBasicTeam: 0x9f3c4b000; teamID='C63QY5NNJS', teamName='(null)'>">
+	<IDEDistributionContext: 0x9f3c1aa80; archive = "<IDEArchive: 0x9f46b2990>", distributionMethod="<IDEDistributionMethodiOSAppStoreDistribution: 0x9f57ea350>", team="<IDEProvisioningBasicTeam: 0x9f3c4b000; teamID='C63QY5NNJS', teamName='(null)'>">
+	<IDEDistributionContext: 0x9f3c1a800; archive = "<IDEArchive: 0x9f46b2990>", distributionMethod="<IDEDistributionMethodiOSAppStoreDistribution: 0x9f57ea350>", team="<IDEProvisioningBasicTeam: 0x9f3c4b000; teamID='C63QY5NNJS', teamName='(null)'>">
+	<IDEDistributionContext: 0x9f3c1a580; archive = "<IDEArchive: 0x9f46b2990>", distributionMethod="<IDEDistributionMethodiOSAppStoreDistribution: 0x9f57ea350>", team="<IDEProvisioningBasicTeam: 0x9f3c4b000; teamID='C63QY5NNJS', teamName='(null)'>">
+	<IDEDistributionContext: 0x9f3c1a300; archive = "<IDEArchive: 0x9f46b2990>", distributionMethod="<IDEDistributionMethodiOSAppStoreDistribution: 0x9f57ea350>", team="<IDEProvisioningBasicTeam: 0x9f3c4b000; teamID='C63QY5NNJS', teamName='(null)'>">
+	<IDEDistributionContext: 0x9f3c1a080; archive = "<IDEArchive: 0x9f46b2990>", distributionMethod="<IDEDistributionMethodiOSAppStoreDistribution: 0x9f57ea350>", team="<IDEProvisioningBasicTeam: 0x9f3c4b000; teamID='C63QY5NNJS', teamName='(null)'>">
+	<IDEDistributionContext: 0x9f3c19e00; archive = "<IDEArchive: 0x9f46b2990>", distributionMethod="<IDEDistributionMethodiOSAppStoreDistribution: 0x9f57ea350>", team="<IDEProvisioningBasicTeam: 0x9f3c4b000; teamID='C63QY5NNJS', teamName='(null)'>">
+	<IDEDistributionContext: 0x9f3c18a00; archive = "<IDEArchive: 0x9f46b2990>", distributionMethod="<IDEDistributionMethodiOSAppStoreDistribution: 0x9f57ea350>", team="<IDEProvisioningBasicTeam: 0x9f3c4b000; teamID='C63QY5NNJS', teamName='(null)'>">
+	<IDEDistributionContext: 0x9f3c18780; archive = "<IDEArchive: 0x9f46b2990>", distributionMethod="<IDEDistributionMethodiOSAppStoreDistribution: 0x9f57ea350>", team="<IDEProvisioningBasicTeam: 0x9f3c4b000; teamID='C63QY5NNJS', teamName='(null)'>">
+	<IDEDistributionContext: 0x9f3c18500; archive = "<IDEArchive: 0x9f46b2990>", distributionMethod="<IDEDistributionMethodiOSAppStoreDistribution: 0x9f57ea350>", team="<IDEProvisioningBasicTeam: 0x9f3c4b000; teamID='C63QY5NNJS', teamName='(null)'>">
+	<IDEDistributionContext: 0x9f3c18280; archive = "<IDEArchive: 0x9f46b2990>", distributionMethod="<IDEDistributionMethodiOSAppStoreDistribution: 0x9f57ea350>", team="(null)">
+	<IDEDistributionContext: 0x9f3c18000; archive = "<IDEArchive: 0x9f46b2990>", distributionMethod="<IDEDistributionMethodiOSAppStoreDistribution: 0x9f57ea350>", team="(null)">
+	<IDEDistributionContext: 0x102b3e280; archive = "<IDEArchive: 0x9f46b2990>", distributionMethod="(null)", team="(null)">
+</IDEDistributionProcessingPipelineContext: 0x9f52d1b00>
+2025-07-31 00:12:42 +0000 [MT] Processing step: IDEDistributionCreateDestRootStep
+2025-07-31 00:12:42 +0000 [MT] Processing step: IDEDistributionCopyItemStep
+2025-07-31 00:12:42 +0000 [MT] Running /usr/bin/ditto '-V' '/Users/tedpossible/Apps/PossibleJourney/PossibleJourney_new.xcarchive/Products/Applications/PossibleJourney.app' '/var/folders/lw/ppy_xvqn1sz69g_nlhjkvvbm0000gn/T/XcodeDistPipeline.~~~WGyjvJ/Root/Payload/PossibleJourney.app'
+2025-07-31 00:12:42 +0000  >>> Copying /Users/tedpossible/Apps/PossibleJourney/PossibleJourney_new.xcarchive/Products/Applications/PossibleJourney.app 
+2025-07-31 00:12:42 +0000  copying file ./_CodeSignature/CodeResources ... 
+2025-07-31 00:12:42 +0000  2775 bytes for ./_CodeSignature/CodeResources
+2025-07-31 00:12:42 +0000  copying file ./AppIcon60x60@2x.png ... 
+2025-07-31 00:12:42 +0000  5868 bytes for ./AppIcon60x60@2x.png
+2025-07-31 00:12:42 +0000  copying file ./Assets.car ... 
+2025-07-31 00:12:42 +0000  95520 bytes for ./Assets.car
+2025-07-31 00:12:42 +0000  copying file ./AppIcon76x76@2x~ipad.png ... 
+2025-07-31 00:12:42 +0000  7422 bytes for ./AppIcon76x76@2x~ipad.png
+2025-07-31 00:12:42 +0000  copying file ./embedded.mobileprovision ... 
+2025-07-31 00:12:42 +0000  12310 bytes for ./embedded.mobileprovision
+2025-07-31 00:12:42 +0000  copying file ./PossibleJourney ... 
+2025-07-31 00:12:42 +0000  841712 bytes for ./PossibleJourney
+2025-07-31 00:12:42 +0000  copying file ./Info.plist ... 
+2025-07-31 00:12:42 +0000  1444 bytes for ./Info.plist
+2025-07-31 00:12:42 +0000  copying file ./PkgInfo ... 
+2025-07-31 00:12:42 +0000  8 bytes for ./PkgInfo
+2025-07-31 00:12:42 +0000 [MT] /usr/bin/ditto exited with 0
+2025-07-31 00:12:42 +0000 [MT] Processing step: IDEDistributionEmbedProfileStep
+2025-07-31 00:12:42 +0000 [MT] Processing step: IDEDistributionInfoPlistStep
+2025-07-31 00:12:42 +0000 [MT] Skipping setting DTXcodeBuildDistribution because toolsBuildVersionName was nil.
+2025-07-31 00:12:42 +0000 [MT] Processing step: IDEDistributionItemRemovalStep
+2025-07-31 00:12:42 +0000 [MT] Processing step: IDEDistributionAppThinningPlistStep
+2025-07-31 00:12:42 +0000 [MT] Skipping step: IDEDistributionAppThinningPlistStep because it said so
+2025-07-31 00:12:42 +0000 [MT] Processing step: IDEDistributionSymbolsStep
+2025-07-31 00:12:42 +0000 [MT] Writing /var/folders/lw/ppy_xvqn1sz69g_nlhjkvvbm0000gn/T/XcodeDistPipeline.~~~WGyjvJ/Symbols/3F6017A4-97D4-301F-89D8-0B9F98CC0D94.symbols
+2025-07-31 00:12:42 +0000 [MT] Processing step: IDEDistributionCopyAppleProvidedContentStep
+2025-07-31 00:12:42 +0000 [MT] Processing step: IDEDistributionAppThinningStep
+2025-07-31 00:12:42 +0000 [MT] Skipping step: IDEDistributionAppThinningStep because it said so
+2025-07-31 00:12:42 +0000 [MT] Processing step: IDEDistributionArchThinningStep
+2025-07-31 00:12:42 +0000 [MT] Item /Users/tedpossible/Apps/PossibleJourney/PossibleJourney_new.xcarchive/Products/Applications/PossibleJourney.app doesn't have the entitlement com.apple.developer.web-browser-engine.host enabled, returning ["arm64e"]
+2025-07-31 00:12:42 +0000 [MT] Archs to thin for item /Users/tedpossible/Apps/PossibleJourney/PossibleJourney_new.xcarchive/Products/Applications/PossibleJourney.app are ["arm64e"]
+2025-07-31 00:12:42 +0000 [MT] Running /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/lipo '/var/folders/lw/ppy_xvqn1sz69g_nlhjkvvbm0000gn/T/XcodeDistPipeline.~~~WGyjvJ/Root/Payload/PossibleJourney.app/PossibleJourney' '-verify_arch' 'arm64e'
+2025-07-31 00:12:42 +0000 [MT] /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/lipo exited with 1
+2025-07-31 00:12:42 +0000 [MT] Skipping architecture thinning for item "PossibleJourney" because arch "arm64e" wasn't found
+2025-07-31 00:12:42 +0000 [MT] Processing step: IDEDistributionODRStep
+2025-07-31 00:12:42 +0000 [MT] Processing step: IDEDistributionStripXattrsStep
+2025-07-31 00:12:42 +0000 [MT] Skipping stripping extended attributes because the codesign step will strip them.
+2025-07-31 00:12:42 +0000 [MT] Processing step: IDEDistributionCodesignStep
+2025-07-31 00:12:42 +0000 [MT] Entitlements for <IDEDistributionItem: 0x9f51c8c00; bundleID='com.mrpossible.PossibleJourney', path='<DVTFilePath:0x9f46b2a00:'/Users/tedpossible/Apps/PossibleJourney/PossibleJourney_new.xcarchive/Products/Applications/PossibleJourney.app'>', codeSigningInfo='<_DVTCodeSigningInformation_Path: 0x9f6284300; isSigned='1', isAdHocSigned='0', signingCertificate='<DVTSigningCertificate: 0x9f4bdb0c0; name='Apple Development: ted@mrpossible.com (PR9MUWNQDU)', hash='FA7FB5D55D4166727EC54FFFE9BBBC9EF677A458', serialNumber='5FB13C9CC2CD6C208F46C634F9B2974', certificateKinds='(
+    "1.2.840.113635.100.6.1.12",
+    "1.2.840.113635.100.6.1.2"
+), issueDate='2025-07-29 23:15:46 +0000''>', entitlements='{
+    "application-identifier" = "C63QY5NNJS.com.mrpossible.PossibleJourney";
+    "com.apple.developer.team-identifier" = C63QY5NNJS;
+    "get-task-allow" = 1;
+}', teamID='C63QY5NNJS', identifier='com.mrpossible.PossibleJourney', executablePath='<DVTFilePath:0x9f56f2a60:'/Users/tedpossible/Apps/PossibleJourney/PossibleJourney_new.xcarchive/Products/Applications/PossibleJourney.app/PossibleJourney'>', hardenedRuntime='0'>'>: {
+    "application-identifier" = "C63QY5NNJS.com.mrpossible.PossibleJourney";
+    "beta-reports-active" = 1;
+    "com.apple.developer.team-identifier" = C63QY5NNJS;
+    "get-task-allow" = 0;
+}
+2025-07-31 00:12:42 +0000 [MT] Associated App Clip Identifiers Filter: Skipping because "com.apple.developer.associated-appclip-app-identifiers" is not present
+2025-07-31 00:12:42 +0000 [MT] Entitlements for <IDEDistributionItem: 0x9f51c8c00; bundleID='com.mrpossible.PossibleJourney', path='<DVTFilePath:0x9f46b2a00:'/Users/tedpossible/Apps/PossibleJourney/PossibleJourney_new.xcarchive/Products/Applications/PossibleJourney.app'>', codeSigningInfo='<_DVTCodeSigningInformation_Path: 0x9f6284300; isSigned='1', isAdHocSigned='0', signingCertificate='<DVTSigningCertificate: 0x9f4bdaac0; name='Apple Development: ted@mrpossible.com (PR9MUWNQDU)', hash='FA7FB5D55D4166727EC54FFFE9BBBC9EF677A458', serialNumber='5FB13C9CC2CD6C208F46C634F9B2974', certificateKinds='(
+    "1.2.840.113635.100.6.1.12",
+    "1.2.840.113635.100.6.1.2"
+), issueDate='2025-07-29 23:15:46 +0000''>', entitlements='{
+    "application-identifier" = "C63QY5NNJS.com.mrpossible.PossibleJourney";
+    "com.apple.developer.team-identifier" = C63QY5NNJS;
+    "get-task-allow" = 1;
+}', teamID='C63QY5NNJS', identifier='com.mrpossible.PossibleJourney', executablePath='<DVTFilePath:0x9f56f2a60:'/Users/tedpossible/Apps/PossibleJourney/PossibleJourney_new.xcarchive/Products/Applications/PossibleJourney.app/PossibleJourney'>', hardenedRuntime='0'>'> are: {
+    "application-identifier" = "C63QY5NNJS.com.mrpossible.PossibleJourney";
+    "beta-reports-active" = 1;
+    "com.apple.developer.team-identifier" = C63QY5NNJS;
+    "get-task-allow" = 0;
+}
+2025-07-31 00:12:42 +0000 [MT] Writing entitlements for <IDEDistributionItem: 0x9f51c8c00; bundleID='com.mrpossible.PossibleJourney', path='<DVTFilePath:0x9f46b2a00:'/Users/tedpossible/Apps/PossibleJourney/PossibleJourney_new.xcarchive/Products/Applications/PossibleJourney.app'>', codeSigningInfo='<_DVTCodeSigningInformation_Path: 0x9f6284300; isSigned='1', isAdHocSigned='0', signingCertificate='<DVTSigningCertificate: 0x9f4bdaac0; name='Apple Development: ted@mrpossible.com (PR9MUWNQDU)', hash='FA7FB5D55D4166727EC54FFFE9BBBC9EF677A458', serialNumber='5FB13C9CC2CD6C208F46C634F9B2974', certificateKinds='(
+    "1.2.840.113635.100.6.1.12",
+    "1.2.840.113635.100.6.1.2"
+), issueDate='2025-07-29 23:15:46 +0000''>', entitlements='{
+    "application-identifier" = "C63QY5NNJS.com.mrpossible.PossibleJourney";
+    "com.apple.developer.team-identifier" = C63QY5NNJS;
+    "get-task-allow" = 1;
+}', teamID='C63QY5NNJS', identifier='com.mrpossible.PossibleJourney', executablePath='<DVTFilePath:0x9f56f2a60:'/Users/tedpossible/Apps/PossibleJourney/PossibleJourney_new.xcarchive/Products/Applications/PossibleJourney.app/PossibleJourney'>', hardenedRuntime='0'>'> to: /var/folders/lw/ppy_xvqn1sz69g_nlhjkvvbm0000gn/T/XcodeDistPipeline.~~~WGyjvJ/entitlements~~~A5eLLs
+2025-07-31 00:12:42 +0000 [MT] invoking codesign: <NSConcreteTask: 0x9f3f25e50; launchPath='/usr/bin/codesign', arguments='(
+    "-f",
+    "-s",
+    4F28F9342FA92ED076F844E127028F5118E970F8,
+    "--entitlements",
+    "/var/folders/lw/ppy_xvqn1sz69g_nlhjkvvbm0000gn/T/XcodeDistPipeline.~~~WGyjvJ/entitlements~~~A5eLLs",
+    "--preserve-metadata=identifier,flags,runtime",
+    "--generate-entitlement-der",
+    "--strip-disallowed-xattrs",
+    "-vvv",
+    "/var/folders/lw/ppy_xvqn1sz69g_nlhjkvvbm0000gn/T/XcodeDistPipeline.~~~WGyjvJ/Root/Payload/PossibleJourney.app"
+)'>
+2025-07-31 00:12:42 +0000 [MT] codesign output: /var/folders/lw/ppy_xvqn1sz69g_nlhjkvvbm0000gn/T/XcodeDistPipeline.~~~WGyjvJ/Root/Payload/PossibleJourney.app: replacing existing signature
+/var/folders/lw/ppy_xvqn1sz69g_nlhjkvvbm0000gn/T/XcodeDistPipeline.~~~WGyjvJ/Root/Payload/PossibleJourney.app: signed app bundle with Mach-O thin (arm64) [com.mrpossible.PossibleJourney]
+2025-07-31 00:12:42 +0000 [MT] Processing step: IDEDistributionZipODRItemStep
+2025-07-31 00:12:42 +0000 [MT] Skipping step: IDEDistributionZipODRItemStep because it said so
+2025-07-31 00:12:42 +0000 [MT] Processing step: IDEDistributionCreateIPAStep
+2025-07-31 00:12:42 +0000 [MT] Running /usr/bin/rsync '-8aPhhE' '/var/folders/lw/ppy_xvqn1sz69g_nlhjkvvbm0000gn/T/XcodeDistPipeline.~~~WGyjvJ/Symbols' '--link-dest' '/var/folders/lw/ppy_xvqn1sz69g_nlhjkvvbm0000gn/T/XcodeDistPipeline.~~~WGyjvJ' '/var/folders/lw/ppy_xvqn1sz69g_nlhjkvvbm0000gn/T/XcodeDistPipeline.~~~WGyjvJ/Root'
+2025-07-31 00:12:42 +0000  Symbols/
+Symbols/3F6017A4-97D4-301F-89D8-0B9F98CC0D94.symbols
+2025-07-31 00:12:42 +0000 [MT] /usr/bin/rsync exited with 0
+2025-07-31 00:12:42 +0000 [MT] Running /usr/bin/ditto '-V' '-c' '-k' '--norsrc' '/var/folders/lw/ppy_xvqn1sz69g_nlhjkvvbm0000gn/T/XcodeDistPipeline.~~~WGyjvJ/Root' '/var/folders/lw/ppy_xvqn1sz69g_nlhjkvvbm0000gn/T/XcodeDistPipeline.~~~WGyjvJ/Packages/PossibleJourney.ipa'
+2025-07-31 00:12:42 +0000  >>> Copying /var/folders/lw/ppy_xvqn1sz69g_nlhjkvvbm0000gn/T/XcodeDistPipeline.~~~WGyjvJ/Root 
+2025-07-31 00:12:42 +0000  copying file ./Payload/PossibleJourney.app/_CodeSignature/CodeResources ... 
+2025-07-31 00:12:42 +0000  2775 bytes for ./Payload/PossibleJourney.app/_CodeSignature/CodeResources
+2025-07-31 00:12:42 +0000  copying file ./Payload/PossibleJourney.app/AppIcon60x60@2x.png ... 
+2025-07-31 00:12:42 +0000  5868 bytes for ./Payload/PossibleJourney.app/AppIcon60x60@2x.png
+2025-07-31 00:12:42 +0000  copying file ./Payload/PossibleJourney.app/Assets.car ... 
+2025-07-31 00:12:42 +0000  95520 bytes for ./Payload/PossibleJourney.app/Assets.car
+2025-07-31 00:12:42 +0000  copying file ./Payload/PossibleJourney.app/AppIcon76x76@2x~ipad.png ... 
+2025-07-31 00:12:42 +0000  7422 bytes for ./Payload/PossibleJourney.app/AppIcon76x76@2x~ipad.png
+2025-07-31 00:12:42 +0000  copying file ./Payload/PossibleJourney.app/embedded.mobileprovision ... 
+2025-07-31 00:12:42 +0000  14383 bytes for ./Payload/PossibleJourney.app/embedded.mobileprovision
+2025-07-31 00:12:42 +0000  copying file ./Payload/PossibleJourney.app/PossibleJourney ... 
+2025-07-31 00:12:42 +0000  841776 bytes for ./Payload/PossibleJourney.app/PossibleJourney
+2025-07-31 00:12:42 +0000  copying file ./Payload/PossibleJourney.app/Info.plist ... 
+1444 bytes for ./Payload/PossibleJourney.app/Info.plist
+2025-07-31 00:12:42 +0000  copying file ./Payload/PossibleJourney.app/PkgInfo ... 
+2025-07-31 00:12:42 +0000  8 bytes for ./Payload/PossibleJourney.app/PkgInfo
+2025-07-31 00:12:42 +0000  copying file ./Symbols/3F6017A4-97D4-301F-89D8-0B9F98CC0D94.symbols ... 
+2025-07-31 00:12:42 +0000  2114180 bytes for ./Symbols/3F6017A4-97D4-301F-89D8-0B9F98CC0D94.symbols
+2025-07-31 00:12:42 +0000 [MT] /usr/bin/ditto exited with 0
+2025-07-31 00:12:42 +0000 [MT] Processing step: IDEDistributionAppStoreInformationStep
+2025-07-31 00:12:42 +0000 [MT] Skipping step: IDEDistributionAppStoreInformationStep because it said so
+2025-07-31 00:12:42 +0000 [MT] Processing step: IDEDistributionGenerateProcessedDistributionItems
+2025-07-31 00:12:42 +0000 [MT] IDEDistributionItem init <DVTFilePath:0x9f3e6a8b0:'/var/folders/lw/ppy_xvqn1sz69g_nlhjkvvbm0000gn/T/XcodeDistPipeline.~~~WGyjvJ/Root/Payload/PossibleJourney.app'>
+2025-07-31 00:12:42 +0000 [MT] Processing step: IDEDistributionCreateManifestStep
+2025-07-31 00:12:42 +0000 [MT] Skipping step: IDEDistributionCreateManifestStep because it said so
