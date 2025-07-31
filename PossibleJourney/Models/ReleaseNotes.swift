@@ -61,7 +61,7 @@ struct ReleaseNotes {
             ),
             ReleaseNotes(
                 version: "1.3",
-                buildNumber: 16,
+                buildNumber: 17,
                 title: "Release Notes Always Show on Upgrade",
                 notes: [
                     "📝 Release notes now always display on every app upgrade",
