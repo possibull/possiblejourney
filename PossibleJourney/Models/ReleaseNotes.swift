@@ -8,7 +8,24 @@ struct ReleaseNotes {
     let date: Date
     
     static let allReleaseNotes: [ReleaseNotes] = [
-                    ReleaseNotes(
+            ReleaseNotes(
+                version: "1.4",
+                buildNumber: 1,
+                title: "Polished Modern UI Design",
+                notes: [
+                    "🎨 Complete UI redesign with modern, polished aesthetics",
+                    "✨ Beautiful animated splash screen with gradient backgrounds",
+                    "📱 Modern card-based design for all views and components",
+                    "🎯 Enhanced task rows with smooth animations and better typography",
+                    "🔧 Redesigned Settings view with elegant card layouts",
+                    "⚡ Smooth spring animations and micro-interactions throughout",
+                    "🎨 Consistent design system with rounded corners and shadows",
+                    "📱 Improved visual hierarchy and spacing for better usability",
+                    "🚀 Ready for TestFlight distribution with stunning new design"
+                ],
+                date: Date()
+            ),
+            ReleaseNotes(
                 version: "1.3",
                 buildNumber: 11,
                 title: "Enhanced UI & Improved User Experience",

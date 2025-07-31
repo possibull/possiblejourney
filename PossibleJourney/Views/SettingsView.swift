@@ -17,92 +17,234 @@ struct SettingsView: View {
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 24) {
-                    // Header
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Settings")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
-                        
-                        Text("Customize your program experience")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal)
-                    .padding(.top, 8)
-                    
-                    // Settings Form
-                    VStack(spacing: 0) {
-                    Section {
-                        HStack {
-                            Image(systemName: "clock.fill")
-                                .foregroundColor(.blue)
-                                .font(.title2)
+            ZStack {
+                // Modern gradient background
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color(.systemBackground),
+                        Color.blue.opacity(0.05),
+                        Color.purple.opacity(0.03)
+                    ]),
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(spacing: 32) {
+                        // Modern header with gradient
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Settings")
+                                .font(.system(size: 36, weight: .bold, design: .rounded))
+                                .foregroundColor(.primary)
+                                .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
                             
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("End of Day Time")
-                                    .font(.headline)
-                                    .foregroundColor(.primary)
-                                Text("When your daily tasks reset")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            
-                            Spacer()
+                            Text("Customize your program experience")
+                                .font(.system(size: 18, weight: .medium, design: .rounded))
+                                .foregroundColor(.secondary)
                         }
-                        .padding(.vertical, 4)
-                        
-                        DatePicker("End of Day Time", selection: $endOfDayTime, displayedComponents: .hourAndMinute)
-                            .datePickerStyle(CompactDatePickerStyle())
-                            .accessibilityIdentifier("EndOfDayTimePicker")
-                            .onChange(of: endOfDayTime) { oldValue, newValue in
-                                let calendar = Calendar.current
-                                let comps = calendar.dateComponents([.hour, .minute], from: newValue)
-                                // Always use today's date for storage
-                                endOfDayTime = calendar.date(bySettingHour: comps.hour ?? 0, minute: comps.minute ?? 0, second: 0, of: Date()) ?? newValue
-                            }
-                    } header: {
-                        Text("Program Settings")
-                            .font(.headline)
-                            .foregroundColor(.blue)
-                            .textCase(.uppercase)
-                            .fontWeight(.semibold)
-                    }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 20)
+                        .padding(.top, 20)
                     
-                    Section {
-                        HStack {
-                            Image(systemName: "ladybug.fill")
-                                .foregroundColor(.orange)
-                                .font(.title2)
-                            
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Debug Mode")
-                                    .font(.headline)
-                                    .foregroundColor(.primary)
-                                Text("Show additional information for testing")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            
-                            Spacer()
-                            
-                            Toggle("", isOn: $debugState.debug)
-                                .accessibilityIdentifier("DebugToggle")
-                                .onChange(of: debugState.debug) { oldValue, newValue in
-                                    print("DEBUG TOGGLE: \(newValue)")
+                    // Modern Settings Cards
+                    VStack(spacing: 20) {
+                        // Program Settings Card
+                        VStack(alignment: .leading, spacing: 20) {
+                            // Card Header
+                            HStack {
+                                Image(systemName: "gear")
+                                    .font(.system(size: 20, weight: .semibold))
+                                    .foregroundColor(.blue)
+                                    .frame(width: 40, height: 40)
+                                    .background(
+                                        Circle()
+                                            .fill(Color.blue.opacity(0.1))
+                                    )
+                                
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Program Settings")
+                                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                                        .foregroundColor(.primary)
+                                    Text("Configure your daily routine")
+                                        .font(.system(size: 14, weight: .medium, design: .rounded))
+                                        .foregroundColor(.secondary)
                                 }
+                                
+                                Spacer()
+                            }
+                            
+                            // End of Day Time Setting
+                            VStack(spacing: 16) {
+                                HStack {
+                                    Image(systemName: "clock.fill")
+                                        .font(.system(size: 16, weight: .medium))
+                                        .foregroundColor(.blue)
+                                        .frame(width: 32, height: 32)
+                                        .background(
+                                            Circle()
+                                                .fill(Color.blue.opacity(0.1))
+                                        )
+                                    
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("End of Day Time")
+                                            .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                            .foregroundColor(.primary)
+                                        Text("When your daily tasks reset")
+                                            .font(.system(size: 14, weight: .regular, design: .rounded))
+                                            .foregroundColor(.secondary)
+                                    }
+                                    
+                                    Spacer()
+                                }
+                                
+                                DatePicker("End of Day Time", selection: $endOfDayTime, displayedComponents: .hourAndMinute)
+                                    .datePickerStyle(CompactDatePickerStyle())
+                                    .accessibilityIdentifier("EndOfDayTimePicker")
+                                    .onChange(of: endOfDayTime) { oldValue, newValue in
+                                        let calendar = Calendar.current
+                                        let comps = calendar.dateComponents([.hour, .minute], from: newValue)
+                                        // Always use today's date for storage
+                                        endOfDayTime = calendar.date(bySettingHour: comps.hour ?? 0, minute: comps.minute ?? 0, second: 0, of: Date()) ?? newValue
+                                    }
+                            }
                         }
-                        .padding(.vertical, 4)
-                    } header: {
-                        Text("Development")
-                            .font(.headline)
-                            .foregroundColor(.orange)
-                            .textCase(.uppercase)
-                            .fontWeight(.semibold)
-                    }
+                        .padding(20)
+                        .background(
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(Color(.systemBackground))
+                                .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 5)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(Color.gray.opacity(0.1), lineWidth: 1)
+                        )
+                    
+                        // Development Settings Card
+                        VStack(alignment: .leading, spacing: 20) {
+                            // Card Header
+                            HStack {
+                                Image(systemName: "ladybug.fill")
+                                    .font(.system(size: 20, weight: .semibold))
+                                    .foregroundColor(.orange)
+                                    .frame(width: 40, height: 40)
+                                    .background(
+                                        Circle()
+                                            .fill(Color.orange.opacity(0.1))
+                                    )
+                                
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Development")
+                                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                                        .foregroundColor(.primary)
+                                    Text("Advanced settings for testing")
+                                        .font(.system(size: 14, weight: .medium, design: .rounded))
+                                        .foregroundColor(.secondary)
+                                }
+                                
+                                Spacer()
+                            }
+                            
+                            // Debug Mode Setting
+                            HStack {
+                                Image(systemName: "ladybug.fill")
+                                    .font(.system(size: 16, weight: .medium))
+                                    .foregroundColor(.orange)
+                                    .frame(width: 32, height: 32)
+                                    .background(
+                                        Circle()
+                                            .fill(Color.orange.opacity(0.1))
+                                    )
+                                
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Debug Mode")
+                                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                        .foregroundColor(.primary)
+                                    Text("Show additional information for testing")
+                                        .font(.system(size: 14, weight: .regular, design: .rounded))
+                                        .foregroundColor(.secondary)
+                                }
+                                
+                                Spacer()
+                                
+                                Toggle("", isOn: $debugState.debug)
+                                    .accessibilityIdentifier("DebugToggle")
+                                    .onChange(of: debugState.debug) { oldValue, newValue in
+                                        print("DEBUG TOGGLE: \(newValue)")
+                                    }
+                            }
+                        }
+                        .padding(20)
+                        .background(
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(Color(.systemBackground))
+                                .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 5)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(Color.gray.opacity(0.1), lineWidth: 1)
+                        )
+                        
+                        // App Information Card
+                        VStack(alignment: .leading, spacing: 20) {
+                            // Card Header
+                            HStack {
+                                Image(systemName: "info.circle.fill")
+                                    .font(.system(size: 20, weight: .semibold))
+                                    .foregroundColor(.blue)
+                                    .frame(width: 40, height: 40)
+                                    .background(
+                                        Circle()
+                                            .fill(Color.blue.opacity(0.1))
+                                    )
+                                
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("App Information")
+                                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                                        .foregroundColor(.primary)
+                                    Text("Version and build details")
+                                        .font(.system(size: 14, weight: .medium, design: .rounded))
+                                        .foregroundColor(.secondary)
+                                }
+                                
+                                Spacer()
+                            }
+                            
+                            // Version Information
+                            HStack {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    HStack {
+                                        Text("App Version")
+                                            .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                            .foregroundColor(.primary)
+                                        Spacer()
+                                        Text("\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "N/A")")
+                                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                                            .foregroundColor(.blue)
+                                    }
+                                    
+                                    HStack {
+                                        Text("Build Number")
+                                            .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                            .foregroundColor(.primary)
+                                        Spacer()
+                                        Text("\(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "N/A")")
+                                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                                            .foregroundColor(.blue)
+                                    }
+                                }
+                            }
+                        }
+                        .padding(20)
+                        .background(
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(Color(.systemBackground))
+                                .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 5)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(Color.gray.opacity(0.1), lineWidth: 1)
+                        )
                     
                     Section {
                         HStack {
@@ -146,47 +288,87 @@ struct SettingsView: View {
                     .cornerRadius(12)
                     .padding(.horizontal)
                     
-                    // Reset Button Section
-                    VStack(spacing: 16) {
-                        Button(action: {
-                            // Clear all program data
-                            ProgramStorage().clear()
-                            DailyProgressStorage().clearAll()
-                            
-                            // Clear the program from app state to trigger navigation back to template selection
-                            appState.loadedProgram = nil
-                            
-                            // Reset end of day time to default
-                            endOfDayTime = Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22) // Default 10pm
-                            
-                            // Call the onReset callback if provided
-                            onReset?()
-                            
-                            // Dismiss the settings sheet
-                            presentationMode.wrappedValue.dismiss()
-                        }) {
-                            HStack(spacing: 8) {
-                                Image(systemName: "arrow.clockwise")
-                                    .font(.title3)
-                                Text("Reset Program")
-                                    .font(.headline)
-                                    .fontWeight(.semibold)
+                        // Reset Program Card
+                        VStack(alignment: .leading, spacing: 20) {
+                            // Card Header
+                            HStack {
+                                Image(systemName: "exclamationmark.triangle.fill")
+                                    .font(.system(size: 20, weight: .semibold))
+                                    .foregroundColor(.red)
+                                    .frame(width: 40, height: 40)
+                                    .background(
+                                        Circle()
+                                            .fill(Color.red.opacity(0.1))
+                                    )
+                                
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Reset Program")
+                                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                                        .foregroundColor(.primary)
+                                    Text("Start fresh with a new program")
+                                        .font(.system(size: 14, weight: .medium, design: .rounded))
+                                        .foregroundColor(.secondary)
+                                }
+                                
+                                Spacer()
                             }
-                            .foregroundColor(.white)
-                            .padding(.vertical, 16)
-                            .frame(maxWidth: .infinity)
-                            .background(Color.red)
-                            .cornerRadius(12)
+                            
+                            // Warning text
+                            Text("This will permanently delete all your current program data and progress. This action cannot be undone.")
+                                .font(.system(size: 14, weight: .regular, design: .rounded))
+                                .foregroundColor(.secondary)
+                                .padding(.vertical, 8)
+                            
+                            // Reset Button
+                            Button(action: {
+                                // Clear all program data
+                                ProgramStorage().clear()
+                                DailyProgressStorage().clearAll()
+                                
+                                // Clear the program from app state to trigger navigation back to template selection
+                                appState.loadedProgram = nil
+                                
+                                // Reset end of day time to default
+                                endOfDayTime = Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22) // Default 10pm
+                                
+                                // Call the onReset callback if provided
+                                onReset?()
+                                
+                                // Dismiss the settings view
+                                presentationMode.wrappedValue.dismiss()
+                            }) {
+                                HStack(spacing: 12) {
+                                    Image(systemName: "arrow.clockwise")
+                                        .font(.system(size: 16, weight: .semibold))
+                                    Text("Reset Program")
+                                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                                }
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [Color.red, Color.red.opacity(0.8)]),
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .cornerRadius(16)
+                                .shadow(color: .red.opacity(0.3), radius: 8, x: 0, y: 4)
+                            }
+                            .accessibilityIdentifier("ResetProgramButton")
                         }
-                        .padding(.horizontal)
-                        
-                        Text("This will clear all your progress and start fresh")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
-                    }
-                    .padding(.bottom, 32)
+                        .padding(20)
+                        .background(
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(Color(.systemBackground))
+                                .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 5)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 20)
+                                .stroke(Color.red.opacity(0.2), lineWidth: 1)
+                        )
+                        .padding(.bottom, 32)
                 }
                 .padding(.horizontal)
             }

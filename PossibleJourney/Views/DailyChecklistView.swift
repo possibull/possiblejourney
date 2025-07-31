@@ -89,9 +89,17 @@ struct DailyChecklistView: View {
     
     var body: some View {
         ZStack {
-            // Light background
-            Color(.systemBackground)
-                .ignoresSafeArea()
+            // Modern gradient background
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color(.systemBackground),
+                    Color.blue.opacity(0.05),
+                    Color.purple.opacity(0.03)
+                ]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
             
             VStack(spacing: 0) {
                 // Update notification at the top
@@ -565,11 +573,11 @@ struct DailyChecklistView: View {
 struct TaskRowView: View {
     let task: Task
     let isCompleted: Bool
-    let currentDailyProgress: DailyProgress // Add current daily progress
+    let currentDailyProgress: DailyProgress
     let onToggle: () -> Void
     let onSetReminder: () -> Void
-    let onUpdateDailyProgress: (DailyProgress) -> Void // Add callback for updating daily progress
-    let onPhotoRemoved: () -> Void // Add callback for clearing photo state
+    let onUpdateDailyProgress: (DailyProgress) -> Void
+    let onPhotoRemoved: () -> Void
     @State private var showingPhotoPicker = false
     @State private var showingImagePicker = false
     @State private var selectedImage: UIImage?
@@ -580,6 +588,8 @@ struct TaskRowView: View {
     @State private var hasPhoto: Bool = false
     @State private var currentLoadingProgressID: UUID?
     @State private var isLoadingThumbnail: Bool = false
+    @State private var cardScale: CGFloat = 1.0
+    @State private var checkboxScale: CGFloat = 1.0
     
     // Get the photo URL for this task
     private func photoURL(from dailyProgress: DailyProgress) -> URL? {
@@ -595,109 +605,191 @@ struct TaskRowView: View {
     }
     
     var body: some View {
-        HStack(spacing: 12) {
-            // Drag handle
-            Image(systemName: "line.3.horizontal")
-                .font(.caption)
-                .foregroundColor(.gray)
-                .padding(.trailing, 4)
-            
-            // Checkbox
-            Button(action: {
-                handleCheckboxTap()
-            }) {
-                Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
-                    .font(.title2)
-                    .foregroundColor(isCompleted ? .blue : .gray)
-            }
-            .buttonStyle(PlainButtonStyle())
-            
-            // Task content with better layout for thumbnails
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(alignment: .top, spacing: 8) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        HStack {
-                                                        HStack(spacing: 4) {
-                                Text(task.title)
-                                    .font(.body)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(.primary)
-                                    .strikethrough(isCompleted)
-                                    .multilineTextAlignment(.leading)
-                                    .lineLimit(2) // Limit title to 2 lines
-                                
-                                // Small photo indicator for tasks that have photos
-                                if task.requiresPhoto && hasPhoto {
-                                    Image(systemName: "photo.fill")
-                                        .font(.caption2)
-                                        .foregroundColor(.green)
-                                }
-                            }
+        VStack(spacing: 0) {
+            // Modern card design
+            HStack(spacing: 16) {
+                // Modern checkbox with animation
+                Button(action: {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                        checkboxScale = 0.8
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                            checkboxScale = 1.0
                         }
+                        handleCheckboxTap()
+                    }
+                }) {
+                    ZStack {
+                        Circle()
+                            .fill(isCompleted ? Color.blue : Color.clear)
+                            .frame(width: 28, height: 28)
+                            .overlay(
+                                Circle()
+                                    .stroke(isCompleted ? Color.blue : Color.gray.opacity(0.4), lineWidth: 2)
+                            )
                         
-                        if let description = task.description, !description.isEmpty {
-                            Text(description)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .strikethrough(isCompleted)
-                                .multilineTextAlignment(.leading)
-                                .lineLimit(2) // Limit description to 2 lines
+                        if isCompleted {
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(.white)
                         }
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .buttonStyle(PlainButtonStyle())
+                .scaleEffect(checkboxScale)
+                
+                // Task content
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(alignment: .top, spacing: 12) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            // Task title with modern typography
+                            Text(task.title)
+                                .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                .foregroundColor(isCompleted ? .secondary : .primary)
+                                .strikethrough(isCompleted)
+                                .multilineTextAlignment(.leading)
+                                .lineLimit(2)
+                            
+                            // Task description
+                            if let description = task.description, !description.isEmpty {
+                                Text(description)
+                                    .font(.system(size: 14, weight: .regular, design: .rounded))
+                                    .foregroundColor(.secondary)
+                                    .strikethrough(isCompleted)
+                                    .multilineTextAlignment(.leading)
+                                    .lineLimit(2)
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        
+                        // Photo thumbnail with modern design
+                        if let thumbnail = thumbnailImage {
+                            Button(action: {
+                                showingFullPhoto = true
+                            }) {
+                                Image(uiImage: thumbnail)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 60, height: 60)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                                    )
+                                    .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                    }
                     
-                    // Photo thumbnail (if photo exists) - positioned to the right
-                    if let thumbnail = thumbnailImage {
-                        Button(action: {
-                            showingFullPhoto = true
-                        }) {
-                            Image(uiImage: thumbnail)
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                                .frame(width: 50, height: 50) // Slightly smaller for better fit
-                                .clipShape(RoundedRectangle(cornerRadius: 6))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 6)
-                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                    // Action buttons row
+                    HStack(spacing: 12) {
+                        // Photo button for tasks that require photos
+                        if task.requiresPhoto && !hasPhoto {
+                            Button(action: {
+                                showingPhotoPicker = true
+                            }) {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "camera")
+                                        .font(.system(size: 12, weight: .medium))
+                                    Text("Add Photo")
+                                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                                }
+                                .foregroundColor(.blue)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(Color.blue.opacity(0.1))
+                                )
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                        
+                        // Photo indicator for tasks with photos
+                        if task.requiresPhoto && hasPhoto {
+                            HStack(spacing: 4) {
+                                Image(systemName: "photo.fill")
+                                    .font(.system(size: 12, weight: .medium))
+                                Text("Photo Added")
+                                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                            }
+                            .foregroundColor(.green)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color.green.opacity(0.1))
+                            )
+                        }
+                        
+                        Spacer()
+                        
+                        // Reminder button
+                        Button(action: onSetReminder) {
+                            Image(systemName: "bell")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.orange)
+                                .padding(8)
+                                .background(
+                                    Circle()
+                                        .fill(Color.orange.opacity(0.1))
                                 )
                         }
                         .buttonStyle(PlainButtonStyle())
                     }
                 }
             }
-            
-            // Photo button for tasks that require photos (minimal design)
-            if task.requiresPhoto && !hasPhoto {
-                Button(action: {
-                    showingPhotoPicker = true
-                }) {
-                    Image(systemName: "camera")
-                        .font(.caption)
-                        .foregroundColor(.blue)
+            .padding(16)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color(.systemBackground))
+                    .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(
+                        isCompleted ? Color.green.opacity(0.3) : Color.gray.opacity(0.1),
+                        lineWidth: 1
+                    )
+            )
+            .scaleEffect(cardScale)
+            .onTapGesture {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                    cardScale = 0.98
                 }
-                .buttonStyle(PlainButtonStyle())
-                .actionSheet(isPresented: $showingPhotoPicker) {
-                    ActionSheet(
-                        title: Text("Add Photo"),
-                        message: Text("Choose how to add a photo for this task"),
-                        buttons: {
-                            var buttons: [ActionSheet.Button] = []
-                            
-                            // Only show camera option if camera is available
-                            if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                                buttons.append(.default(Text("Take Photo")) {
-                                    imageSource = .camera
-                                    showingImagePicker = true
-                                })
-                            }
-                            
-                            // Always show photo library option
-                            buttons.append(.default(Text("Choose from Library")) {
-                                imageSource = .photoLibrary
-                                showingImagePicker = true
-                            })
-                            
-                            buttons.append(.cancel())
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                        cardScale = 1.0
+                    }
+                }
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .actionSheet(isPresented: $showingPhotoPicker) {
+            ActionSheet(
+                title: Text("Add Photo"),
+                message: Text("Choose how to add a photo for this task"),
+                buttons: {
+                    var buttons: [ActionSheet.Button] = []
+                    
+                    // Only show camera option if camera is available
+                    if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                        buttons.append(.default(Text("Take Photo")) {
+                            imageSource = .camera
+                            showingImagePicker = true
+                        })
+                    }
+                    
+                    // Always show photo library option
+                    buttons.append(.default(Text("Choose from Library")) {
+                        imageSource = .photoLibrary
+                        showingImagePicker = true
+                    })
+                    
+                    buttons.append(.cancel())
                             return buttons
                         }()
                     )
