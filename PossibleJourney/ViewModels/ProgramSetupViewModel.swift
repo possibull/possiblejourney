@@ -148,7 +148,7 @@ class DailyChecklistViewModel: ObservableObject {
         self.program = program
         self.dailyProgress = dailyProgress
         self.now = now
-        // Use the program's nextActiveDay logic to determine the correct active day
-        self.selectedDate = program.nextActiveDay(currentDate: now) ?? Calendar.current.startOfDay(for: now)
+        // Use the program's currentAppDay to show the current active day, not the next one
+        self.selectedDate = program.currentAppDay
     }
 } 

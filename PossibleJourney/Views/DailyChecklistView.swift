@@ -69,8 +69,8 @@ struct DailyChecklistView: View {
         )
         
         let now = Date()
-        // Use the program's nextActiveDay logic to determine the correct active day
-        let activeDay = program.nextActiveDay(currentDate: now) ?? Calendar.current.startOfDay(for: now)
+        // Use the program's currentAppDay to show the current active day, not the next one
+        let activeDay = program.currentAppDay
         let dailyProgress = dailyProgressStorage.load(for: activeDay) ?? DailyProgress(
             id: UUID(),
             date: activeDay,
