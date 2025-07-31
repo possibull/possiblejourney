@@ -129,8 +129,9 @@ class AppUpdateChecker: ObservableObject {
     func dismissUpdateNotification() {
         updateAvailable = false
         // Store that user dismissed this version
-        UserDefaults.standard.set("\(updateInfo?.version ?? "")_\(updateInfo?.buildNumber ?? 0)", 
-                                 forKey: "dismissedUpdateVersion")
+        let dismissedKey = "\(updateInfo?.version ?? "")_\(updateInfo?.buildNumber ?? 0)"
+        UserDefaults.standard.set(dismissedKey, forKey: "dismissedUpdateVersion")
+        print("DEBUG: Dismissed update notification for version: \(dismissedKey)")
     }
     
     func shouldShowUpdateNotification() -> Bool {
@@ -138,6 +139,8 @@ class AppUpdateChecker: ObservableObject {
         
         let dismissedVersion = UserDefaults.standard.string(forKey: "dismissedUpdateVersion")
         let currentUpdateKey = "\(updateInfo.version)_\(updateInfo.buildNumber)"
+        
+        print("DEBUG: Update notification check - dismissed: \(dismissedVersion ?? "none"), current: \(currentUpdateKey)")
         
         return dismissedVersion != currentUpdateKey
     }
@@ -170,8 +173,11 @@ class AppUpdateChecker: ObservableObject {
     }
     
     private func processRemoteVersionCheck(remoteVersion: String, build: Int) {
+        print("DEBUG: Processing remote version check - remote: \(remoteVersion) (\(build)), current: \(currentVersion) (\(currentBuildNumber))")
+        
         // Check if remote version is newer than current
         if self.isVersionNewer(remoteVersion, build: build) {
+            print("DEBUG: Remote version is newer, showing update notification")
             // Find matching release notes for the remote version
             if let remoteNotes = ReleaseNotes.allReleaseNotes.first(where: { 
                 $0.version == remoteVersion && $0.buildNumber == build 
