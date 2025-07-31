@@ -18,6 +18,9 @@ class AppUpdateChecker: ObservableObject {
     private let currentBuildNumber = Int(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "4") ?? 4
     private let bundleIdentifier = Bundle.main.bundleIdentifier ?? "com.mrpossible.PossibleJourney"
     
+    // Session-based dismissal - only dismisses for current app session
+    private var dismissedForSession = false
+    
                     // Check if this is a TestFlight build
                 var isTestFlightBuild: Bool {
                     #if targetEnvironment(simulator)
@@ -129,21 +132,20 @@ class AppUpdateChecker: ObservableObject {
     
     func dismissUpdateNotification() {
         updateAvailable = false
-        // Store that user dismissed this version
-        let dismissedKey = "\(updateInfo?.version ?? "")_\(updateInfo?.buildNumber ?? 0)"
-        UserDefaults.standard.set(dismissedKey, forKey: "dismissedUpdateVersion")
-        print("DEBUG: Dismissed update notification for version: \(dismissedKey)")
+        // Dismiss only for current session - will show again on app reload
+        dismissedForSession = true
+        print("DEBUG: Dismissed update notification for current session")
     }
     
     func shouldShowUpdateNotification() -> Bool {
         guard let updateInfo = updateInfo else { return false }
         
-        let dismissedVersion = UserDefaults.standard.string(forKey: "dismissedUpdateVersion")
-        let currentUpdateKey = "\(updateInfo.version)_\(updateInfo.buildNumber)"
+        // Only show if not dismissed for current session
+        let shouldShow = !dismissedForSession
         
-        print("DEBUG: Update notification check - dismissed: \(dismissedVersion ?? "none"), current: \(currentUpdateKey)")
+        print("DEBUG: Update notification check - dismissed for session: \(dismissedForSession), should show: \(shouldShow)")
         
-        return dismissedVersion != currentUpdateKey
+        return shouldShow
     }
     
     // MARK: - Remote API Methods (TODO: Implement these)
@@ -179,6 +181,8 @@ class AppUpdateChecker: ObservableObject {
         // Check if remote version is newer than current
         if self.isVersionNewer(remoteVersion, build: build) {
             print("DEBUG: Remote version is newer, showing update notification")
+            // Reset session dismissal when a new update is detected
+            dismissedForSession = false
             // Find matching release notes for the remote version
             if let remoteNotes = ReleaseNotes.allReleaseNotes.first(where: { 
                 $0.version == remoteVersion && $0.buildNumber == build 
