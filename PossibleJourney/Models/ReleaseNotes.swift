@@ -107,6 +107,22 @@ struct ReleaseNotes {
                 ],
                 date: Date()
             ),
+            ReleaseNotes(
+                version: "1.3",
+                buildNumber: 20,
+                title: "Simplified Task Row Design",
+                notes: [
+                    "🎨 Removed photo gallery icons from task rows",
+                    "📱 Cleaner and more streamlined task interface",
+                    "👁️ Reduced visual clutter in daily checklist",
+                    "🎯 Better focus on task completion status",
+                    "✨ Simplified user interface for better usability",
+                    "📸 Photo functionality still available but less prominent",
+                    "🔧 Improved task row layout and spacing",
+                    "🚀 Ready for TestFlight distribution with cleaner design"
+                ],
+                date: Date()
+            ),
         ReleaseNotes(
             version: "1.3",
             buildNumber: 7,

@@ -625,12 +625,7 @@ struct TaskRowView: View {
                                 .multilineTextAlignment(.leading)
                                 .lineLimit(2) // Limit title to 2 lines
                             
-                            // Photo requirement indicator
-                            if task.requiresPhoto {
-                                Image(systemName: hasPhoto ? "camera.fill" : "camera")
-                                    .foregroundColor(hasPhoto ? .green : .blue)
-                                    .font(.caption)
-                            }
+
                         }
                         
                         if let description = task.description, !description.isEmpty {
@@ -664,43 +659,7 @@ struct TaskRowView: View {
                 }
             }
             
-            // Photo button for tasks that require photos
-            if task.requiresPhoto {
-                Button(action: {
-                    showingPhotoPicker = true
-                }) {
-                    Image(systemName: hasPhoto ? "photo.fill" : "camera")
-                        .font(.caption)
-                        .foregroundColor(hasPhoto ? .green : .blue)
-                }
-                .buttonStyle(PlainButtonStyle())
-                .actionSheet(isPresented: $showingPhotoPicker) {
-                    ActionSheet(
-                        title: Text(hasPhoto ? "Update Photo" : "Add Photo"),
-                        message: Text("Choose how to \(hasPhoto ? "update" : "add") a photo for this task"),
-                        buttons: {
-                            var buttons: [ActionSheet.Button] = []
-                            
-                            // Only show camera option if camera is available
-                            if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                                buttons.append(.default(Text("Take Photo")) {
-                                    imageSource = .camera
-                                    showingImagePicker = true
-                                })
-                            }
-                            
-                            // Always show photo library option
-                            buttons.append(.default(Text("Choose from Library")) {
-                                imageSource = .photoLibrary
-                                showingImagePicker = true
-                            })
-                            
-                            buttons.append(.cancel())
-                            return buttons
-                        }()
-                    )
-                }
-            }
+
             
             // Reminder button
             Button(action: onSetReminder) {
