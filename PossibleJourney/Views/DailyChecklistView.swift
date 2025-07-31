@@ -617,15 +617,22 @@ struct TaskRowView: View {
                 HStack(alignment: .top, spacing: 8) {
                     VStack(alignment: .leading, spacing: 2) {
                         HStack {
-                            Text(task.title)
-                                .font(.body)
-                                .fontWeight(.medium)
-                                .foregroundColor(.primary)
-                                .strikethrough(isCompleted)
-                                .multilineTextAlignment(.leading)
-                                .lineLimit(2) // Limit title to 2 lines
-                            
-
+                                                        HStack(spacing: 4) {
+                                Text(task.title)
+                                    .font(.body)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.primary)
+                                    .strikethrough(isCompleted)
+                                    .multilineTextAlignment(.leading)
+                                    .lineLimit(2) // Limit title to 2 lines
+                                
+                                // Small photo indicator for tasks that have photos
+                                if task.requiresPhoto && hasPhoto {
+                                    Image(systemName: "photo.fill")
+                                        .font(.caption2)
+                                        .foregroundColor(.green)
+                                }
+                            }
                         }
                         
                         if let description = task.description, !description.isEmpty {
@@ -659,7 +666,43 @@ struct TaskRowView: View {
                 }
             }
             
-
+            // Photo button for tasks that require photos (minimal design)
+            if task.requiresPhoto && !hasPhoto {
+                Button(action: {
+                    showingPhotoPicker = true
+                }) {
+                    Image(systemName: "camera")
+                        .font(.caption)
+                        .foregroundColor(.blue)
+                }
+                .buttonStyle(PlainButtonStyle())
+                .actionSheet(isPresented: $showingPhotoPicker) {
+                    ActionSheet(
+                        title: Text("Add Photo"),
+                        message: Text("Choose how to add a photo for this task"),
+                        buttons: {
+                            var buttons: [ActionSheet.Button] = []
+                            
+                            // Only show camera option if camera is available
+                            if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                                buttons.append(.default(Text("Take Photo")) {
+                                    imageSource = .camera
+                                    showingImagePicker = true
+                                })
+                            }
+                            
+                            // Always show photo library option
+                            buttons.append(.default(Text("Choose from Library")) {
+                                imageSource = .photoLibrary
+                                showingImagePicker = true
+                            })
+                            
+                            buttons.append(.cancel())
+                            return buttons
+                        }()
+                    )
+                }
+            }
             
             // Reminder button
             Button(action: onSetReminder) {
