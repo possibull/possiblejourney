@@ -98,18 +98,19 @@ class AppUpdateChecker: ObservableObject {
     }
     
                     func openAppStore() {
-                    // For TestFlight builds, just open the TestFlight app
+                    // For TestFlight builds, open TestFlight app directly
                     if isTestFlightBuild {
                         #if targetEnvironment(simulator)
                         // In simulator, show an alert or just dismiss
                         print("TestFlight updates not available in simulator")
                         return
                         #else
-                        // On device, try to open TestFlight app directly first
-                        if let testFlightURL = URL(string: "testflight://") {
+                        // Use the TestFlight app's specific URL scheme
+                        // This should open TestFlight directly without going through App Store
+                        if let testFlightURL = URL(string: "testflight://beta") {
                             UIApplication.shared.open(testFlightURL, options: [:]) { success in
-                                // If TestFlight app is not installed, fall back to App Store
                                 if !success {
+                                    // Fallback to App Store TestFlight page
                                     if let appStoreURL = URL(string: "itms-apps://itunes.apple.com/app/testflight/id899247664") {
                                         UIApplication.shared.open(appStoreURL, options: [:], completionHandler: nil)
                                     }
