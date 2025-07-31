@@ -53,6 +53,7 @@ struct DailyChecklistView: View {
     @State private var showingSettings = false
     @State private var showingCalendar = false
     @State private var autoAdvanceTimer: Timer?
+    @State private var showingReleaseNotes = false
     @EnvironmentObject var appState: ProgramAppState
     
     init() {
@@ -133,6 +134,13 @@ struct DailyChecklistView: View {
                 }
             }
         }
+        .sheet(isPresented: $showingReleaseNotes) {
+            if let releaseNotes = ReleaseNotes.getUnseenReleaseNotes().first {
+                ReleaseNotesView(releaseNotes: releaseNotes) {
+                    showingReleaseNotes = false
+                }
+            }
+        }
         .onAppear {
             // Check for missed days and navigate to the first missed day if needed
             checkForMissedDaysAndNavigate()
@@ -148,6 +156,11 @@ struct DailyChecklistView: View {
                 print("DEBUG: Forcing thumbnail refresh after app appear")
                 // Trigger a UI refresh by updating the view model
                 self.viewModel.objectWillChange.send()
+            }
+            
+            // Check for release notes to show after a short delay
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                checkForReleaseNotes()
             }
         }
         .onDisappear {
@@ -278,6 +291,15 @@ struct DailyChecklistView: View {
         if allTasksCompleted && viewModel.program.shouldAutoAdvanceToNextDay(now: now, lastCompletedDay: viewModel.program.lastCompletedDay) {
             // Auto-advance to the next day
             autoAdvanceToNextDay()
+        }
+    }
+    
+    // Check for release notes to show
+    private func checkForReleaseNotes() {
+        let unseenReleaseNotes = ReleaseNotes.getUnseenReleaseNotes()
+        if let latestReleaseNotes = unseenReleaseNotes.first {
+            print("DEBUG: Showing release notes for version \(latestReleaseNotes.version)")
+            showingReleaseNotes = true
         }
     }
     
