@@ -10,7 +10,7 @@ struct ReleaseNotes {
     static let allReleaseNotes: [ReleaseNotes] = [
         ReleaseNotes(
             version: "1.3",
-            buildNumber: 8,
+            buildNumber: 9,
             title: "Session-Based Update Notifications & Direct TestFlight Integration",
             notes: [
                 "🔔 Fixed update notification dismissal to be session-based only",
