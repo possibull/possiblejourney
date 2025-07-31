@@ -10,6 +10,20 @@ struct ReleaseNotes {
     static let allReleaseNotes: [ReleaseNotes] = [
         ReleaseNotes(
             version: "1.0",
+            buildNumber: 3,
+            title: "Thumbnail Display Fixes",
+            notes: [
+                "🔧 Fixed thumbnail oscillation when navigating between days",
+                "⚡ Improved thumbnail loading performance and reliability",
+                "🔄 Enhanced race condition prevention for async image loading",
+                "📱 Better visual consistency across calendar navigation",
+                "🐛 Resolved thumbnail display issues after app updates",
+                "🎯 Improved overall app stability and user experience"
+            ],
+            date: Date()
+        ),
+        ReleaseNotes(
+            version: "1.0",
             buildNumber: 2,
             title: "Bug Fixes & Improvements",
             notes: [
