@@ -128,10 +128,11 @@ class AppUpdateChecker: ObservableObject {
     // MARK: - Remote API Methods (TODO: Implement these)
     
     private func fetchRemoteVersionInfo(completion: @escaping (String, Int) -> Void) {
-        // TODO: Implement actual remote API call
-        // Example implementation:
-        /*
-        guard let url = URL(string: "https://your-backend.com/api/latest-version") else {
+        // GitHub repository: https://github.com/possibull/possiblejourney
+        // Raw JSON URL: https://raw.githubusercontent.com/possibull/possiblejourney/main/latest-version.json
+        // Update the JSON file in the repository whenever you release new TestFlight builds
+        
+        guard let url = URL(string: "https://raw.githubusercontent.com/possibull/possiblejourney/main/latest-version.json") else {
             completion("1.0", 1) // Fallback to current version
             return
         }
@@ -144,16 +145,11 @@ class AppUpdateChecker: ObservableObject {
                    let build = json["build"] as? Int {
                     completion(version, build)
                 } else {
-                    completion("1.0", 1) // Fallback to current version
+                    // Fallback to simulated response for testing
+                    completion("1.2", 6)
                 }
             }
         }.resume()
-        */
-        
-        // For now, simulate API response
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            completion("1.2", 6) // Simulated remote version
-        }
     }
     
     private func processRemoteVersionCheck(remoteVersion: String, build: Int) {
