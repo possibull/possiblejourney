@@ -86,7 +86,8 @@ class DailyChecklistViewModel: ObservableObject {
 
     func completeCurrentDay() {
         // Called when all tasks are completed for the current day
-        program.lastCompletedDay = currentActiveDay
+        // Set lastCompletedDay to the actual date being completed (selectedDate), not the computed currentActiveDay
+        program.lastCompletedDay = selectedDate
         // Save program with updated lastCompletedDay
         ProgramStorage().save(program)
         
