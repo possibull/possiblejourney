@@ -67,7 +67,7 @@ class AppUpdateChecker: ObservableObject {
                     buildNumber: remoteBuild,
                     releaseNotes: remoteNotes.notes.joined(separator: "\n"),
                     isRequired: false,
-                    appStoreURL: "https://testflight.apple.com/join/your-testflight-link" // Replace with your TestFlight link
+                    appStoreURL: "" // Not needed for TestFlight
                 )
                 self.updateAvailable = true
             } else {
@@ -77,7 +77,7 @@ class AppUpdateChecker: ObservableObject {
                     buildNumber: remoteBuild,
                     releaseNotes: "A new version is available with bug fixes and improvements.",
                     isRequired: false,
-                    appStoreURL: "https://testflight.apple.com/join/your-testflight-link"
+                    appStoreURL: "" // Not needed for TestFlight
                 )
                 self.updateAvailable = true
             }
@@ -94,20 +94,20 @@ class AppUpdateChecker: ObservableObject {
         return build > currentBuildNumber
     }
     
-    func openAppStore() {
-        guard let updateInfo = updateInfo else { return }
-        
-        if let url = URL(string: updateInfo.appStoreURL) {
-            // For TestFlight, we need to handle the URL differently
-            if isTestFlightBuild {
-                // TestFlight links should open in Safari or the TestFlight app
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            } else {
-                // Regular App Store links
-                UIApplication.shared.open(url)
-            }
-        }
-    }
+                    func openAppStore() {
+                    // For TestFlight builds, just open the TestFlight app
+                    if isTestFlightBuild {
+                        if let testFlightURL = URL(string: "itms-apps://itunes.apple.com/app/testflight/id899247664") {
+                            UIApplication.shared.open(testFlightURL, options: [:], completionHandler: nil)
+                        }
+                    } else {
+                        // For App Store builds, open the App Store
+                        guard let updateInfo = updateInfo else { return }
+                        if let url = URL(string: updateInfo.appStoreURL) {
+                            UIApplication.shared.open(url)
+                        }
+                    }
+                }
     
     func dismissUpdateNotification() {
         updateAvailable = false
