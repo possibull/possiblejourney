@@ -94,6 +94,9 @@ class DailyChecklistViewModel: ObservableObject {
         // Mark the day as completed since all tasks are done
         dailyProgress.isCompleted = true
         DailyProgressStorage().save(progress: dailyProgress)
+        
+        // Auto-advance to the next incomplete day
+        autoAdvanceToNextIncompleteDay()
     }
 
     func resetProgramToToday() {
@@ -102,6 +105,46 @@ class DailyChecklistViewModel: ObservableObject {
         // This preserves the historical program data and allows starting fresh
         ProgramStorage().clear()
         DailyProgressStorage().clearAll()
+    }
+    
+    // Auto-advance to the next incomplete day after completing the current day
+    private func autoAdvanceToNextIncompleteDay() {
+        let calendar = Calendar.current
+        let startDate = calendar.startOfDay(for: program.startDate)
+        let today = calendar.startOfDay(for: Date())
+        let dailyProgressStorage = DailyProgressStorage()
+        
+        // Start checking from the day after the one we just completed
+        var nextDate = calendar.date(byAdding: .day, value: 1, to: selectedDate)!
+        
+        // Check all days from the next day up to today
+        while nextDate <= today {
+            // Skip if we're past the program duration
+            let dayNumber = calendar.dateComponents([.day], from: startDate, to: nextDate).day ?? 0
+            if dayNumber >= program.numberOfDays() {
+                break
+            }
+            
+            // Load the progress for this day and check if it was completed
+            let dayProgress = dailyProgressStorage.load(for: nextDate) ?? DailyProgress(
+                id: UUID(),
+                date: nextDate,
+                completedTaskIDs: [],
+                isCompleted: false
+            )
+            
+            if !dayProgress.isCompleted {
+                // Found the next incomplete day, navigate to it
+                selectDate(nextDate)
+                return
+            }
+            
+            // Move to next day
+            nextDate = calendar.date(byAdding: .day, value: 1, to: nextDate)!
+        }
+        
+        // No more incomplete days found, stay on today
+        selectDate(today)
     }
     
     func updateDailyProgress(_ newProgress: DailyProgress) {
@@ -149,7 +192,7 @@ class DailyChecklistViewModel: ObservableObject {
         self.program = program
         self.dailyProgress = dailyProgress
         self.now = now
-        // Use the program's currentAppDay to show the current active day, not the next one
-        self.selectedDate = program.currentAppDay
+        // Start with today's date - the missed day logic will handle finding the first missed day
+        self.selectedDate = Calendar.current.startOfDay(for: now)
     }
 } 

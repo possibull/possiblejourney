@@ -69,11 +69,11 @@ struct DailyChecklistView: View {
         )
         
         let now = Date()
-        // Use the program's currentAppDay to show the current active day, not the next one
-        let activeDay = program.currentAppDay
-        let dailyProgress = dailyProgressStorage.load(for: activeDay) ?? DailyProgress(
+        // Start with today's date - the missed day logic will handle finding the first missed day
+        let today = Calendar.current.startOfDay(for: now)
+        let dailyProgress = dailyProgressStorage.load(for: today) ?? DailyProgress(
             id: UUID(),
-            date: activeDay,
+            date: today,
             completedTaskIDs: []
         )
         
@@ -133,6 +133,9 @@ struct DailyChecklistView: View {
             }
         }
         .onAppear {
+            // Check for missed days and navigate to the first missed day if needed
+            checkForMissedDaysAndNavigate()
+            
             // Always load progress for the selected date (which acts as the current date for the app)
             loadDailyProgressForDate(viewModel.selectedDate)
         }
@@ -153,6 +156,44 @@ struct DailyChecklistView: View {
         DispatchQueue.main.async {
             self.viewModel.objectWillChange.send()
         }
+    }
+    
+    // Check for missed days and navigate to the first missed day
+    private func checkForMissedDaysAndNavigate() {
+        let calendar = Calendar.current
+        let startDate = calendar.startOfDay(for: viewModel.program.startDate)
+        let today = calendar.startOfDay(for: Date())
+        let dailyProgressStorage = DailyProgressStorage()
+        
+        // Check all days from start date up to today
+        var currentDate = startDate
+        while currentDate <= today {
+            // Skip if we're past the program duration
+            let dayNumber = calendar.dateComponents([.day], from: startDate, to: currentDate).day ?? 0
+            if dayNumber >= viewModel.program.numberOfDays() {
+                break
+            }
+            
+            // Load the progress for this day and check if it was completed
+            let dayProgress = dailyProgressStorage.load(for: currentDate) ?? DailyProgress(
+                id: UUID(),
+                date: currentDate,
+                completedTaskIDs: [],
+                isCompleted: false
+            )
+            
+            if !dayProgress.isCompleted {
+                // Found the first missed day, navigate to it
+                viewModel.selectDate(currentDate)
+                return
+            }
+            
+            // Move to next day
+            currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate)!
+        }
+        
+        // No missed days found, stay on today
+        viewModel.selectDate(today)
     }
     
     private var missedDayScreen: some View {
