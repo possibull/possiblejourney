@@ -9,18 +9,36 @@ struct ReleaseNotes {
     
     static let allReleaseNotes: [ReleaseNotes] = [
         ReleaseNotes(
+            version: "1.3",
+            buildNumber: 7,
+            title: "Enhanced User Experience & Performance",
+            notes: [
+                "🎨 Improved UI/UX design and visual consistency",
+                "⚡ Enhanced app performance and responsiveness",
+                "🔧 Additional bug fixes and stability improvements",
+                "📱 Better mobile experience and accessibility",
+                "🔄 Optimized data handling and storage",
+                "🎯 Improved user workflow and navigation",
+                "📋 Enhanced feature reliability and consistency",
+                "🚀 Continued app improvements and refinements"
+            ],
+            date: Date()
+        ),
+        ReleaseNotes(
             version: "1.2",
             buildNumber: 6,
-            title: "Remote Version Checking & Enhanced Update System",
+            title: "TestFlight Update System & Simulator Compatibility",
             notes: [
-                "🌐 Remote version checking from backend API",
-                "📡 Automatic update detection from server",
+                "🔔 Complete TestFlight update notification system",
+                "🌐 GitHub-based remote version checking",
+                "📱 Direct TestFlight app integration (no URLs needed)",
+                "🖥️ Full simulator compatibility and safe testing",
+                "⚡ Automatic environment detection (simulator vs device)",
                 "🔄 Real-time version comparison with remote server",
-                "📱 Improved update notification accuracy",
-                "⚡ Faster update checking and response times",
-                "🔧 Better error handling for network requests",
-                "🎯 More reliable update detection system",
-                "📋 Enhanced update management and user experience"
+                "🎯 Smart update prompts with release notes preview",
+                "🔧 Enhanced error handling and graceful fallbacks",
+                "📋 Improved update management and user experience",
+                "🚀 Ready for production TestFlight distribution"
             ],
             date: Date()
         ),
