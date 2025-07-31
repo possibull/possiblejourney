@@ -18,16 +18,19 @@ class AppUpdateChecker: ObservableObject {
     private let currentBuildNumber = Int(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "4") ?? 4
     private let bundleIdentifier = Bundle.main.bundleIdentifier ?? "com.mrpossible.PossibleJourney"
     
-    // Check if this is a TestFlight build
-    var isTestFlightBuild: Bool {
-        #if DEBUG
-        return false
-        #else
-        // For now, we'll assume TestFlight builds have a sandbox receipt
-        // In a real implementation, you might want to use a more sophisticated detection method
-        return Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
-        #endif
-    }
+                    // Check if this is a TestFlight build
+                var isTestFlightBuild: Bool {
+                    #if targetEnvironment(simulator)
+                    // In simulator, always return false since TestFlight isn't available
+                    return false
+                    #elseif DEBUG
+                    return false
+                    #else
+                    // For now, we'll assume TestFlight builds have a sandbox receipt
+                    // In a real implementation, you might want to use a more sophisticated detection method
+                    return Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
+                    #endif
+                }
     
     func checkForUpdates() {
         isChecking = true
@@ -97,7 +100,12 @@ class AppUpdateChecker: ObservableObject {
                     func openAppStore() {
                     // For TestFlight builds, just open the TestFlight app
                     if isTestFlightBuild {
-                        // Try to open TestFlight app directly first
+                        #if targetEnvironment(simulator)
+                        // In simulator, show an alert or just dismiss
+                        print("TestFlight updates not available in simulator")
+                        return
+                        #else
+                        // On device, try to open TestFlight app directly first
                         if let testFlightURL = URL(string: "testflight://") {
                             UIApplication.shared.open(testFlightURL, options: [:]) { success in
                                 // If TestFlight app is not installed, fall back to App Store
@@ -108,6 +116,7 @@ class AppUpdateChecker: ObservableObject {
                                 }
                             }
                         }
+                        #endif
                     } else {
                         // For App Store builds, open the App Store
                         guard let updateInfo = updateInfo else { return }
