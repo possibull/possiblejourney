@@ -91,6 +91,22 @@ struct ReleaseNotes {
                 ],
                 date: Date()
             ),
+            ReleaseNotes(
+                version: "1.3",
+                buildNumber: 19,
+                title: "Version Information in Settings",
+                notes: [
+                    "📱 Added current version display to Settings page",
+                    "ℹ️ Shows version number and build number programmatically",
+                    "🎯 Better user awareness of app version",
+                    "📋 Clean and organized version information display",
+                    "🔧 Improved settings page with version details",
+                    "⚡ Version info automatically updates with app builds",
+                    "🎨 Consistent design with other settings sections",
+                    "🚀 Ready for TestFlight distribution with version display"
+                ],
+                date: Date()
+            ),
         ReleaseNotes(
             version: "1.3",
             buildNumber: 7,

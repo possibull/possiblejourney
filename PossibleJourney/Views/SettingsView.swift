@@ -101,6 +101,42 @@ struct SettingsView: View {
                             .textCase(.uppercase)
                             .fontWeight(.semibold)
                     }
+                    
+                    Section {
+                        HStack {
+                            Image(systemName: "info.circle.fill")
+                                .foregroundColor(.blue)
+                                .font(.title2)
+                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("App Version")
+                                    .font(.headline)
+                                    .foregroundColor(.primary)
+                                Text("Current version information")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            
+                            Spacer()
+                            
+                            VStack(alignment: .trailing, spacing: 2) {
+                                Text("\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.primary)
+                                Text("Build \(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1")")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    } header: {
+                        Text("About")
+                            .font(.headline)
+                            .foregroundColor(.blue)
+                            .textCase(.uppercase)
+                            .fontWeight(.semibold)
+                    }
                 }
                 .scrollContentBackground(.hidden)
                 .background(Color(.systemGroupedBackground))
