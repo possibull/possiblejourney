@@ -766,15 +766,18 @@ struct TaskRowView: View {
         currentLoadingProgressID = progressID
         isLoadingThumbnail = true
         
-        // Clear any existing images immediately to prevent showing wrong image
-        thumbnailImage = nil
-        fullImage = nil
-        hasPhoto = false
+        // Only clear images if we're loading for a different daily progress
+        if currentLoadingProgressID != progressID {
+            thumbnailImage = nil
+            fullImage = nil
+            hasPhoto = false
+        }
         
         // Check if we have a photo URL for this task
         guard let url = photoURL(from: currentDailyProgress) else {
             print("DEBUG: No photo URL found for task: \(task.title)")
             print("DEBUG: fullImage after clearing: \(fullImage == nil ? "nil" : "not nil")")
+            isLoadingThumbnail = false
             return
         }
         
@@ -820,15 +823,17 @@ struct TaskRowView: View {
                 }
                 
                 DispatchQueue.main.async {
-                    self.thumbnailImage = nil
-                    self.fullImage = nil
-                    self.hasPhoto = false
+                    // Only clear state if we don't already have a valid image
+                    if self.fullImage == nil {
+                        self.thumbnailImage = nil
+                        self.hasPhoto = false
+                    }
                     self.isLoadingThumbnail = false
                     print("DEBUG: fullImage after clearing (failed): \(self.fullImage == nil ? "nil" : "not nil")")
                 }
                 
-                // Retry loading after a short delay (helps with app update scenarios)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                // Retry loading after a longer delay to prevent rapid retries
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                     // Check again before retrying
                     guard self.currentLoadingProgressID == progressID else {
                         print("DEBUG: Skipping retry for task: \(self.task.title) - daily progress changed")
