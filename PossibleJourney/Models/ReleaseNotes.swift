@@ -10,6 +10,22 @@ struct ReleaseNotes {
     static let allReleaseNotes: [ReleaseNotes] = [
         ReleaseNotes(
             version: "1.0",
+            buildNumber: 4,
+            title: "Thumbnail Path Recovery & Stability",
+            notes: [
+                "🔧 Fixed thumbnail loading after app upgrades - automatically corrects file paths",
+                "⚡ Enhanced image loading with comprehensive fallback search across all directories",
+                "🔄 Automatic URL correction when images are found in different locations",
+                "📱 Improved thumbnail display reliability across app updates",
+                "🐛 Resolved persistent thumbnail issues after app upgrades",
+                "🎯 Better handling of file path changes during app updates",
+                "📸 Enhanced photo storage and retrieval system",
+                "⚡ Improved overall app stability and user experience"
+            ],
+            date: Date()
+        ),
+        ReleaseNotes(
+            version: "1.0",
             buildNumber: 3,
             title: "Thumbnail Display Fixes",
             notes: [
