@@ -1,7 +1,7 @@
 {
   "version": "1.3",
-  "build": 17,
-  "releaseNotes": "Enhanced User Experience & Performance - Improved UI/UX design and visual consistency - Enhanced app performance and responsiveness - Additional bug fixes and stability improvements - Better mobile experience and accessibility - Optimized data handling and storage - Improved user workflow and navigation - Enhanced feature reliability and consistency - Continued app improvements and refinements",
+  "build": 19,
+  "releaseNotes": "Version Information in Settings - Added current version display to Settings page - Shows version number and build number programmatically - Better user awareness of app version - Clean and organized version information display - Improved settings page with version details - Version info automatically updates with app builds - Consistent design with other settings sections - Ready for TestFlight distribution with version display",
   "forceUpdate": false,
-  "lastUpdated": "2025-07-31T05:25:23Z"
+  "lastUpdated": "2025-07-31T06:30:00Z"
 }
