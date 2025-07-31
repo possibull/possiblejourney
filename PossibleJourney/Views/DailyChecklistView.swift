@@ -562,6 +562,7 @@ struct TaskRowView: View {
     @State private var fullImage: UIImage?
     @State private var showingFullPhoto = false
     @State private var hasPhoto: Bool = false
+    @State private var currentLoadingProgressID: UUID?
     
     // Get the photo URL for this task
     private func photoURL(from dailyProgress: DailyProgress) -> URL? {
@@ -760,12 +761,18 @@ struct TaskRowView: View {
         print("DEBUG: fullImage before loadThumbnail: \(fullImage == nil ? "nil" : "not nil")")
         print("DEBUG: currentDailyProgress photoURLs count: \(currentDailyProgress.photoURLs.count)")
         
+        // Track which daily progress we're loading for to prevent race conditions
+        let progressID = currentDailyProgress.id
+        currentLoadingProgressID = progressID
+        
+        // Clear any existing images immediately to prevent showing wrong image
+        thumbnailImage = nil
+        fullImage = nil
+        hasPhoto = false
+        
         // Check if we have a photo URL for this task
         guard let url = photoURL(from: currentDailyProgress) else {
             print("DEBUG: No photo URL found for task: \(task.title)")
-            thumbnailImage = nil
-            fullImage = nil
-            hasPhoto = false
             print("DEBUG: fullImage after clearing: \(fullImage == nil ? "nil" : "not nil")")
             return
         }
@@ -774,6 +781,12 @@ struct TaskRowView: View {
         
         // Try to load the image, and if it fails, try to find it in other possible locations
         loadImageFromURL(url) { image in
+            // Check if we're still loading for the same daily progress (prevent race conditions)
+            guard self.currentLoadingProgressID == progressID else {
+                print("DEBUG: Ignoring image load result for task: \(self.task.title) - daily progress changed")
+                return
+            }
+            
             if let image = image {
                 print("DEBUG: Successfully loaded image for task: \(self.task.title)")
                 DispatchQueue.main.async {
@@ -784,6 +797,12 @@ struct TaskRowView: View {
                 }
                 
                 image.prepareThumbnail(of: CGSize(width: 80, height: 80)) { thumbnail in
+                    // Check if we're still loading for the same daily progress
+                    guard self.currentLoadingProgressID == progressID else {
+                        print("DEBUG: Ignoring thumbnail result for task: \(self.task.title) - daily progress changed")
+                        return
+                    }
+                    
                     DispatchQueue.main.async {
                         self.thumbnailImage = thumbnail ?? image
                         print("DEBUG: Set thumbnail for task: \(self.task.title)")
@@ -791,6 +810,13 @@ struct TaskRowView: View {
                 }
             } else {
                 print("DEBUG: Failed to load image for task: \(self.task.title)")
+                
+                // Check if we're still loading for the same daily progress
+                guard self.currentLoadingProgressID == progressID else {
+                    print("DEBUG: Ignoring failed load for task: \(self.task.title) - daily progress changed")
+                    return
+                }
+                
                 DispatchQueue.main.async {
                     self.thumbnailImage = nil
                     self.fullImage = nil
@@ -800,6 +826,11 @@ struct TaskRowView: View {
                 
                 // Retry loading after a short delay (helps with app update scenarios)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    // Check again before retrying
+                    guard self.currentLoadingProgressID == progressID else {
+                        print("DEBUG: Skipping retry for task: \(self.task.title) - daily progress changed")
+                        return
+                    }
                     print("DEBUG: Retrying thumbnail load for task: \(self.task.title)")
                     self.loadThumbnail()
                 }
