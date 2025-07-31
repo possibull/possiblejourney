@@ -55,6 +55,10 @@ struct PossibleJourneyApp: App {
         return WindowGroup {
             if showSplash {
                 SplashView(showSplash: $showSplash)
+                    .onAppear {
+                        // Check for updates when app starts
+                        updateChecker.checkForUpdates()
+                    }
             } else {
                 ZStack(alignment: .top) {
                     NavigationStack {
@@ -190,6 +194,10 @@ struct PossibleJourneyApp: App {
             }
             .environmentObject(appState)
             .environmentObject(updateChecker)
+            .onAppear {
+                // Check for updates when main content appears (backup)
+                updateChecker.checkForUpdates()
+            }
             }
         }
     }

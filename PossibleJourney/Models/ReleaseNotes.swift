@@ -139,6 +139,22 @@ struct ReleaseNotes {
                 ],
                 date: Date()
             ),
+            ReleaseNotes(
+                version: "1.3",
+                buildNumber: 22,
+                title: "Fixed App Update Checking on Startup",
+                notes: [
+                    "🔧 Fixed app update checking to run every time app opens",
+                    "📱 Update check now triggers on app startup and splash screen",
+                    "✅ Ensures users always see latest version information",
+                    "🔄 Added backup update check when main content appears",
+                    "⚡ Improved update notification reliability",
+                    "🎯 Better user experience with consistent update checking",
+                    "🔧 Enhanced app startup workflow and update detection",
+                    "🚀 Ready for TestFlight distribution with reliable update checking"
+                ],
+                date: Date()
+            ),
         ReleaseNotes(
             version: "1.3",
             buildNumber: 7,
