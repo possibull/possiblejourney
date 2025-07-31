@@ -8,23 +8,40 @@ struct ReleaseNotes {
     let date: Date
     
     static let allReleaseNotes: [ReleaseNotes] = [
-        ReleaseNotes(
-            version: "1.3",
-            buildNumber: 11,
-            title: "Enhanced UI & Improved User Experience",
-            notes: [
-                "🖼️ Increased thumbnail size on task rows for better visibility",
-                "📱 Improved photo display and interaction in daily checklist",
-                "🎨 Enhanced visual design with larger, more accessible thumbnails",
-                "👆 Better touch targets for photo viewing and interaction",
-                "📋 Improved task row layout and spacing",
-                "🔧 Enhanced photo thumbnail quality and presentation",
-                "🎯 Better user experience for photo-based tasks",
-                "⚡ Optimized thumbnail loading and display performance",
-                "🚀 Ready for TestFlight distribution with improved UI"
-            ],
-            date: Date()
-        ),
+                    ReleaseNotes(
+                version: "1.3",
+                buildNumber: 11,
+                title: "Enhanced UI & Improved User Experience",
+                notes: [
+                    "🖼️ Increased thumbnail size on task rows for better visibility",
+                    "📱 Improved photo display and interaction in daily checklist",
+                    "🎨 Enhanced visual design with larger, more accessible thumbnails",
+                    "👆 Better touch targets for photo viewing and interaction",
+                    "📋 Improved task row layout and spacing",
+                    "🔧 Enhanced photo thumbnail quality and presentation",
+                    "🎯 Better user experience for photo-based tasks",
+                    "⚡ Optimized thumbnail loading and display performance",
+                    "🚀 Ready for TestFlight distribution with improved UI"
+                ],
+                date: Date()
+            ),
+            ReleaseNotes(
+                version: "1.3",
+                buildNumber: 12,
+                title: "Optimized Layout for Mobile Devices",
+                notes: [
+                    "📱 Fixed text wrapping issues on iPhone devices",
+                    "🎯 Optimized task row layout for smaller screens",
+                    "🖼️ Adjusted thumbnail size for better mobile fit (50x50)",
+                    "📝 Limited title and description to 2 lines each",
+                    "⚡ Improved responsive design for different screen sizes",
+                    "🎨 Better visual balance between text and thumbnails",
+                    "📋 Enhanced readability on mobile devices",
+                    "🔧 Optimized spacing and alignment for iPhone",
+                    "🚀 Ready for TestFlight distribution with mobile-optimized layout"
+                ],
+                date: Date()
+            ),
         ReleaseNotes(
             version: "1.3",
             buildNumber: 7,

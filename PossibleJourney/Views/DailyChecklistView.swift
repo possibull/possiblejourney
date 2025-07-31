@@ -605,54 +605,56 @@ struct TaskRowView: View {
             }
             .buttonStyle(PlainButtonStyle())
             
-            // Task content
-            VStack(alignment: .leading, spacing: 6) {
-                HStack {
-                    Text(task.title)
-                        .font(.body)
-                        .fontWeight(.medium)
-                        .foregroundColor(.primary)
-                        .strikethrough(isCompleted)
-                        .multilineTextAlignment(.leading)
+            // Task content with better layout for thumbnails
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(alignment: .top, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack {
+                            Text(task.title)
+                                .font(.body)
+                                .fontWeight(.medium)
+                                .foregroundColor(.primary)
+                                .strikethrough(isCompleted)
+                                .multilineTextAlignment(.leading)
+                                .lineLimit(2) // Limit title to 2 lines
+                            
+                            // Photo requirement indicator
+                            if task.requiresPhoto {
+                                Image(systemName: hasPhoto ? "camera.fill" : "camera")
+                                    .foregroundColor(hasPhoto ? .green : .blue)
+                                    .font(.caption)
+                            }
+                        }
+                        
+                        if let description = task.description, !description.isEmpty {
+                            Text(description)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                                .strikethrough(isCompleted)
+                                .multilineTextAlignment(.leading)
+                                .lineLimit(2) // Limit description to 2 lines
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     
-                    // Photo requirement indicator
-                    if task.requiresPhoto {
-                        Image(systemName: hasPhoto ? "camera.fill" : "camera")
-                            .foregroundColor(hasPhoto ? .green : .blue)
-                            .font(.caption)
+                    // Photo thumbnail (if photo exists) - positioned to the right
+                    if let thumbnail = thumbnailImage {
+                        Button(action: {
+                            showingFullPhoto = true
+                        }) {
+                            Image(uiImage: thumbnail)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: 50, height: 50) // Slightly smaller for better fit
+                                .clipShape(RoundedRectangle(cornerRadius: 6))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 6)
+                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                )
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
                 }
-                
-                if let description = task.description, !description.isEmpty {
-                    Text(description)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .strikethrough(isCompleted)
-                        .multilineTextAlignment(.leading)
-                        .lineLimit(nil)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            
-            Spacer()
-            
-            // Photo thumbnail (if photo exists)
-            if let thumbnail = thumbnailImage {
-                Button(action: {
-                    showingFullPhoto = true
-                }) {
-                    Image(uiImage: thumbnail)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 60, height: 60)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                        )
-                }
-                .buttonStyle(PlainButtonStyle())
             }
             
             // Photo button for tasks that require photos
