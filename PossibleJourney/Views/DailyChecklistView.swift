@@ -141,8 +141,8 @@ struct DailyChecklistView: View {
             }
         }
         .sheet(isPresented: $showingReleaseNotes) {
-            if let combinedReleaseNotes = ReleaseNotes.getCombinedReleaseNotesForCurrentUser() {
-                ReleaseNotesView(releaseNotes: combinedReleaseNotes) {
+            if let currentReleaseNotes = ReleaseNotes.getReleaseNotesForCurrentVersion() {
+                ReleaseNotesView(releaseNotes: currentReleaseNotes) {
                     showingReleaseNotes = false
                 }
             }
@@ -311,10 +311,17 @@ struct DailyChecklistView: View {
     
     // Check for release notes to show
     private func checkForReleaseNotes() {
-        // Use combined release notes to show all changes from user's last seen version to current
-        if let combinedReleaseNotes = ReleaseNotes.getCombinedReleaseNotesForCurrentUser() {
-            print("DEBUG: Showing combined release notes for versions up to \(combinedReleaseNotes.version) build \(combinedReleaseNotes.buildNumber)")
-            showingReleaseNotes = true
+        // Always show release notes for the current version if user hasn't seen them
+        if let currentReleaseNotes = ReleaseNotes.getReleaseNotesForCurrentVersion() {
+            let lastSeenVersion = UserDefaults.standard.string(forKey: "LastSeenReleaseNotesVersion") ?? "0.0"
+            let lastSeenBuild = UserDefaults.standard.integer(forKey: "LastSeenReleaseNotesBuild")
+            
+            // Show if this is a new version/build the user hasn't seen
+            if currentReleaseNotes.version > lastSeenVersion || 
+               (currentReleaseNotes.version == lastSeenVersion && currentReleaseNotes.buildNumber > lastSeenBuild) {
+                print("DEBUG: Showing release notes for current version \(currentReleaseNotes.version) build \(currentReleaseNotes.buildNumber)")
+                showingReleaseNotes = true
+            }
         }
     }
     
