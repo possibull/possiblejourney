@@ -713,6 +713,14 @@ struct TaskRowView: View {
         .sheet(isPresented: $showingFullPhoto) {
             FullPhotoViewer(image: fullImage, taskTitle: task.title)
         }
+        .alert("Remove Photo?", isPresented: $showingUncheckAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Remove Photo", role: .destructive) {
+                onToggle()
+            }
+        } message: {
+            Text("Unchecking this task will remove the photo you've taken. This action cannot be undone.")
+        }
         .onChange(of: showingFullPhoto) { _, isShowing in
             if isShowing {
                 print("DEBUG: Opening FullPhotoViewer for task: \(task.title)")
@@ -751,10 +759,15 @@ struct TaskRowView: View {
         }
     }
     
+    @State private var showingUncheckAlert = false
+    
     private func handleCheckboxTap() {
         // If task requires photo and doesn't have one yet, show photo picker
         if task.requiresPhoto && !hasPhoto && !isCompleted {
             showingPhotoPicker = true
+        } else if task.requiresPhoto && hasPhoto && isCompleted {
+            // If task has a photo and is currently completed, show warning before unchecking
+            showingUncheckAlert = true
         } else {
             // Otherwise, just toggle the task completion
             onToggle()

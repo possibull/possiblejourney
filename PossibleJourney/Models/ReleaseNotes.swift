@@ -42,6 +42,23 @@ struct ReleaseNotes {
                 ],
                 date: Date()
             ),
+            ReleaseNotes(
+                version: "1.3",
+                buildNumber: 13,
+                title: "Photo Protection & User Safety",
+                notes: [
+                    "⚠️ Added photo removal warning when unchecking tasks",
+                    "🛡️ Prevents accidental photo deletion with confirmation alert",
+                    "📸 Clear warning that photo removal cannot be undone",
+                    "🎯 Better user experience for photo-based tasks",
+                    "🔒 Protects user's progress photos from accidental loss",
+                    "💡 Improved task completion workflow with safety checks",
+                    "📱 Enhanced mobile interaction with confirmation dialogs",
+                    "🔧 Better error prevention and user guidance",
+                    "🚀 Ready for TestFlight distribution with photo protection"
+                ],
+                date: Date()
+            ),
         ReleaseNotes(
             version: "1.3",
             buildNumber: 7,
