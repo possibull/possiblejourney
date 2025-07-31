@@ -97,8 +97,16 @@ class AppUpdateChecker: ObservableObject {
                     func openAppStore() {
                     // For TestFlight builds, just open the TestFlight app
                     if isTestFlightBuild {
-                        if let testFlightURL = URL(string: "itms-apps://itunes.apple.com/app/testflight/id899247664") {
-                            UIApplication.shared.open(testFlightURL, options: [:], completionHandler: nil)
+                        // Try to open TestFlight app directly first
+                        if let testFlightURL = URL(string: "testflight://") {
+                            UIApplication.shared.open(testFlightURL, options: [:]) { success in
+                                // If TestFlight app is not installed, fall back to App Store
+                                if !success {
+                                    if let appStoreURL = URL(string: "itms-apps://itunes.apple.com/app/testflight/id899247664") {
+                                        UIApplication.shared.open(appStoreURL, options: [:], completionHandler: nil)
+                                    }
+                                }
+                            }
                         }
                     } else {
                         // For App Store builds, open the App Store
