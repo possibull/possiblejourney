@@ -184,6 +184,12 @@ struct DailyChecklistView: View {
         DispatchQueue.main.async {
             self.viewModel.objectWillChange.send()
         }
+        
+        // Force thumbnail refresh after a short delay to ensure UI has updated
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            print("DEBUG: Forcing thumbnail refresh after loading daily progress for date: \(date)")
+            self.viewModel.objectWillChange.send()
+        }
     }
     
     // Check for missed days and navigate to the first missed day
@@ -718,16 +724,15 @@ struct TaskRowView: View {
         .onAppear {
             loadThumbnail()
         }
+        .id(currentDailyProgress.id) // Force view recreation when daily progress changes
+
         .onChange(of: hasPhoto) { _, _ in
             loadThumbnail()
         }
         .onChange(of: currentDailyProgress.photoURLs) { _, _ in
             loadThumbnail()
         }
-        .onChange(of: currentDailyProgress.id) { _, _ in
-            // Reload thumbnail when daily progress changes (e.g., after app update)
-            loadThumbnail()
-        }
+
         .onChange(of: isCompleted) { _, newIsCompleted in
             if !newIsCompleted {
                 // Task was unchecked - clear photo state
