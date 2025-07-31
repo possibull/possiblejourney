@@ -1,0 +1,107 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Build and archive the app"
+  lane :build do
+    # Build the app
+    build_ios_app(
+      project: "PossibleJourney.xcodeproj",
+      scheme: "PossibleJourney",
+      export_method: "app-store",
+      export_options: {
+        method: "app-store",
+        provisioningProfiles: {
+          "com.mrpossible.PossibleJourney" => "PossibleJourney_AppStore"
+        }
+      },
+      output_directory: "builds",
+      output_name: "PossibleJourney.ipa"
+    )
+  end
+
+  desc "Upload to TestFlight"
+  lane :beta do
+    # Build and upload to TestFlight
+    build_ios_app(
+      project: "PossibleJourney.xcodeproj",
+      scheme: "PossibleJourney",
+      export_method: "app-store",
+      export_options: {
+        method: "app-store",
+        provisioningProfiles: {
+          "com.mrpossible.PossibleJourney" => "PossibleJourney_AppStore"
+        }
+      },
+      output_directory: "builds",
+      output_name: "PossibleJourney.ipa"
+    )
+    
+    # Upload to TestFlight
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true
+    )
+  end
+
+  desc "Deploy to App Store"
+  lane :release do
+    # Build the app
+    build_ios_app(
+      project: "PossibleJourney.xcodeproj",
+      scheme: "PossibleJourney",
+      export_method: "app-store",
+      export_options: {
+        method: "app-store",
+        provisioningProfiles: {
+          "com.mrpossible.PossibleJourney" => "PossibleJourney_AppStore"
+        }
+      },
+      output_directory: "builds",
+      output_name: "PossibleJourney.ipa"
+    )
+    
+    # Upload to App Store Connect
+    upload_to_app_store(
+      force: true,
+      skip_metadata: true,
+      skip_screenshots: true,
+      precheck_include_in_app_purchases: false
+    )
+  end
+
+  desc "Increment build number and deploy"
+  lane :deploy do
+    # Increment build number
+    increment_build_number(
+      build_number: latest_testflight_build_number + 1
+    )
+    
+    # Build and upload to TestFlight
+    beta
+  end
+
+  desc "Full release process"
+  lane :full_release do
+    # Increment build number
+    increment_build_number(
+      build_number: latest_testflight_build_number + 1
+    )
+    
+    # Build and upload to App Store
+    release
+  end
+end 
