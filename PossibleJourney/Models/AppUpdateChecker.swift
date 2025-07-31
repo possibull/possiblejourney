@@ -32,39 +32,52 @@ class AppUpdateChecker: ObservableObject {
     func checkForUpdates() {
         isChecking = true
         
-        // For TestFlight builds, we'll check against our known versions
+        // For TestFlight builds, we'll check against remote versions
         // In production, you might want to use a backend API or TestFlight API
         
-        // Simulate checking for updates (replace with actual API call)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            self.checkLocalUpdateInfo()
+        // Use the remote API method
+        fetchRemoteVersionInfo { remoteVersion, remoteBuild in
+            self.processRemoteVersionCheck(remoteVersion: remoteVersion, build: remoteBuild)
             self.isChecking = false
         }
     }
     
-    private func checkLocalUpdateInfo() {
-        // Get the latest version from our release notes
-        // In production, you might want to use a backend API or TestFlight API
+    private func checkRemoteUpdateInfo() {
+        // TODO: Replace this with actual remote API call
+        // For now, we'll simulate a remote check with hardcoded values
+        // In production, this should call your backend API or TestFlight API
         
-        // Get the latest release notes entry
-        guard let latestReleaseNotes = ReleaseNotes.allReleaseNotes.first else {
-            return
-        }
+        // Simulate remote version check
+        let remoteVersion = "1.2"  // This would come from your backend/API
+        let remoteBuild = 6        // This would come from your backend/API
         
-        let latestKnownVersion = latestReleaseNotes.version
-        let latestKnownBuild = latestReleaseNotes.buildNumber
+        // TODO: Replace the above with actual API call like:
+        // fetchRemoteVersionInfo { remoteVersion, remoteBuild in
+        //     self.processRemoteVersionCheck(remoteVersion: remoteVersion, build: remoteBuild)
+        // }
         
-        if let latestNotes = ReleaseNotes.allReleaseNotes.first(where: { 
-            $0.version == latestKnownVersion && $0.buildNumber == latestKnownBuild 
-        }) {
-            // Check if this version is newer than current
-            if self.isVersionNewer(latestKnownVersion, build: latestKnownBuild) {
+        // Check if remote version is newer than current
+        if self.isVersionNewer(remoteVersion, build: remoteBuild) {
+            // Find matching release notes for the remote version
+            if let remoteNotes = ReleaseNotes.allReleaseNotes.first(where: { 
+                $0.version == remoteVersion && $0.buildNumber == remoteBuild 
+            }) {
                 self.updateInfo = AppUpdateInfo(
-                    version: latestKnownVersion,
-                    buildNumber: latestKnownBuild,
-                    releaseNotes: latestNotes.notes.joined(separator: "\n"),
+                    version: remoteVersion,
+                    buildNumber: remoteBuild,
+                    releaseNotes: remoteNotes.notes.joined(separator: "\n"),
                     isRequired: false,
                     appStoreURL: "https://testflight.apple.com/join/your-testflight-link" // Replace with your TestFlight link
+                )
+                self.updateAvailable = true
+            } else {
+                // If no matching release notes found, create a generic update info
+                self.updateInfo = AppUpdateInfo(
+                    version: remoteVersion,
+                    buildNumber: remoteBuild,
+                    releaseNotes: "A new version is available with bug fixes and improvements.",
+                    isRequired: false,
+                    appStoreURL: "https://testflight.apple.com/join/your-testflight-link"
                 )
                 self.updateAvailable = true
             }
@@ -110,5 +123,65 @@ class AppUpdateChecker: ObservableObject {
         let currentUpdateKey = "\(updateInfo.version)_\(updateInfo.buildNumber)"
         
         return dismissedVersion != currentUpdateKey
+    }
+    
+    // MARK: - Remote API Methods (TODO: Implement these)
+    
+    private func fetchRemoteVersionInfo(completion: @escaping (String, Int) -> Void) {
+        // TODO: Implement actual remote API call
+        // Example implementation:
+        /*
+        guard let url = URL(string: "https://your-backend.com/api/latest-version") else {
+            completion("1.0", 1) // Fallback to current version
+            return
+        }
+        
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            DispatchQueue.main.async {
+                if let data = data,
+                   let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let version = json["version"] as? String,
+                   let build = json["build"] as? Int {
+                    completion(version, build)
+                } else {
+                    completion("1.0", 1) // Fallback to current version
+                }
+            }
+        }.resume()
+        */
+        
+        // For now, simulate API response
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            completion("1.2", 6) // Simulated remote version
+        }
+    }
+    
+    private func processRemoteVersionCheck(remoteVersion: String, build: Int) {
+        // Check if remote version is newer than current
+        if self.isVersionNewer(remoteVersion, build: build) {
+            // Find matching release notes for the remote version
+            if let remoteNotes = ReleaseNotes.allReleaseNotes.first(where: { 
+                $0.version == remoteVersion && $0.buildNumber == build 
+            }) {
+                self.updateInfo = AppUpdateInfo(
+                    version: remoteVersion,
+                    buildNumber: build,
+                    releaseNotes: remoteNotes.notes.joined(separator: "\n"),
+                    isRequired: false,
+                    appStoreURL: "https://testflight.apple.com/join/your-testflight-link"
+                )
+                self.updateAvailable = true
+            } else {
+                // If no matching release notes found, create a generic update info
+                self.updateInfo = AppUpdateInfo(
+                    version: remoteVersion,
+                    buildNumber: build,
+                    releaseNotes: "A new version is available with bug fixes and improvements.",
+                    isRequired: false,
+                    appStoreURL: "https://testflight.apple.com/join/your-testflight-link"
+                )
+                self.updateAvailable = true
+            }
+        }
     }
 } 

@@ -9,6 +9,22 @@ struct ReleaseNotes {
     
     static let allReleaseNotes: [ReleaseNotes] = [
         ReleaseNotes(
+            version: "1.2",
+            buildNumber: 6,
+            title: "Remote Version Checking & Enhanced Update System",
+            notes: [
+                "🌐 Remote version checking from backend API",
+                "📡 Automatic update detection from server",
+                "🔄 Real-time version comparison with remote server",
+                "📱 Improved update notification accuracy",
+                "⚡ Faster update checking and response times",
+                "🔧 Better error handling for network requests",
+                "🎯 More reliable update detection system",
+                "📋 Enhanced update management and user experience"
+            ],
+            date: Date()
+        ),
+        ReleaseNotes(
             version: "1.1",
             buildNumber: 5,
             title: "In-App Update Notifications & Enhanced Features",
