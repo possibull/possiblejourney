@@ -42,8 +42,8 @@ class AppUpdateChecker: ObservableObject {
         // In production, you might want to use a backend API or TestFlight API
         
         // Use the remote API method
-        fetchRemoteVersionInfo { remoteVersion, remoteBuild in
-            self.processRemoteVersionCheck(remoteVersion: remoteVersion, build: remoteBuild)
+        fetchRemoteVersionInfo { remoteVersion, remoteBuild, releaseNotes in
+            self.processRemoteVersionCheck(remoteVersion: remoteVersion, build: remoteBuild, releaseNotes: releaseNotes)
             self.isChecking = false
         }
     }
@@ -150,13 +150,13 @@ class AppUpdateChecker: ObservableObject {
     
     // MARK: - Remote API Methods (TODO: Implement these)
     
-    private func fetchRemoteVersionInfo(completion: @escaping (String, Int) -> Void) {
+    private func fetchRemoteVersionInfo(completion: @escaping (String, Int, String) -> Void) {
         // GitHub repository: https://github.com/possibull/possiblejourney
         // Raw JSON URL: https://raw.githubusercontent.com/possibull/possiblejourney/main/latest-version.json
         // Update the JSON file in the repository whenever you release new TestFlight builds
         
         guard let url = URL(string: "https://raw.githubusercontent.com/possibull/possiblejourney/main/latest-version.json") else {
-            completion("1.0", 1) // Fallback to current version
+            completion("1.0", 1, "A new version is available with bug fixes and improvements.") // Fallback
             return
         }
         
@@ -166,16 +166,17 @@ class AppUpdateChecker: ObservableObject {
                    let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                    let version = json["version"] as? String,
                    let build = json["build"] as? Int {
-                    completion(version, build)
+                    let releaseNotes = json["releaseNotes"] as? String ?? "A new version is available with bug fixes and improvements."
+                    completion(version, build, releaseNotes)
                 } else {
                     // Fallback to simulated response for testing
-                    completion("1.2", 6)
+                    completion("1.3", 9, "Enhanced User Experience & Performance - Improved UI/UX design and visual consistency - Enhanced app performance and responsiveness - Additional bug fixes and stability improvements - Better mobile experience and accessibility - Optimized data handling and storage - Improved user workflow and navigation - Enhanced feature reliability and consistency - Continued app improvements and refinements")
                 }
             }
         }.resume()
     }
     
-    private func processRemoteVersionCheck(remoteVersion: String, build: Int) {
+    private func processRemoteVersionCheck(remoteVersion: String, build: Int, releaseNotes: String) {
         print("DEBUG: Processing remote version check - remote: \(remoteVersion) (\(build)), current: \(currentVersion) (\(currentBuildNumber))")
         
         // Check if remote version is newer than current
@@ -183,29 +184,16 @@ class AppUpdateChecker: ObservableObject {
             print("DEBUG: Remote version is newer, showing update notification")
             // Reset session dismissal when a new update is detected
             dismissedForSession = false
-            // Find matching release notes for the remote version
-            if let remoteNotes = ReleaseNotes.allReleaseNotes.first(where: { 
-                $0.version == remoteVersion && $0.buildNumber == build 
-            }) {
-                self.updateInfo = AppUpdateInfo(
-                    version: remoteVersion,
-                    buildNumber: build,
-                    releaseNotes: remoteNotes.notes.joined(separator: "\n"),
-                    isRequired: false,
-                    appStoreURL: "https://testflight.apple.com/join/your-testflight-link"
-                )
-                self.updateAvailable = true
-            } else {
-                // If no matching release notes found, create a generic update info
-                self.updateInfo = AppUpdateInfo(
-                    version: remoteVersion,
-                    buildNumber: build,
-                    releaseNotes: "A new version is available with bug fixes and improvements.",
-                    isRequired: false,
-                    appStoreURL: "https://testflight.apple.com/join/your-testflight-link"
-                )
-                self.updateAvailable = true
-            }
+            
+            // Always create update info with release notes from remote JSON
+            self.updateInfo = AppUpdateInfo(
+                version: remoteVersion,
+                buildNumber: build,
+                releaseNotes: releaseNotes,
+                isRequired: false,
+                appStoreURL: "" // Not needed for TestFlight
+            )
+            self.updateAvailable = true
         }
     }
 } 
