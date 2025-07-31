@@ -73,10 +73,10 @@ struct UpdateNotificationView: View {
             }
             .sheet(isPresented: $showingReleaseNotes) {
                 if let updateInfo = updateChecker.updateInfo {
-                    // Show release notes for the current version being updated to
-                    if let currentReleaseNotes = ReleaseNotes.getReleaseNotesForCurrentVersion() {
+                    // Use build 18 logic: always show release notes, but combine if multiple versions
+                    if let releaseNotes = ReleaseNotes.getReleaseNotesForBuild18() {
                         ReleaseNotesView(
-                            releaseNotes: currentReleaseNotes,
+                            releaseNotes: releaseNotes,
                             onDismiss: {
                                 showingReleaseNotes = false
                             }

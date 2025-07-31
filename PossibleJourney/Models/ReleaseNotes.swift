@@ -75,6 +75,22 @@ struct ReleaseNotes {
                 ],
                 date: Date()
             ),
+            ReleaseNotes(
+                version: "1.3",
+                buildNumber: 18,
+                title: "Combined Release Notes for Multi-Version Upgrades",
+                notes: [
+                    "📝 Release notes now show on every upgrade",
+                    "🔄 For multi-version upgrades, shows all changes in one scrollable page",
+                    "📱 Improved release notes presentation with better organization",
+                    "🎯 Enhanced user experience for users upgrading from older versions",
+                    "🔧 Better release notes logic for version gap handling",
+                    "⚡ Optimized release notes loading and display",
+                    "🎨 Improved visual design for combined release notes",
+                    "🚀 Ready for TestFlight distribution with enhanced release notes"
+                ],
+                date: Date()
+            ),
         ReleaseNotes(
             version: "1.3",
             buildNumber: 7,
@@ -294,14 +310,80 @@ struct ReleaseNotes {
         return getCombinedReleaseNotes(fromUserVersion: currentVersion, userBuild: currentBuild)
     }
     
-    /// Gets the release notes for the current version being installed
-    static func getReleaseNotesForCurrentVersion() -> ReleaseNotes? {
+    // MARK: - Build 18 Logic: Combined Release Notes for Multi-Version Upgrades
+    
+    /// Gets release notes for build 18 logic: always show release notes, but combine if multiple versions
+    static func getReleaseNotesForBuild18() -> ReleaseNotes? {
         let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
         let currentBuild = Int(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1") ?? 1
         
-        // Find the release notes for the current version and build
-        return allReleaseNotes.first { release in
-            release.version == currentVersion && release.buildNumber == currentBuild
+        // Always get release notes for current version
+        let currentReleaseNotes = getReleaseNotesForCurrentVersion()
+        
+        // Check if user is upgrading from more than one version back
+        let userSeenVersion = UserDefaults.standard.string(forKey: "LastSeenReleaseNotesVersion") ?? currentVersion
+        let userSeenBuild = UserDefaults.standard.integer(forKey: "LastSeenReleaseNotesBuild")
+        
+        // Get all releases between user's last seen version and current version
+        let releasesInRange = allReleaseNotes.filter { release in
+            if release.version > userSeenVersion {
+                return true
+            } else if release.version == userSeenVersion && release.buildNumber > userSeenBuild {
+                return true
+            }
+            return false
+        }.sorted { $0.buildNumber < $1.buildNumber }
+        
+        // If only one version difference, show current version's notes
+        if releasesInRange.count <= 1 {
+            return currentReleaseNotes
         }
+        
+        // If multiple versions, create combined release notes
+        return createCombinedReleaseNotesForMultipleVersions(releasesInRange)
     }
+    
+    /// Creates combined release notes for multiple versions in a scrollable format
+    private static func createCombinedReleaseNotesForMultipleVersions(_ releases: [ReleaseNotes]) -> ReleaseNotes? {
+        guard !releases.isEmpty else { return nil }
+        
+        let firstRelease = releases.first!
+        let lastRelease = releases.last!
+        
+        // Create version range string
+        let versionRange: String
+        if firstRelease.version == lastRelease.version {
+            versionRange = "Version \(firstRelease.version) Builds \(firstRelease.buildNumber)-\(lastRelease.buildNumber)"
+        } else {
+            versionRange = "Versions \(firstRelease.version) Build \(firstRelease.buildNumber) to \(lastRelease.version) Build \(lastRelease.buildNumber)"
+        }
+        
+        // Combine all notes from all releases
+        var allNotes: [String] = []
+        
+        for (index, release) in releases.enumerated() {
+            // Add version header for each release
+            allNotes.append("📱 **\(release.version) Build \(release.buildNumber) - \(release.title)**")
+            
+            // Add all notes for this release
+            allNotes.append(contentsOf: release.notes)
+            
+            // Add separator between releases (except for the last one)
+            if index < releases.count - 1 {
+                allNotes.append("")
+                allNotes.append("---")
+                allNotes.append("")
+            }
+        }
+        
+        return ReleaseNotes(
+            version: lastRelease.version,
+            buildNumber: lastRelease.buildNumber,
+            title: "Combined Updates: \(versionRange)",
+            notes: allNotes,
+            date: Date()
+        )
+    }
+    
+
 } 
