@@ -196,6 +196,44 @@ struct DailyChecklistView: View {
         viewModel.selectDate(today)
     }
     
+    // Navigate to the first missed day from the start of the program
+    private func navigateToFirstMissedDay() {
+        let calendar = Calendar.current
+        let startDate = calendar.startOfDay(for: viewModel.program.startDate)
+        let today = calendar.startOfDay(for: Date())
+        let dailyProgressStorage = DailyProgressStorage()
+        
+        // Check all days from start date up to today
+        var currentDate = startDate
+        while currentDate <= today {
+            // Skip if we're past the program duration
+            let dayNumber = calendar.dateComponents([.day], from: startDate, to: currentDate).day ?? 0
+            if dayNumber >= viewModel.program.numberOfDays() {
+                break
+            }
+            
+            // Load the progress for this day and check if it was completed
+            let dayProgress = dailyProgressStorage.load(for: currentDate) ?? DailyProgress(
+                id: UUID(),
+                date: currentDate,
+                completedTaskIDs: [],
+                isCompleted: false
+            )
+            
+            if !dayProgress.isCompleted {
+                // Found the first missed day, navigate to it
+                viewModel.selectDate(currentDate)
+                return
+            }
+            
+            // Move to next day
+            currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate)!
+        }
+        
+        // No missed days found, stay on today
+        viewModel.selectDate(today)
+    }
+    
     private var missedDayScreen: some View {
         VStack(spacing: 20) {
             Image(systemName: "exclamationmark.triangle.fill")
@@ -226,6 +264,8 @@ struct DailyChecklistView: View {
                 
                 Button("Continue Anyway") {
                     viewModel.ignoreMissedDayForCurrentSession = true
+                    // Navigate to the first missed day from the start of the program
+                    navigateToFirstMissedDay()
                 }
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
