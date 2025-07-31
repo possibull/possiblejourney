@@ -155,6 +155,22 @@ struct ReleaseNotes {
                 ],
                 date: Date()
             ),
+            ReleaseNotes(
+                version: "1.3",
+                buildNumber: 23,
+                title: "Enhanced Settings View with Test-Driven Development",
+                notes: [
+                    "🧪 Added comprehensive test coverage for Settings view",
+                    "📱 Enhanced version information display with accessibility identifiers",
+                    "✅ Verified version and build number display functionality",
+                    "🔧 Added UI tests to ensure version information is properly shown",
+                    "📋 Improved testability with accessibility identifiers for version text",
+                    "🎯 Better quality assurance with TDD approach for settings features",
+                    "⚡ Enhanced app reliability through comprehensive testing",
+                    "🚀 Ready for TestFlight distribution with thoroughly tested settings"
+                ],
+                date: Date()
+            ),
         ReleaseNotes(
             version: "1.3",
             buildNumber: 7,

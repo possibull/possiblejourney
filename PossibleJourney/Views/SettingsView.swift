@@ -124,9 +124,11 @@ struct SettingsView: View {
                                     .font(.headline)
                                     .fontWeight(.semibold)
                                     .foregroundColor(.primary)
+                                    .accessibilityIdentifier("AppVersionText")
                                 Text("Build \(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1")")
                                     .font(.caption)
                                     .foregroundColor(.secondary)
+                                    .accessibilityIdentifier("BuildNumberText")
                             }
                         }
                         .padding(.vertical, 4)
