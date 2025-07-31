@@ -142,6 +142,13 @@ struct DailyChecklistView: View {
             
             // Start timer to check for auto-advancement every minute
             startAutoAdvanceTimer()
+            
+            // Force a refresh of thumbnails after a short delay to handle app update scenarios
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                print("DEBUG: Forcing thumbnail refresh after app appear")
+                // Trigger a UI refresh by updating the view model
+                self.viewModel.objectWillChange.send()
+            }
         }
         .onDisappear {
             // Stop timer when view disappears
@@ -695,6 +702,10 @@ struct TaskRowView: View {
         .onChange(of: currentDailyProgress.photoURLs) { _, _ in
             loadThumbnail()
         }
+        .onChange(of: currentDailyProgress.id) { _, _ in
+            // Reload thumbnail when daily progress changes (e.g., after app update)
+            loadThumbnail()
+        }
         .onChange(of: isCompleted) { _, newIsCompleted in
             if !newIsCompleted {
                 // Task was unchecked - clear photo state
@@ -720,7 +731,9 @@ struct TaskRowView: View {
     private func loadThumbnail() {
         print("DEBUG: loadThumbnail called for task: \(task.title)")
         print("DEBUG: fullImage before loadThumbnail: \(fullImage == nil ? "nil" : "not nil")")
+        print("DEBUG: currentDailyProgress photoURLs count: \(currentDailyProgress.photoURLs.count)")
         
+        // Check if we have a photo URL for this task
         guard let url = photoURL(from: currentDailyProgress) else {
             print("DEBUG: No photo URL found for task: \(task.title)")
             thumbnailImage = nil
@@ -756,6 +769,12 @@ struct TaskRowView: View {
                     self.fullImage = nil
                     self.hasPhoto = false
                     print("DEBUG: fullImage after clearing (failed): \(self.fullImage == nil ? "nil" : "not nil")")
+                }
+                
+                // Retry loading after a short delay (helps with app update scenarios)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    print("DEBUG: Retrying thumbnail load for task: \(self.task.title)")
+                    self.loadThumbnail()
                 }
             }
         }
