@@ -25,9 +25,7 @@ platform :ios do
       export_method: "app-store",
       export_options: {
         method: "app-store",
-        provisioningProfiles: {
-          "com.mrpossible.PossibleJourney" => "PossibleJourney_AppStore"
-        }
+        signingStyle: "automatic"
       },
       output_directory: "builds",
       output_name: "PossibleJourney.ipa"
@@ -43,9 +41,7 @@ platform :ios do
       export_method: "app-store",
       export_options: {
         method: "app-store",
-        provisioningProfiles: {
-          "com.mrpossible.PossibleJourney" => "PossibleJourney_AppStore"
-        }
+        signingStyle: "automatic"
       },
       output_directory: "builds",
       output_name: "PossibleJourney.ipa"
@@ -66,9 +62,7 @@ platform :ios do
       export_method: "app-store",
       export_options: {
         method: "app-store",
-        provisioningProfiles: {
-          "com.mrpossible.PossibleJourney" => "PossibleJourney_AppStore"
-        }
+        signingStyle: "automatic"
       },
       output_directory: "builds",
       output_name: "PossibleJourney.ipa"

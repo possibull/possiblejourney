@@ -59,6 +59,22 @@ struct ReleaseNotes {
                 ],
                 date: Date()
             ),
+            ReleaseNotes(
+                version: "1.3",
+                buildNumber: 16,
+                title: "Release Notes Always Show on Upgrade",
+                notes: [
+                    "📝 Release notes now always display on every app upgrade",
+                    "🎯 Shows current version's changes instead of combined notes",
+                    "🔄 Simplified upgrade experience with consistent release notes",
+                    "📱 Better user experience for version updates",
+                    "🔧 Fixed release notes logic to be more predictable",
+                    "⚡ Improved app startup with proper release note handling",
+                    "🎨 Enhanced release notes presentation and timing",
+                    "🚀 Ready for TestFlight distribution with improved release notes"
+                ],
+                date: Date()
+            ),
         ReleaseNotes(
             version: "1.3",
             buildNumber: 7,
@@ -276,5 +292,16 @@ struct ReleaseNotes {
         let currentBuild = Int(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1") ?? 1
         
         return getCombinedReleaseNotes(fromUserVersion: currentVersion, userBuild: currentBuild)
+    }
+    
+    /// Gets the release notes for the current version being installed
+    static func getReleaseNotesForCurrentVersion() -> ReleaseNotes? {
+        let currentVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
+        let currentBuild = Int(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1") ?? 1
+        
+        // Find the release notes for the current version and build
+        return allReleaseNotes.first { release in
+            release.version == currentVersion && release.buildNumber == currentBuild
+        }
     }
 } 
