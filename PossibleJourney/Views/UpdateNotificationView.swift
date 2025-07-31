@@ -15,7 +15,7 @@ struct UpdateNotificationView: View {
                             .font(.title2)
                         
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Update Available")
+                            Text(updateChecker.isTestFlightBuild ? "New TestFlight Build" : "Update Available")
                                 .font(.headline)
                                 .foregroundColor(.primary)
                             
@@ -53,7 +53,7 @@ struct UpdateNotificationView: View {
                         Button(action: {
                             updateChecker.openAppStore()
                         }) {
-                            Text("Update Now")
+                            Text(updateChecker.isTestFlightBuild ? "Get Update" : "Update Now")
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.white)

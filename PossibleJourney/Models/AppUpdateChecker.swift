@@ -18,11 +18,22 @@ class AppUpdateChecker: ObservableObject {
     private let currentBuildNumber = Int(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "4") ?? 4
     private let bundleIdentifier = Bundle.main.bundleIdentifier ?? "com.mrpossible.PossibleJourney"
     
+    // Check if this is a TestFlight build
+    var isTestFlightBuild: Bool {
+        #if DEBUG
+        return false
+        #else
+        // For now, we'll assume TestFlight builds have a sandbox receipt
+        // In a real implementation, you might want to use a more sophisticated detection method
+        return Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
+        #endif
+    }
+    
     func checkForUpdates() {
         isChecking = true
         
-        // For now, we'll use a simple approach that checks against our known versions
-        // In a production app, you might want to use a backend API or App Store Connect API
+        // For TestFlight builds, we'll check against our known versions
+        // In production, you might want to use a backend API or TestFlight API
         
         // Simulate checking for updates (replace with actual API call)
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
@@ -32,9 +43,11 @@ class AppUpdateChecker: ObservableObject {
     }
     
     private func checkLocalUpdateInfo() {
-        // This is a simplified version - in production, you'd fetch this from a server
-        // For now, we'll check if there's a newer version in our release notes
+        // For TestFlight, we'll check if there's a newer version in our release notes
+        // In production, you might want to use a backend API or TestFlight API
         
+        // TODO: Replace these with your actual TestFlight version and build numbers
+        // You can get these from App Store Connect or your TestFlight dashboard
         let latestKnownVersion = "1.1" // This would come from your backend
         let latestKnownBuild = 5 // This would come from your backend
         
@@ -48,7 +61,7 @@ class AppUpdateChecker: ObservableObject {
                     buildNumber: latestKnownBuild,
                     releaseNotes: latestNotes.notes.joined(separator: "\n"),
                     isRequired: false,
-                    appStoreURL: "https://apps.apple.com/app/id123456789" // Replace with actual App Store URL
+                    appStoreURL: "https://testflight.apple.com/join/your-testflight-link" // Replace with your TestFlight link
                 )
                 self.updateAvailable = true
             }
@@ -69,7 +82,14 @@ class AppUpdateChecker: ObservableObject {
         guard let updateInfo = updateInfo else { return }
         
         if let url = URL(string: updateInfo.appStoreURL) {
-            UIApplication.shared.open(url)
+            // For TestFlight, we need to handle the URL differently
+            if isTestFlightBuild {
+                // TestFlight links should open in Safari or the TestFlight app
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            } else {
+                // Regular App Store links
+                UIApplication.shared.open(url)
+            }
         }
     }
     
