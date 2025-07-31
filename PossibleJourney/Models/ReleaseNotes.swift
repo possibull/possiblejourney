@@ -123,6 +123,22 @@ struct ReleaseNotes {
                 ],
                 date: Date()
             ),
+            ReleaseNotes(
+                version: "1.3",
+                buildNumber: 21,
+                title: "Fixed Photo Functionality for Required Tasks",
+                notes: [
+                    "🔧 Restored photo functionality for photo-required tasks",
+                    "📸 Added minimal camera button for tasks without photos",
+                    "✅ Fixed ability to uncheck and recheck photo-required tasks",
+                    "🎯 Small green photo indicator shows when task has photo",
+                    "📱 Clean interface with functional photo capabilities",
+                    "⚡ Improved user experience for photo-based tasks",
+                    "🔧 Better photo workflow and task completion logic",
+                    "🚀 Ready for TestFlight distribution with working photo features"
+                ],
+                date: Date()
+            ),
         ReleaseNotes(
             version: "1.3",
             buildNumber: 7,
