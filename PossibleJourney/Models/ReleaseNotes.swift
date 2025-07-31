@@ -9,6 +9,22 @@ struct ReleaseNotes {
     
     static let allReleaseNotes: [ReleaseNotes] = [
         ReleaseNotes(
+            version: "1.1",
+            buildNumber: 5,
+            title: "In-App Update Notifications & Enhanced Features",
+            notes: [
+                "🔔 New in-app update notification system",
+                "📱 Automatic update checking and user notifications",
+                "🎯 Smart update prompts with release notes preview",
+                "⚡ Improved app performance and responsiveness",
+                "🔄 Enhanced user experience with update awareness",
+                "📋 Better update management and user control",
+                "🎨 Improved UI for update notifications",
+                "🔧 Additional bug fixes and stability improvements"
+            ],
+            date: Date()
+        ),
+        ReleaseNotes(
             version: "1.0",
             buildNumber: 4,
             title: "Thumbnail Path Recovery & Stability",

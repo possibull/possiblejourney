@@ -35,6 +35,7 @@ func resetForUITestingIfNeeded() {
 struct PossibleJourneyApp: App {
     @StateObject private var appState = ProgramAppState()
     @StateObject private var debugState = DebugState()
+    @StateObject private var updateChecker = AppUpdateChecker()
     @State private var showSplash = true
     
     init() {
@@ -188,6 +189,7 @@ struct PossibleJourneyApp: App {
                 .environmentObject(debugState)
             }
             .environmentObject(appState)
+            .environmentObject(updateChecker)
             }
         }
     }

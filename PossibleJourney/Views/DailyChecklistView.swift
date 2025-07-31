@@ -50,11 +50,12 @@ struct DebugWindow<Content: View>: View {
 
 struct DailyChecklistView: View {
     @StateObject private var viewModel: DailyChecklistViewModel
+    @EnvironmentObject var appState: ProgramAppState
+    @EnvironmentObject var updateChecker: AppUpdateChecker
     @State private var showingSettings = false
     @State private var showingCalendar = false
     @State private var autoAdvanceTimer: Timer?
     @State private var showingReleaseNotes = false
-    @EnvironmentObject var appState: ProgramAppState
     
     init() {
         // Load the current program and daily progress from storage
@@ -92,10 +93,15 @@ struct DailyChecklistView: View {
             Color(.systemBackground)
                 .ignoresSafeArea()
             
-            if viewModel.isDayMissed {
-                missedDayScreen
-            } else {
-                checklistContent
+            VStack(spacing: 0) {
+                // Update notification at the top
+                UpdateNotificationView(updateChecker: updateChecker)
+                
+                if viewModel.isDayMissed {
+                    missedDayScreen
+                } else {
+                    checklistContent
+                }
             }
         }
         .navigationTitle("Daily Checklist")
@@ -150,6 +156,9 @@ struct DailyChecklistView: View {
             
             // Start timer to check for auto-advancement every minute
             startAutoAdvanceTimer()
+            
+            // Check for app updates
+            updateChecker.checkForUpdates()
             
             // Force a refresh of thumbnails after a short delay to handle app update scenarios
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {

@@ -400,9 +400,9 @@
 				DEVELOPMENT_TEAM = C63QY5NNJS;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Possible Journey needs camera access to take progress photos for your daily tasks.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Possible Journey needs photo library access to select progress photos for your daily tasks.";
-				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -431,9 +431,9 @@
 				DEVELOPMENT_TEAM = C63QY5NNJS;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Possible Journey needs camera access to take progress photos for your daily tasks.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Possible Journey needs photo library access to select progress photos for your daily tasks.";
-				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
