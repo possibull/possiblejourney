@@ -43,13 +43,16 @@ class AppUpdateChecker: ObservableObject {
     }
     
     private func checkLocalUpdateInfo() {
-        // For TestFlight, we'll check if there's a newer version in our release notes
+        // Get the latest version from our release notes
         // In production, you might want to use a backend API or TestFlight API
         
-        // TODO: Replace these with your actual TestFlight version and build numbers
-        // You can get these from App Store Connect or your TestFlight dashboard
-        let latestKnownVersion = "1.1" // This would come from your backend
-        let latestKnownBuild = 5 // This would come from your backend
+        // Get the latest release notes entry
+        guard let latestReleaseNotes = ReleaseNotes.allReleaseNotes.first else {
+            return
+        }
+        
+        let latestKnownVersion = latestReleaseNotes.version
+        let latestKnownBuild = latestReleaseNotes.buildNumber
         
         if let latestNotes = ReleaseNotes.allReleaseNotes.first(where: { 
             $0.version == latestKnownVersion && $0.buildNumber == latestKnownBuild 
