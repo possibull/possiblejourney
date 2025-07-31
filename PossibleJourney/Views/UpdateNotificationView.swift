@@ -73,18 +73,29 @@ struct UpdateNotificationView: View {
             }
             .sheet(isPresented: $showingReleaseNotes) {
                 if let updateInfo = updateChecker.updateInfo {
-                    ReleaseNotesView(
-                        releaseNotes: ReleaseNotes(
-                            version: updateInfo.version,
-                            buildNumber: updateInfo.buildNumber,
-                            title: "What's New in Version \(updateInfo.version)",
-                            notes: updateInfo.releaseNotes.components(separatedBy: "\n"),
-                            date: Date()
-                        ),
-                        onDismiss: {
-                            showingReleaseNotes = false
-                        }
-                    )
+                    // Try to get combined release notes first, fallback to update info if not available
+                    if let combinedReleaseNotes = ReleaseNotes.getCombinedReleaseNotesForCurrentUser() {
+                        ReleaseNotesView(
+                            releaseNotes: combinedReleaseNotes,
+                            onDismiss: {
+                                showingReleaseNotes = false
+                            }
+                        )
+                    } else {
+                        // Fallback to the update info release notes
+                        ReleaseNotesView(
+                            releaseNotes: ReleaseNotes(
+                                version: updateInfo.version,
+                                buildNumber: updateInfo.buildNumber,
+                                title: "What's New in Version \(updateInfo.version)",
+                                notes: updateInfo.releaseNotes.components(separatedBy: "\n"),
+                                date: Date()
+                            ),
+                            onDismiss: {
+                                showingReleaseNotes = false
+                            }
+                        )
+                    }
                 }
             }
         }
