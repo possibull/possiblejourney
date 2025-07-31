@@ -68,17 +68,19 @@ struct DailyChecklistView: View {
             customNumberOfDays: nil
         )
         
-        let today = Date()
-        let dailyProgress = dailyProgressStorage.load(for: today) ?? DailyProgress(
+        let now = Date()
+        // Use the program's nextActiveDay logic to determine the correct active day
+        let activeDay = program.nextActiveDay(currentDate: now) ?? Calendar.current.startOfDay(for: now)
+        let dailyProgress = dailyProgressStorage.load(for: activeDay) ?? DailyProgress(
             id: UUID(),
-            date: today,
+            date: activeDay,
             completedTaskIDs: []
         )
         
         _viewModel = StateObject(wrappedValue: DailyChecklistViewModel(
             program: program,
             dailyProgress: dailyProgress,
-            now: today
+            now: now
         ))
     }
     

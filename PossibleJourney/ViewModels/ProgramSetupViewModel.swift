@@ -148,6 +148,7 @@ class DailyChecklistViewModel: ObservableObject {
         self.program = program
         self.dailyProgress = dailyProgress
         self.now = now
-        self.selectedDate = now // Always start with current date, not the loaded progress date
+        // Use the program's nextActiveDay logic to determine the correct active day
+        self.selectedDate = program.nextActiveDay(currentDate: now) ?? Calendar.current.startOfDay(for: now)
     }
 } 
