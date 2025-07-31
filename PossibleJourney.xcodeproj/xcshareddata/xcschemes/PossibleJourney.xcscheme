@@ -97,6 +97,7 @@
    </AnalyzeAction>
    <ArchiveAction
       buildConfiguration = "Release"
+      customArchiveName = "PossibleJourney"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>
