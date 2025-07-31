@@ -112,16 +112,9 @@ extension Program {
     var currentAppDay: Date {
         let calendar = Calendar.current
         if let last = lastCompletedDay {
-            // Check if we should advance to the next day based on current time and EOD rules
-            let boundary = nextAppDayBoundary(after: last)
-            let now = Date()
-            if now >= boundary {
-                // Should advance to next day
-                return calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: last))!
-            } else {
-                // Should still be on the last completed day
-                return calendar.startOfDay(for: last)
-            }
+            // The current active day is always the next day after the last completed day
+            // We don't need to check EOD boundaries here - that's handled by the day progression logic
+            return calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: last))!
         } else {
             return calendar.startOfDay(for: startDate)
         }
