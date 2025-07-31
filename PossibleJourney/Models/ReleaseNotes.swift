@@ -10,6 +10,23 @@ struct ReleaseNotes {
     static let allReleaseNotes: [ReleaseNotes] = [
         ReleaseNotes(
             version: "1.3",
+            buildNumber: 8,
+            title: "Session-Based Update Notifications & Direct TestFlight Integration",
+            notes: [
+                "🔔 Fixed update notification dismissal to be session-based only",
+                "🔄 Update notifications now reappear on app reload and program reset",
+                "📱 Direct TestFlight app integration (bypasses App Store)",
+                "🎯 Persistent update reminders until user actually updates",
+                "⚡ Improved TestFlight URL scheme handling",
+                "🖥️ Enhanced simulator compatibility for update system",
+                "🔧 Better update notification user experience",
+                "📋 Improved update management and user control",
+                "🚀 Ready for production TestFlight distribution with persistent reminders"
+            ],
+            date: Date()
+        ),
+        ReleaseNotes(
+            version: "1.3",
             buildNumber: 7,
             title: "Enhanced User Experience & Performance",
             notes: [
