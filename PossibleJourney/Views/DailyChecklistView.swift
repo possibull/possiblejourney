@@ -52,6 +52,7 @@ struct DailyChecklistView: View {
     @StateObject private var viewModel: DailyChecklistViewModel
     @State private var showingSettings = false
     @State private var showingCalendar = false
+    @State private var autoAdvanceTimer: Timer?
     @EnvironmentObject var appState: ProgramAppState
     
     init() {
@@ -138,6 +139,13 @@ struct DailyChecklistView: View {
             
             // Always load progress for the selected date (which acts as the current date for the app)
             loadDailyProgressForDate(viewModel.selectedDate)
+            
+            // Start timer to check for auto-advancement every minute
+            startAutoAdvanceTimer()
+        }
+        .onDisappear {
+            // Stop timer when view disappears
+            stopAutoAdvanceTimer()
         }
     }
     
@@ -232,6 +240,52 @@ struct DailyChecklistView: View {
         
         // No missed days found, stay on today
         viewModel.selectDate(today)
+    }
+    
+    // Start timer to check for auto-advancement
+    private func startAutoAdvanceTimer() {
+        // Stop any existing timer
+        stopAutoAdvanceTimer()
+        
+        // Create a timer that fires every minute
+        autoAdvanceTimer = Timer.scheduledTimer(withTimeInterval: 60.0, repeats: true) { _ in
+            checkForAutoAdvancement()
+        }
+    }
+    
+    // Stop the auto-advancement timer
+    private func stopAutoAdvanceTimer() {
+        autoAdvanceTimer?.invalidate()
+        autoAdvanceTimer = nil
+    }
+    
+    // Check if we should auto-advance to the next day
+    private func checkForAutoAdvancement() {
+        let now = Date()
+        
+        // Only auto-advance if the current day is completed
+        let allTasksCompleted = viewModel.program.tasks().allSatisfy { 
+            viewModel.dailyProgress.completedTaskIDs.contains($0.id) 
+        }
+        
+        if allTasksCompleted && viewModel.program.shouldAutoAdvanceToNextDay(now: now, lastCompletedDay: viewModel.program.lastCompletedDay) {
+            // Auto-advance to the next day
+            autoAdvanceToNextDay()
+        }
+    }
+    
+    // Auto-advance to the next day
+    private func autoAdvanceToNextDay() {
+        let calendar = Calendar.current
+        let nextDay = calendar.date(byAdding: .day, value: 1, to: viewModel.selectedDate)!
+        
+        // Navigate to the next day
+        viewModel.selectDate(nextDay)
+        
+        // Force UI update
+        DispatchQueue.main.async {
+            self.viewModel.objectWillChange.send()
+        }
     }
     
     private var missedDayScreen: some View {

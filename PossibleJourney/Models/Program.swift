@@ -142,4 +142,35 @@ extension Program {
         let allComplete = tasks().allSatisfy { completedTaskIDs.contains($0.id) }
         return !allComplete && now >= eod
     }
+    
+    /// Returns true if the app should auto-advance to the next day
+    /// This happens when a day is completed AND it's past EOD and 12AM of the next day, whichever comes last
+    func shouldAutoAdvanceToNextDay(now: Date, lastCompletedDay: Date?) -> Bool {
+        guard let lastCompleted = lastCompletedDay else { return false }
+        
+        let calendar = Calendar.current
+        let endHour = calendar.component(.hour, from: endOfDayTime)
+        let endMinute = calendar.component(.minute, from: endOfDayTime)
+        
+        // Calculate EOD boundary for the last completed day
+        let startOfLastCompleted = calendar.startOfDay(for: lastCompleted)
+        let eodBoundary: Date
+        if endHour < 12 {
+            // EOD is AM: boundary is next day at EOD time (e.g., 2AM)
+            let nextDay = calendar.date(byAdding: .day, value: 1, to: startOfLastCompleted)!
+            eodBoundary = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: nextDay)!
+        } else {
+            // EOD is PM: boundary is same day at EOD time (e.g., 10PM)
+            eodBoundary = calendar.date(bySettingHour: endHour, minute: endMinute, second: 0, of: startOfLastCompleted)!
+        }
+        
+        // Calculate 12AM boundary (midnight of the next day after the last completed day)
+        let nextDayAfterCompleted = calendar.date(byAdding: .day, value: 1, to: startOfLastCompleted)!
+        let midnightBoundary = calendar.startOfDay(for: nextDayAfterCompleted)
+        
+        // Auto-advance when current time is past whichever boundary comes last
+        let autoAdvanceBoundary = max(eodBoundary, midnightBoundary)
+        
+        return now >= autoAdvanceBoundary
+    }
 } 
