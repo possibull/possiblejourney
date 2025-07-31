@@ -17,23 +17,25 @@ struct SettingsView: View {
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 24) {
-                // Header
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Settings")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .foregroundColor(.primary)
+            ScrollView {
+                VStack(spacing: 24) {
+                    // Header
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Settings")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
+                        
+                        Text("Customize your program experience")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal)
+                    .padding(.top, 8)
                     
-                    Text("Customize your program experience")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal)
-                .padding(.top, 8)
-                // Settings Form
-                Form {
+                    // Settings Form
+                    VStack(spacing: 0) {
                     Section {
                         HStack {
                             Image(systemName: "clock.fill")
@@ -139,51 +141,54 @@ struct SettingsView: View {
                             .textCase(.uppercase)
                             .fontWeight(.semibold)
                     }
-                }
-                .scrollContentBackground(.hidden)
-                .background(Color(.systemGroupedBackground))
-                // Reset Button
-                VStack(spacing: 16) {
-                    Button(action: {
-                        // Clear all program data
-                        ProgramStorage().clear()
-                        DailyProgressStorage().clearAll()
-                        
-                        // Clear the program from app state to trigger navigation back to template selection
-                        appState.loadedProgram = nil
-                        
-                        // Reset end of day time to default
-                        endOfDayTime = Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22) // Default 10pm
-                        
-                        // Call the onReset callback if provided
-                        onReset?()
-                        
-                        // Dismiss the settings sheet
-                        presentationMode.wrappedValue.dismiss()
-                    }) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "arrow.clockwise")
-                                .font(.title3)
-                            Text("Reset Program")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                        }
-                        .foregroundColor(.white)
-                        .padding(.vertical, 16)
-                        .frame(maxWidth: .infinity)
-                        .background(Color.red)
-                        .cornerRadius(12)
                     }
+                    .background(Color(.systemGroupedBackground))
+                    .cornerRadius(12)
                     .padding(.horizontal)
                     
-                    Text("This will clear all your progress and start fresh")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .multilineTextAlignment(.center)
+                    // Reset Button Section
+                    VStack(spacing: 16) {
+                        Button(action: {
+                            // Clear all program data
+                            ProgramStorage().clear()
+                            DailyProgressStorage().clearAll()
+                            
+                            // Clear the program from app state to trigger navigation back to template selection
+                            appState.loadedProgram = nil
+                            
+                            // Reset end of day time to default
+                            endOfDayTime = Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22) // Default 10pm
+                            
+                            // Call the onReset callback if provided
+                            onReset?()
+                            
+                            // Dismiss the settings sheet
+                            presentationMode.wrappedValue.dismiss()
+                        }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "arrow.clockwise")
+                                    .font(.title3)
+                                Text("Reset Program")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                            }
+                            .foregroundColor(.white)
+                            .padding(.vertical, 16)
+                            .frame(maxWidth: .infinity)
+                            .background(Color.red)
+                            .cornerRadius(12)
+                        }
                         .padding(.horizontal)
+                        
+                        Text("This will clear all your progress and start fresh")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                    }
+                    .padding(.bottom, 32)
                 }
-                
-                Spacer()
+                .padding(.horizontal)
             }
             .background(Color(.systemBackground))
         }

@@ -171,6 +171,22 @@ struct ReleaseNotes {
                 ],
                 date: Date()
             ),
+            ReleaseNotes(
+                version: "1.3",
+                buildNumber: 24,
+                title: "Fixed Settings View Layout and Scrolling",
+                notes: [
+                    "🔧 Fixed Settings view layout to prevent About section from being obscured",
+                    "📱 Restructured Settings view to use proper ScrollView instead of Form",
+                    "✅ Reset Program button now properly positioned at bottom of scrollable content",
+                    "🎯 Improved Settings view scrolling behavior and content visibility",
+                    "📋 Enhanced Settings view layout with better spacing and organization",
+                    "⚡ Fixed UI layout issues that were affecting iPhone display",
+                    "🔧 Better user experience with properly accessible About section",
+                    "🚀 Ready for TestFlight distribution with improved Settings view layout"
+                ],
+                date: Date()
+            ),
         ReleaseNotes(
             version: "1.3",
             buildNumber: 7,
