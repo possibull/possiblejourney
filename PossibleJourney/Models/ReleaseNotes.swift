@@ -10,18 +10,18 @@ struct ReleaseNotes {
     static let allReleaseNotes: [ReleaseNotes] = [
         ReleaseNotes(
             version: "1.3",
-            buildNumber: 10,
-            title: "Fixed Release Notes Display & Enhanced Update System",
+            buildNumber: 11,
+            title: "Enhanced UI & Improved User Experience",
             notes: [
-                "🔧 Fixed release notes not showing in update notifications",
-                "📝 Release notes now always display from remote JSON",
-                "🔄 Improved remote version checking and release notes fetching",
-                "📱 Enhanced TestFlight update system reliability",
-                "🎯 Better update notification user experience",
-                "⚡ Optimized remote API calls and error handling",
-                "🖥️ Improved simulator compatibility for update system",
-                "📋 Enhanced update management and user control",
-                "🚀 Ready for production TestFlight distribution with proper release notes"
+                "🖼️ Increased thumbnail size on task rows for better visibility",
+                "📱 Improved photo display and interaction in daily checklist",
+                "🎨 Enhanced visual design with larger, more accessible thumbnails",
+                "👆 Better touch targets for photo viewing and interaction",
+                "📋 Improved task row layout and spacing",
+                "🔧 Enhanced photo thumbnail quality and presentation",
+                "🎯 Better user experience for photo-based tasks",
+                "⚡ Optimized thumbnail loading and display performance",
+                "🚀 Ready for TestFlight distribution with improved UI"
             ],
             date: Date()
         ),
