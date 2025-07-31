@@ -1,7 +1,7 @@
 {
   "version": "1.3",
-  "build": 21,
-  "releaseNotes": "Fixed Photo Functionality for Required Tasks - Restored photo functionality for photo-required tasks - Added minimal camera button for tasks without photos - Fixed ability to uncheck and recheck photo-required tasks - Small green photo indicator shows when task has photo - Clean interface with functional photo capabilities - Improved user experience for photo-based tasks - Better photo workflow and task completion logic - Ready for TestFlight distribution with working photo features",
+  "build": 22,
+  "releaseNotes": "Fixed App Update Checking on Startup - Fixed app update checking to run every time app opens - Update check now triggers on app startup and splash screen - Ensures users always see latest version information - Added backup update check when main content appears - Improved update notification reliability - Better user experience with consistent update checking - Enhanced app startup workflow and update detection - Ready for TestFlight distribution with reliable update checking",
   "forceUpdate": false,
-  "lastUpdated": "2025-07-31T07:30:00Z"
+  "lastUpdated": "2025-07-31T08:00:00Z"
 }
