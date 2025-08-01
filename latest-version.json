@@ -1,0 +1,7 @@
+{
+  "version": "1.5",
+  "build": 1,
+  "releaseNotes": "Complete Theme System Implementation - All UI pages now properly conform to the selected theme (Light, Dark, System) - Enhanced visual consistency across the entire app with theme-aware backgrounds and styling - Improved user experience with seamless theme switching and persistent theme preferences - Modern gradient backgrounds and card styling that adapt to the selected theme - Enhanced text colors and contrast for better readability in all themes - Professional styling updates across DailyChecklistView, ProgramCalendarView, ProgramSetupView, SplashView, ReleaseNotesView, UpdateNotificationView, and SettingsView - Fixed Swift compiler issues and improved code structure for better maintainability - Comprehensive theme support ensures the app looks great in any lighting condition",
+  "forceUpdate": false,
+  "lastUpdated": "2025-07-31T19:00:00Z"
+}
