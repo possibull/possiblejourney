@@ -52,6 +52,7 @@ struct DailyChecklistView: View {
     @StateObject private var viewModel: DailyChecklistViewModel
     @EnvironmentObject var appState: ProgramAppState
     @EnvironmentObject var updateChecker: AppUpdateChecker
+    @EnvironmentObject var themeManager: ThemeManager
     @State private var showingSettings = false
     @State private var showingCalendar = false
     @State private var autoAdvanceTimer: Timer?
@@ -89,17 +90,10 @@ struct DailyChecklistView: View {
     
     var body: some View {
         ZStack {
-            // Modern gradient background
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    Color(.systemBackground),
-                    Color.blue.opacity(0.05),
-                    Color.purple.opacity(0.03)
-                ]),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
+            // Theme-aware background
+            Color.clear
+                .themeAwareBackground()
+                .ignoresSafeArea()
             
             VStack(spacing: 0) {
                 // Update notification at the top
@@ -433,7 +427,7 @@ struct DailyChecklistView: View {
                 .scaleEffect(x: 1, y: 2, anchor: .center)
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(Color(.systemGray6).opacity(themeManager.colorScheme == .dark ? 0.3 : 1.0))
     }
     
     private var taskListView: some View {
@@ -470,6 +464,7 @@ struct DailyChecklistView: View {
             .onMove(perform: moveTasks)
         }
         .listStyle(PlainListStyle())
+        .background(Color.clear)
         .onAppear {
             // Debug: Print task information to help identify missing descriptions
             print("=== Task Debug Info ===")
@@ -579,6 +574,7 @@ struct TaskRowView: View {
     let onSetReminder: () -> Void
     let onUpdateDailyProgress: (DailyProgress) -> Void
     let onPhotoRemoved: () -> Void
+    @EnvironmentObject var themeManager: ThemeManager
     @State private var showingPhotoPicker = false
     @State private var showingImagePicker = false
     @State private var selectedImage: UIImage?
@@ -743,11 +739,7 @@ struct TaskRowView: View {
                 }
             }
             .padding(16)
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color(.systemBackground))
-                    .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 4)
-            )
+            .themeAwareCard()
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(
