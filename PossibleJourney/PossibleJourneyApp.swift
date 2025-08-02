@@ -26,7 +26,7 @@ struct BeaNumberSequenceView: View {
         ["x", "o", "o", "o", "x", "x", "x", "x"],
         ["X", "O", "O", "O", "X", "X", "X", "X"],
         [".", "-", "-", "-", ".", ".", "."],
-        ["💜", "💛", "💛", "💛", "💜", "💜", "💜", "💜"]
+        ["ph", "yh", "yh", "yh", "ph", "ph", "ph", "ph"]
     ]
     @State private var currentSequence: [String] = []
     private let displayDuration: TimeInterval = 0.8
