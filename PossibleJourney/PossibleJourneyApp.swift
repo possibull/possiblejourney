@@ -131,32 +131,32 @@ struct BeaNumberSequenceView: View {
         // Position bees in the shape of "B E A" above the numbers
         let centerX: CGFloat = 200 // Center of screen
         let baseY: CGFloat = 150   // Above the numbers
-        let letterSpacing: CGFloat = 120 // Space between letters
-        let beeSpacing: CGFloat = 40 // Space between bees in each letter
+        let letterSpacing: CGFloat = 80 // Space between letters
+        let beeSpacing: CGFloat = 25 // Space between bees in each letter
         
-        // Letter "B" - 5 bees
+        // Letter "B" - 5 bees forming a proper B shape
         let bStartX = centerX - letterSpacing
-        beePositions.append(CGPoint(x: bStartX, y: baseY - 40)) // Top
-        beePositions.append(CGPoint(x: bStartX, y: baseY))      // Middle
-        beePositions.append(CGPoint(x: bStartX, y: baseY + 40)) // Bottom
-        beePositions.append(CGPoint(x: bStartX + beeSpacing, y: baseY - 20)) // Top curve
-        beePositions.append(CGPoint(x: bStartX + beeSpacing, y: baseY + 20)) // Bottom curve
+        beePositions.append(CGPoint(x: bStartX, y: baseY - 30)) // Top left
+        beePositions.append(CGPoint(x: bStartX, y: baseY))      // Middle left
+        beePositions.append(CGPoint(x: bStartX, y: baseY + 30)) // Bottom left
+        beePositions.append(CGPoint(x: bStartX + beeSpacing, y: baseY - 15)) // Top curve
+        beePositions.append(CGPoint(x: bStartX + beeSpacing, y: baseY + 15)) // Bottom curve
         
-        // Letter "E" - 5 bees
+        // Letter "E" - 5 bees forming a proper E shape
         let eStartX = centerX
-        beePositions.append(CGPoint(x: eStartX, y: baseY - 40)) // Top
-        beePositions.append(CGPoint(x: eStartX, y: baseY))      // Middle
-        beePositions.append(CGPoint(x: eStartX, y: baseY + 40)) // Bottom
-        beePositions.append(CGPoint(x: eStartX + beeSpacing, y: baseY - 40)) // Top bar
-        beePositions.append(CGPoint(x: eStartX + beeSpacing, y: baseY + 40)) // Bottom bar
+        beePositions.append(CGPoint(x: eStartX, y: baseY - 30)) // Top left
+        beePositions.append(CGPoint(x: eStartX, y: baseY))      // Middle left
+        beePositions.append(CGPoint(x: eStartX, y: baseY + 30)) // Bottom left
+        beePositions.append(CGPoint(x: eStartX + beeSpacing, y: baseY - 30)) // Top bar
+        beePositions.append(CGPoint(x: eStartX + beeSpacing, y: baseY + 30)) // Bottom bar
         
-        // Letter "A" - 5 bees
+        // Letter "A" - 5 bees forming a proper A shape
         let aStartX = centerX + letterSpacing
-        beePositions.append(CGPoint(x: aStartX, y: baseY - 40)) // Top left
-        beePositions.append(CGPoint(x: aStartX, y: baseY + 40)) // Bottom left
-        beePositions.append(CGPoint(x: aStartX + beeSpacing, y: baseY - 40)) // Top right
-        beePositions.append(CGPoint(x: aStartX + beeSpacing, y: baseY + 40)) // Bottom right
+        beePositions.append(CGPoint(x: aStartX, y: baseY + 30)) // Bottom left
+        beePositions.append(CGPoint(x: aStartX + beeSpacing, y: baseY + 30)) // Bottom right
+        beePositions.append(CGPoint(x: aStartX + beeSpacing/2, y: baseY - 30)) // Top point
         beePositions.append(CGPoint(x: aStartX + beeSpacing/2, y: baseY))    // Middle cross
+        beePositions.append(CGPoint(x: aStartX + beeSpacing/2, y: baseY + 15)) // Middle cross lower
         
         // Initialize rotations and scales for all bees
         for _ in 0..<beeCount {
