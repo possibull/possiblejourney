@@ -24,28 +24,28 @@ struct SplashView: View {
         
         switch themeManager.currentTheme {
         case .bea:
-            print("DEBUG: Using Bea theme colors")
+            print("DEBUG: Using Bea theme colors - PINK")
             return [
-                Color(red: 0.6, green: 0.8, blue: 1.0), // Pastel blue
-                Color(red: 1.0, green: 0.9, blue: 0.6), // Pastel yellow
-                Color(red: 0.7, green: 0.9, blue: 1.0)  // Medium pastel blue
+                Color.pink, // Very distinct color for testing
+                Color.yellow,
+                Color.pink
             ]
         case .dark:
-            print("DEBUG: Using Dark theme colors")
+            print("DEBUG: Using Dark theme colors - RED")
             return [
-                Color.blue.opacity(0.9),
-                Color.purple.opacity(0.7),
-                Color.blue.opacity(0.5)
+                Color.red,
+                Color.orange,
+                Color.red
             ]
         case .light, .system:
-            print("DEBUG: Using Light/System theme colors")
+            print("DEBUG: Using Light/System theme colors - GREEN")
             return [
-                Color.blue.opacity(0.9),
-                Color.purple.opacity(0.7),
-                Color.blue.opacity(0.5)
+                Color.green,
+                Color.blue,
+                Color.green
             ]
         @unknown default:
-            print("DEBUG: Using default fallback colors")
+            print("DEBUG: Using default fallback colors - PURPLE")
             // Fallback to original colors if theme is not recognized
             return [
                 Color.blue.opacity(0.8),
@@ -59,11 +59,7 @@ struct SplashView: View {
         ZStack {
             // Animated gradient background
             LinearGradient(
-                gradient: Gradient(colors: [
-                    Color.blue.opacity(0.8),
-                    Color.purple.opacity(0.6),
-                    Color.blue.opacity(0.4)
-                ]),
+                gradient: Gradient(colors: themeGradientColors),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )

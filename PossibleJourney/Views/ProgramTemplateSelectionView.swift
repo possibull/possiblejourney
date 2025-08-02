@@ -363,6 +363,7 @@ struct TemplateDetailView: View {
     @State private var numberOfDays: Int
     @State private var useCustomDays = false
     @Environment(\.presentationMode) private var presentationMode
+    @EnvironmentObject var themeManager: ThemeManager
     
     init(template: ProgramTemplate, onStartProgram: @escaping (Program) -> Void, onDuplicate: @escaping (ProgramTemplate) -> Void, onDelete: @escaping (ProgramTemplate) -> Void) {
         self.template = template
@@ -372,18 +373,46 @@ struct TemplateDetailView: View {
         self._numberOfDays = State(initialValue: template.defaultNumberOfDays)
     }
     
+    private var themeAccentColor: Color {
+        switch themeManager.currentTheme {
+        case .bea:
+            return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
+        case .dark:
+            return Color.blue
+        case .light, .system:
+            return Color.blue
+        }
+    }
+    
+    private var themeSecondaryColor: Color {
+        switch themeManager.currentTheme {
+        case .bea:
+            return Color(red: 1.0, green: 0.98, blue: 0.8) // Pastel yellow
+        case .dark:
+            return Color.blue.opacity(0.7)
+        case .light, .system:
+            return Color.blue.opacity(0.7)
+        }
+    }
+    
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
-                    headerSection
-                    tasksSection
-                    numberOfDaysSection
-                    startDateSection
-                    endOfDaySection
-                    startButton
+            ZStack {
+                // Theme-aware background
+                Color.clear
+                    .themeAwareBackground()
+                    .ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 24) {
+                        headerSection
+                        tasksSection
+                        configurationSection
+                        startButton
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 32)
                 }
-                .padding()
             }
             .navigationTitle("Template Details")
             .navigationBarTitleDisplayMode(.inline)
@@ -392,162 +421,208 @@ struct TemplateDetailView: View {
                     Button("Cancel") {
                         presentationMode.wrappedValue.dismiss()
                     }
+                    .foregroundColor(themeAccentColor)
+                    .fontWeight(.medium)
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    HStack {
+                    HStack(spacing: 16) {
                         Button("Duplicate") {
                             onDuplicate(template)
                         }
+                        .foregroundColor(themeAccentColor)
+                        .fontWeight(.medium)
                         
                         Button("Delete") {
                             onDelete(template)
                         }
                         .foregroundColor(.red)
+                        .fontWeight(.medium)
                     }
                 }
-            }
-            .onAppear {
-                // Template detail view appeared
             }
         }
     }
     
     private var headerSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Image(systemName: template.category.icon)
-                    .font(.title)
-                    .foregroundColor(.blue)
+        VStack(alignment: .leading, spacing: 16) {
+            // Icon and title section
+            HStack(spacing: 16) {
+                // Category icon with themed background
+                ZStack {
+                    Circle()
+                        .fill(themeSecondaryColor.opacity(0.3))
+                        .frame(width: 60, height: 60)
+                    
+                    Image(systemName: template.category.icon)
+                        .font(.title)
+                        .foregroundColor(themeAccentColor)
+                }
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(template.name)
                         .font(.title)
                         .fontWeight(.bold)
+                        .foregroundColor(.primary)
                     
                     Text(template.description)
                         .font(.body)
                         .foregroundColor(.secondary)
+                        .lineLimit(2)
                 }
                 
                 Spacer()
             }
             
-            HStack {
-                Label("\(template.defaultNumberOfDays) days", systemImage: "calendar")
+            // Stats row
+            HStack(spacing: 20) {
+                StatItem(
+                    icon: "calendar",
+                    value: "\(template.defaultNumberOfDays)",
+                    label: "days",
+                    color: themeAccentColor
+                )
+                
+                StatItem(
+                    icon: "tag",
+                    value: template.category.displayName,
+                    label: "category",
+                    color: themeSecondaryColor
+                )
+                
+                StatItem(
+                    icon: "checkmark.circle",
+                    value: "\(template.tasks.count)",
+                    label: "tasks",
+                    color: themeAccentColor
+                )
+                
                 Spacer()
-                Label(template.category.displayName, systemImage: "tag")
             }
-            .font(.caption)
-            .foregroundColor(.secondary)
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
+        .padding(20)
+        .themeAwareCard()
     }
     
     private var tasksSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Daily Tasks")
-                .font(.headline)
-                .fontWeight(.semibold)
-            
-            ForEach(template.tasks, id: \.id) { task in
-                HStack(alignment: .top, spacing: 12) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundColor(.blue)
-                        .font(.title3)
-                    
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(task.title)
-                            .font(.body)
-                            .fontWeight(.medium)
-                        
-                        if let description = task.description {
-                            Text(description)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    
-                    Spacer()
-                }
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(8)
-            }
-        }
-    }
-    
-    private var startDateSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Start Date")
-                .font(.headline)
-                .fontWeight(.semibold)
-            
-            DatePicker("Start Date", selection: $startDate, displayedComponents: .date)
-                .datePickerStyle(CompactDatePickerStyle())
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(8)
-        }
-    }
-    
-    private var numberOfDaysSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Number of Days")
-                .font(.headline)
-                .fontWeight(.semibold)
-            
+        VStack(alignment: .leading, spacing: 16) {
             HStack {
-                Toggle("Custom", isOn: $useCustomDays)
-                    .font(.body)
+                Image(systemName: "list.bullet")
+                    .foregroundColor(themeAccentColor)
+                    .font(.title2)
+                
+                Text("Daily Tasks")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.primary)
                 
                 Spacer()
-                
-                if useCustomDays {
-                    Text("days")
-                        .font(.body)
-                        .foregroundColor(.secondary)
-                    
-                    TextField("Days", value: $numberOfDays, format: .number)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .frame(width: 80)
-                        .keyboardType(.numberPad)
-                        .onChange(of: numberOfDays) { oldValue, newValue in
-                            // Ensure the value stays within valid range
-                            if newValue < 1 {
-                                numberOfDays = 1
-                            } else if newValue > 365 {
-                                numberOfDays = 365
-                            }
-                        }
-                    
-                    Stepper("", value: $numberOfDays, in: 1...365)
-                        .labelsHidden()
-                } else {
-                    Text("\(template.defaultNumberOfDays) days (default)")
-                        .font(.body)
-                        .foregroundColor(.secondary)
+            }
+            
+            LazyVStack(spacing: 12) {
+                ForEach(Array(template.tasks.enumerated()), id: \.element.id) { index, task in
+                    TaskDetailRow(
+                        task: task,
+                        index: index + 1,
+                        accentColor: themeAccentColor,
+                        secondaryColor: themeSecondaryColor
+                    )
                 }
             }
-            .padding()
-            .background(Color(.systemGray6))
-            .cornerRadius(8)
         }
     }
     
-    private var endOfDaySection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("End of Day Time")
-                .font(.headline)
-                .fontWeight(.semibold)
+    private var configurationSection: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            HStack {
+                Image(systemName: "gear")
+                    .foregroundColor(themeAccentColor)
+                    .font(.title2)
+                
+                Text("Program Configuration")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.primary)
+                
+                Spacer()
+            }
             
-            DatePicker("End of Day Time", selection: $endOfDayTime, displayedComponents: .hourAndMinute)
-                .datePickerStyle(CompactDatePickerStyle())
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(8)
+            VStack(spacing: 16) {
+                // Start Date
+                ConfigurationRow(
+                    icon: "calendar.badge.plus",
+                    title: "Start Date",
+                    content: {
+                        DatePicker("Start Date", selection: $startDate, displayedComponents: .date)
+                            .datePickerStyle(CompactDatePickerStyle())
+                            .accentColor(themeAccentColor)
+                    },
+                    accentColor: themeAccentColor
+                )
+                
+                // Number of Days
+                ConfigurationRow(
+                    icon: "number.circle",
+                    title: "Number of Days",
+                    content: {
+                        VStack(spacing: 12) {
+                            HStack {
+                                Toggle("Custom Duration", isOn: $useCustomDays)
+                                    .font(.body)
+                                    .accentColor(themeAccentColor)
+                                
+                                Spacer()
+                            }
+                            
+                            if useCustomDays {
+                                HStack {
+                                    Text("days")
+                                        .font(.body)
+                                        .foregroundColor(.secondary)
+                                    
+                                    TextField("Days", value: $numberOfDays, format: .number)
+                                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                                        .frame(width: 80)
+                                        .keyboardType(.numberPad)
+                                        .onChange(of: numberOfDays) { oldValue, newValue in
+                                            if newValue < 1 {
+                                                numberOfDays = 1
+                                            } else if newValue > 365 {
+                                                numberOfDays = 365
+                                            }
+                                        }
+                                    
+                                    Stepper("", value: $numberOfDays, in: 1...365)
+                                        .labelsHidden()
+                                        .accentColor(themeAccentColor)
+                                    
+                                    Spacer()
+                                }
+                            } else {
+                                HStack {
+                                    Text("\(template.defaultNumberOfDays) days (default)")
+                                        .font(.body)
+                                        .foregroundColor(.secondary)
+                                    Spacer()
+                                }
+                            }
+                        }
+                    },
+                    accentColor: themeAccentColor
+                )
+                
+                // End of Day Time
+                ConfigurationRow(
+                    icon: "clock",
+                    title: "End of Day Time",
+                    content: {
+                        DatePicker("End of Day Time", selection: $endOfDayTime, displayedComponents: .hourAndMinute)
+                            .datePickerStyle(CompactDatePickerStyle())
+                            .accentColor(themeAccentColor)
+                    },
+                    accentColor: themeAccentColor
+                )
+            }
         }
     }
     
@@ -557,18 +632,146 @@ struct TemplateDetailView: View {
             let program = template.createProgram(startDate: startDate, endOfDayTime: endOfDayTime, numberOfDays: customDays)
             onStartProgram(program)
         }) {
-            HStack {
+            HStack(spacing: 12) {
                 Image(systemName: "play.fill")
+                    .font(.title3)
                 Text("Start Program")
+                    .font(.title3)
                     .fontWeight(.semibold)
             }
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
-            .padding()
-            .background(Color.blue)
-            .cornerRadius(12)
+            .padding(.vertical, 16)
+            .background(
+                LinearGradient(
+                    gradient: Gradient(colors: [themeAccentColor, themeAccentColor.opacity(0.8)]),
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+            .cornerRadius(16)
+            .shadow(
+                color: themeAccentColor.opacity(0.3),
+                radius: 8,
+                x: 0,
+                y: 4
+            )
         }
-        .padding(.top)
+        .padding(.top, 8)
+    }
+}
+
+// MARK: - Supporting Views
+
+struct StatItem: View {
+    let icon: String
+    let value: String
+    let label: String
+    let color: Color
+    
+    var body: some View {
+        VStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundColor(color)
+            
+            Text(value)
+                .font(.headline)
+                .fontWeight(.semibold)
+                .foregroundColor(.primary)
+            
+            Text(label)
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .textCase(.uppercase)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+struct TaskDetailRow: View {
+    let task: Task
+    let index: Int
+    let accentColor: Color
+    let secondaryColor: Color
+    
+    var body: some View {
+        HStack(alignment: .top, spacing: 16) {
+            // Task number badge
+            ZStack {
+                Circle()
+                    .fill(secondaryColor.opacity(0.3))
+                    .frame(width: 32, height: 32)
+                
+                Text("\(index)")
+                    .font(.caption)
+                    .fontWeight(.bold)
+                    .foregroundColor(accentColor)
+            }
+            
+            VStack(alignment: .leading, spacing: 6) {
+                HStack {
+                    Text(task.title)
+                        .font(.body)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.primary)
+                    
+                    Spacer()
+                    
+                    if task.requiresPhoto {
+                        Image(systemName: "camera.fill")
+                            .foregroundColor(accentColor)
+                            .font(.caption)
+                    }
+                }
+                
+                if let description = task.description {
+                    Text(description)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .lineLimit(3)
+                }
+            }
+            
+            Spacer()
+        }
+        .padding(16)
+        .themeAwareCard()
+    }
+}
+
+struct ConfigurationRow<Content: View>: View {
+    let icon: String
+    let title: String
+    let content: Content
+    let accentColor: Color
+    
+    init(icon: String, title: String, @ViewBuilder content: () -> Content, accentColor: Color) {
+        self.icon = icon
+        self.title = title
+        self.content = content()
+        self.accentColor = accentColor
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: icon)
+                    .foregroundColor(accentColor)
+                    .font(.title3)
+                
+                Text(title)
+                    .font(.headline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.primary)
+                
+                Spacer()
+            }
+            
+            content
+        }
+        .padding(16)
+        .themeAwareCard()
     }
 }
 
