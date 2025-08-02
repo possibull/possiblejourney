@@ -23,6 +23,13 @@ struct SplashView: View {
         print("DEBUG: Current theme: \(themeManager.currentTheme)")
         
         switch themeManager.currentTheme {
+        case .birthday:
+            print("DEBUG: Using Birthday theme colors - PASTEL")
+            return [
+                Color(red: 1.0, green: 0.95, blue: 0.8), // Pastel yellow
+                Color(red: 0.9, green: 0.95, blue: 1.0), // Pastel blue
+                Color(red: 1.0, green: 0.9, blue: 0.95)  // Pastel pink
+            ]
         case .bea:
             print("DEBUG: Using Bea theme colors - PINK")
             return [
