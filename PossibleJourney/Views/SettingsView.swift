@@ -11,7 +11,6 @@ struct SettingsView: View {
     @EnvironmentObject var debugState: DebugState
     @EnvironmentObject var appState: ProgramAppState
     @EnvironmentObject var themeManager: ThemeManager
-    @Environment(\.presentationMode) private var presentationMode
     @State private var forceRefresh = false
     
     var body: some View {
@@ -211,7 +210,6 @@ struct SettingsView: View {
                                 ProgramStorage().clear()
                                 DailyProgressStorage().clearAll()
                                 appState.loadedProgram = nil
-                                presentationMode.wrappedValue.dismiss()
                             }) {
                                 HStack {
                                     Image(systemName: "trash.fill")
@@ -268,7 +266,6 @@ struct SettingsView: View {
                                 debugState.debugWindowExpanded = false
                                 themeManager.changeTheme(to: .system)
                                 forceRefresh.toggle()
-                                presentationMode.wrappedValue.dismiss()
                             }) {
                                 HStack {
                                     Image(systemName: "trash.circle.fill")
@@ -299,19 +296,8 @@ struct SettingsView: View {
                 .padding(.horizontal)
             }
         }
-        .overlay(
-            VStack {
-                HStack {
-                    Spacer()
-                    Button("Done") {
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                    .fontWeight(.medium)
-                    .padding()
-                }
-                Spacer()
-            }
-        )
+        .navigationTitle("Settings")
+        .navigationBarTitleDisplayMode(.large)
     }
 }
 

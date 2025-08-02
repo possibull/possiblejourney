@@ -54,7 +54,6 @@ struct DailyChecklistView: View {
     @EnvironmentObject var updateChecker: AppUpdateChecker
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var debugState: DebugState
-    @State private var showingSettings = false
     @State private var showingCalendar = false
     @State private var autoAdvanceTimer: Timer?
     @State private var showingReleaseNotes = false
@@ -117,12 +116,7 @@ struct DailyChecklistView: View {
                 }
             }
         }
-        .sheet(isPresented: $showingSettings) {
-            SettingsView(endOfDayTime: $viewModel.program.endOfDayTime)
-                .environmentObject(debugState)
-                .environmentObject(appState)
-                .environmentObject(themeManager)
-        }
+
         .sheet(isPresented: $showingCalendar) {
             NavigationView {
                 ProgramCalendarView(
@@ -503,9 +497,10 @@ struct DailyChecklistView: View {
 
     
     private var settingsLink: some View {
-        Button(action: {
-            showingSettings = true
-        }) {
+        NavigationLink(destination: SettingsView(endOfDayTime: $viewModel.program.endOfDayTime)
+            .environmentObject(debugState)
+            .environmentObject(appState)
+            .environmentObject(themeManager)) {
             Image(systemName: "gearshape.fill")
                 .foregroundColor(.blue)
         }
