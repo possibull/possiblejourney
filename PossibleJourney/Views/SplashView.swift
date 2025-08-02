@@ -22,21 +22,21 @@ struct SplashView: View {
         switch themeManager.currentTheme {
         case .bea:
             return [
-                Color(red: 0.8, green: 0.9, blue: 1.0).opacity(0.8), // Pastel blue
-                Color(red: 1.0, green: 0.98, blue: 0.8).opacity(0.6), // Pastel yellow
-                Color(red: 0.8, green: 0.9, blue: 1.0).opacity(0.4)  // Pastel blue
+                Color(red: 0.6, green: 0.8, blue: 1.0), // Stronger pastel blue
+                Color(red: 1.0, green: 0.9, blue: 0.6), // Stronger pastel yellow
+                Color(red: 0.7, green: 0.9, blue: 1.0)  // Medium pastel blue
             ]
         case .dark:
             return [
-                Color.blue.opacity(0.8),
-                Color.purple.opacity(0.6),
-                Color.blue.opacity(0.4)
+                Color.blue.opacity(0.9),
+                Color.purple.opacity(0.7),
+                Color.blue.opacity(0.5)
             ]
         case .light, .system:
             return [
-                Color.blue.opacity(0.8),
-                Color.purple.opacity(0.6),
-                Color.blue.opacity(0.4)
+                Color.blue.opacity(0.9),
+                Color.purple.opacity(0.7),
+                Color.blue.opacity(0.5)
             ]
         }
     }
