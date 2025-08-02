@@ -12,13 +12,37 @@ import Foundation
 struct GlobalThemeSelector: View {
     @EnvironmentObject var themeManager: ThemeManager
     @State private var showingThemeMenu = false
+    @State private var beaTapCount = 0
+    @State private var lastBeaTapTime: Date = Date()
     
     var body: some View {
         Menu {
-            ForEach(ThemeMode.allCases, id: \.self) { theme in
+            ForEach(ThemeMode.allCases.filter { $0 != .birthday }, id: \.self) { theme in
                 Button(action: {
                     withAnimation(.easeInOut(duration: 0.3)) {
                         themeManager.changeTheme(to: theme)
+                        
+                        // Check for Bea theme tap sequence
+                        if theme == .bea {
+                            let now = Date()
+                            if now.timeIntervalSince(lastBeaTapTime) < 2.0 {
+                                beaTapCount += 1
+                                if beaTapCount >= 5 {
+                                    // Activate Birthday theme as Easter egg
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                        withAnimation(.easeInOut(duration: 0.3)) {
+                                            themeManager.changeTheme(to: .birthday)
+                                        }
+                                    }
+                                    beaTapCount = 0
+                                }
+                            } else {
+                                beaTapCount = 1
+                            }
+                            lastBeaTapTime = now
+                        } else {
+                            beaTapCount = 0
+                        }
                     }
                 }) {
                     HStack {
