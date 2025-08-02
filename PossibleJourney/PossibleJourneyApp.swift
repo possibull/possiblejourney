@@ -26,7 +26,7 @@ struct BeaNumberSequenceView: View {
         ["x", "o", "o", "o", "x", "x", "x", "x"],
         ["X", "O", "O", "O", "X", "X", "X", "X"],
         [".", "-", "-", "-", ".", ".", "."],
-        ["💜", "💛", "💛", "💛", "💜", "💜", "💜", "💜"]
+        ["❤️", "💛", "💛", "💛", "❤️", "❤️", "❤️", "❤️"]
     ]
     @State private var currentSequence: [String] = []
     private let displayDuration: TimeInterval = 0.8
@@ -104,8 +104,10 @@ struct BeaNumberSequenceView: View {
     }
     
     private func displayNextNumber() {
+        print("Displaying item \(currentIndex + 1) of \(currentSequence.count): '\(currentSequence[currentIndex])'")
         guard currentIndex < currentSequence.count else {
             // Sequence complete, dismiss the sheet
+            print("Sequence complete, dismissing sheet")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 dismiss()
             }
