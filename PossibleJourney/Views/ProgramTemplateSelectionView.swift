@@ -167,7 +167,6 @@ struct ProgramTemplateSelectionView: View {
                     template: template,
                     onStartProgram: { program in
                         onProgramCreated(program)
-                        selectedTemplate = nil
                     },
                     onDuplicate: { template in
                         let copy = viewModel.duplicateTemplate(template)
@@ -642,7 +641,12 @@ struct TemplateDetailView: View {
         Button(action: {
             let customDays = useCustomDays ? numberOfDays : nil
             let program = template.createProgram(startDate: startDate, endOfDayTime: endOfDayTime, numberOfDays: customDays)
-            onStartProgram(program)
+            // Dismiss the sheet first, then start the program
+            presentationMode.wrappedValue.dismiss()
+            // Use a slight delay to ensure the sheet is dismissed before starting the program
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                onStartProgram(program)
+            }
         }) {
             HStack(spacing: 12) {
                 Image(systemName: "play.fill")
