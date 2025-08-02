@@ -6,6 +6,30 @@
 echo "Starting auto-commit watcher..."
 echo "Press Ctrl+C to stop"
 
+# Function to build and test after commit
+build_after_commit() {
+    local changed_files="$1"
+    
+    # Check if Swift files were changed
+    if echo "$changed_files" | grep -q "\.swift"; then
+        echo "🔨 Swift files changed, running build test..."
+        
+        # Run build with temporary file logging
+        if [ -f "./build-with-tmp.sh" ]; then
+            ./build-with-tmp.sh
+            BUILD_RESULT=$?
+            
+            if [ $BUILD_RESULT -eq 0 ]; then
+                echo "✅ Build test passed"
+            else
+                echo "❌ Build test failed - check logs in /tmp/possiblejourney-build-*"
+            fi
+        else
+            echo "⚠️  build-with-tmp.sh not found, skipping build test"
+        fi
+    fi
+}
+
 # Function to commit changes
 commit_changes() {
     local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
@@ -85,6 +109,9 @@ commit_changes() {
         git commit -m "$commit_msg"
         
         echo "✅ Auto-committed: $commit_msg"
+        
+        # Run build test after successful commit
+        build_after_commit "$changed_files"
     fi
 }
 
