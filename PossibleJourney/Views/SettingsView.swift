@@ -181,10 +181,10 @@ struct SettingsView: View {
                                     .background(Circle().fill(Color.red.opacity(0.1)))
                                 
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text("Reset Program")
+                                    Text("Back to Program Select")
                                         .font(.system(size: 18, weight: .bold, design: .rounded))
                                         .foregroundColor(.primary)
-                                    Text("Clear current program data")
+                                    Text("Return to program selection screen")
                                         .font(.system(size: 14, weight: .medium, design: .rounded))
                                         .foregroundColor(.secondary)
                                 }
@@ -192,8 +192,7 @@ struct SettingsView: View {
                             }
                             
                             Button(action: {
-                                ProgramStorage().clear()
-                                DailyProgressStorage().clearAll()
+                                // Navigate back to ProgramSelect screen without clearing data
                                 appState.loadedProgram = nil
                             }) {
                                 HStack {
@@ -203,7 +202,7 @@ struct SettingsView: View {
                                         .frame(width: 32, height: 32)
                                         .background(Circle().fill(Color.red))
                                     
-                                    Text("Reset Program")
+                                    Text("Back to Program Select")
                                         .font(.system(size: 16, weight: .semibold, design: .rounded))
                                         .foregroundColor(.white)
                                     
@@ -214,7 +213,7 @@ struct SettingsView: View {
                                 .background(RoundedRectangle(cornerRadius: 12).fill(Color.red))
                                 .shadow(color: .red.opacity(0.3), radius: 8, x: 0, y: 4)
                             }
-                            .accessibilityIdentifier("ResetProgramButton")
+                            .accessibilityIdentifier("BackToProgramSelectButton")
                         }
                         .padding(20)
                         .themeAwareCard()
