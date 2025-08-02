@@ -25,7 +25,7 @@ struct GlobalThemeSelector: View {
                         }
                     }) {
                         HStack {
-                            Image(systemName: themeManager.currentTheme == theme ? "checkmark" : theme.iconName)
+                            Image(systemName: theme.iconName)
                                 .foregroundColor(themeManager.currentTheme == theme ? .blue : .primary)
                             Text(theme.displayName)
                             Spacer()
