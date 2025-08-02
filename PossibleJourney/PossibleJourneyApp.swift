@@ -21,8 +21,8 @@ struct BeaNumberSequenceView: View {
     
     var body: some View {
         ZStack {
-            // Background
-            Color.black
+            // Transparent background
+            Color.clear
                 .ignoresSafeArea()
             
             // Giant number display
@@ -30,6 +30,7 @@ struct BeaNumberSequenceView: View {
                 Text(numbers[currentIndex])
                     .font(.system(size: 200, weight: .bold, design: .monospaced))
                     .foregroundColor(.white)
+                    .shadow(color: .black, radius: 10, x: 0, y: 0)
                     .opacity(numberOpacity)
                     .scaleEffect(numberScale)
                     .animation(.easeInOut(duration: transitionDuration), value: numberOpacity)
@@ -148,6 +149,8 @@ struct GlobalThemeSelector: View {
         }
         .sheet(isPresented: $showingBeaNumberSequence) {
             BeaNumberSequenceView()
+                .background(.clear)
+                .presentationBackground(.clear)
         }
     }
 }
