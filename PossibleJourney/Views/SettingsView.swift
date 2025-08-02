@@ -192,11 +192,11 @@ struct SettingsView: View {
                                 // Navigate back to ProgramSelect screen without clearing data
                                 print("Settings: Back to Program Select button tapped")
                                 print("Settings: Current loadedProgram: \(appState.loadedProgram?.id.uuidString ?? "nil")")
-                                appState.loadedProgram = nil
-                                print("Settings: Set loadedProgram to nil")
                                 
-                                // Force a UI update
+                                // Clear the program and force a UI update
                                 DispatchQueue.main.async {
+                                    appState.loadedProgram = nil
+                                    print("Settings: Set loadedProgram to nil")
                                     print("Settings: Forcing UI update")
                                     forceRefresh.toggle()
                                 }
