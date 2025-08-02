@@ -197,7 +197,6 @@ struct PossibleJourneyApp: App {
                         .environmentObject(updateChecker)
                         .environmentObject(themeManager)
                         .preferredColorScheme(themeManager.colorScheme)
-                        .id(themeManager.currentTheme) // Force view refresh when theme changes
             .onAppear {
                 // Check for updates when main content appears (backup)
                 updateChecker.checkForUpdates()
