@@ -22,7 +22,7 @@ struct BeaNumberSequenceView: View {
     private let numbers = ["1", "0", "0", "0", "1", "1", "1", "1"]
     private let displayDuration: TimeInterval = 0.8
     private let transitionDuration: TimeInterval = 0.3
-    private let beeCount = 8
+    private let beeCount = 15
     
     private var themeAccentColor: Color {
         switch themeManager.currentTheme {
@@ -65,8 +65,8 @@ struct BeaNumberSequenceView: View {
                         .position(beePositions[index])
                         .rotationEffect(.degrees(beeRotations[index]))
                         .scaleEffect(beeScales[index])
-                        .animation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true), value: beeRotations[index])
-                        .animation(.easeInOut(duration: 0.6).repeatForever(autoreverses: true), value: beeScales[index])
+                        .animation(.easeInOut(duration: 0.4).repeatForever(autoreverses: true), value: beeRotations[index])
+                        .animation(.easeInOut(duration: 0.3).repeatForever(autoreverses: true), value: beeScales[index])
                 }
             }
             
@@ -148,12 +148,12 @@ struct BeaNumberSequenceView: View {
     private func startBeeAnimations() {
         // Animate bee positions in a buzzing pattern
         for i in 0..<beeCount {
-            let delay = Double(i) * 0.1
+            let delay = Double(i) * 0.05
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
                     if i < beePositions.count {
-                        beePositions[i].x += CGFloat.random(in: -80...80)
-                        beePositions[i].y += CGFloat.random(in: -50...50)
+                        beePositions[i].x += CGFloat.random(in: -100...100)
+                        beePositions[i].y += CGFloat.random(in: -60...60)
                     }
                 }
             }
