@@ -27,18 +27,18 @@ struct GlobalThemeSelector: View {
                         HStack {
                             Image(systemName: theme.iconName)
                                 .foregroundColor(themeManager.currentTheme == theme ? .blue : .primary)
-                                .font(.system(size: 16, weight: themeManager.currentTheme == theme ? .semibold : .regular))
                             Text(theme.displayName)
                                 .foregroundColor(themeManager.currentTheme == theme ? .blue : .primary)
-                                .fontWeight(themeManager.currentTheme == theme ? .semibold : .regular)
                             Spacer()
                             if themeManager.currentTheme == theme {
                                 Image(systemName: "checkmark.circle.fill")
                                     .foregroundColor(.blue)
-                                    .font(.system(size: 16, weight: .semibold))
                             }
                         }
-                        .padding(.vertical, 4)
+                        .background(themeManager.currentTheme == theme ? Color.blue.opacity(0.1) : Color.clear)
+                        .cornerRadius(6)
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 2)
                     }
                 }
             } label: {
