@@ -53,6 +53,7 @@ struct DailyChecklistView: View {
     @EnvironmentObject var appState: ProgramAppState
     @EnvironmentObject var updateChecker: AppUpdateChecker
     @EnvironmentObject var themeManager: ThemeManager
+    @EnvironmentObject var debugState: DebugState
     @State private var showingSettings = false
     @State private var showingCalendar = false
     @State private var autoAdvanceTimer: Timer?
@@ -118,6 +119,9 @@ struct DailyChecklistView: View {
         }
         .sheet(isPresented: $showingSettings) {
             SettingsView(endOfDayTime: $viewModel.program.endOfDayTime)
+                .environmentObject(debugState)
+                .environmentObject(appState)
+                .environmentObject(themeManager)
         }
         .sheet(isPresented: $showingCalendar) {
             NavigationView {
