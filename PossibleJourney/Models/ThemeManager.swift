@@ -5,6 +5,7 @@ enum ThemeMode: String, CaseIterable, Codable {
     case light = "light"
     case dark = "dark"
     case system = "system"
+    case bea = "bea"
     
     var displayName: String {
         switch self {
@@ -14,6 +15,8 @@ enum ThemeMode: String, CaseIterable, Codable {
             return "Dark"
         case .system:
             return "System"
+        case .bea:
+            return "Bea"
         }
     }
     
@@ -25,6 +28,8 @@ enum ThemeMode: String, CaseIterable, Codable {
             return "moon.fill"
         case .system:
             return "gear"
+        case .bea:
+            return "heart.fill"
         }
     }
 }
@@ -51,6 +56,8 @@ class ThemeManager: ObservableObject {
             return .dark
         case .system:
             return nil
+        case .bea:
+            return .light
         }
     }
     
@@ -60,41 +67,75 @@ class ThemeManager: ObservableObject {
 // MARK: - Theme-Aware View Modifiers (Fixed)
 struct ThemeAwareBackground: ViewModifier {
     @Environment(\.colorScheme) private var colorScheme
+    @EnvironmentObject var themeManager: ThemeManager
     
     func body(content: Content) -> some View {
         content
             .background(
-                colorScheme == .dark ?
-                    // Simplified dark theme - single gradient
-                    LinearGradient(
-                        gradient: Gradient(colors: [
-                            Color.black,
-                            Color(red: 0.1, green: 0.05, blue: 0.15)
-                        ]),
-                        startPoint: .top,
-                        endPoint: .bottom
-                    ) :
-                    // Simplified light theme - single gradient
-                    LinearGradient(
-                        gradient: Gradient(colors: [
-                            Color(.systemBackground),
-                            Color.blue.opacity(0.02)
-                        ]),
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
+                Group {
+                    if themeManager.currentTheme == .bea {
+                        // Bea theme - pastel yellow to pastel blue gradient
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color(red: 1.0, green: 0.98, blue: 0.8), // Pastel yellow
+                                Color(red: 0.8, green: 0.9, blue: 1.0)  // Pastel blue
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    } else if colorScheme == .dark {
+                        // Simplified dark theme - single gradient
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color.black,
+                                Color(red: 0.1, green: 0.05, blue: 0.15)
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    } else {
+                        // Simplified light theme - single gradient
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color(.systemBackground),
+                                Color.blue.opacity(0.02)
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    }
+                }
             )
     }
 }
 
 struct ThemeAwareCard: ViewModifier {
     @Environment(\.colorScheme) private var colorScheme
+    @EnvironmentObject var themeManager: ThemeManager
     
     func body(content: Content) -> some View {
         content
             .background(
                 Group {
-                    if colorScheme == .dark {
+                    if themeManager.currentTheme == .bea {
+                        // Bea theme - soft pastel card
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color.white.opacity(0.9))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [
+                                                Color(red: 1.0, green: 0.98, blue: 0.8), // Pastel yellow
+                                                Color(red: 0.8, green: 0.9, blue: 1.0)  // Pastel blue
+                                            ]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 2
+                                    )
+                            )
+                    } else if colorScheme == .dark {
                         // Enhanced dark card with subtle gradient and glow
                         RoundedRectangle(cornerRadius: 16)
                             .fill(
@@ -133,23 +174,35 @@ struct ThemeAwareCard: ViewModifier {
                 }
             )
             .shadow(
-                color: colorScheme == .dark ? 
-                    Color.black.opacity(0.4) : Color.black.opacity(0.05),
-                radius: colorScheme == .dark ? 12 : 8,
+                color: themeManager.currentTheme == .bea ? 
+                    Color.black.opacity(0.1) : 
+                    (colorScheme == .dark ? Color.black.opacity(0.4) : Color.black.opacity(0.05)),
+                radius: themeManager.currentTheme == .bea ? 6 : (colorScheme == .dark ? 12 : 8),
                 x: 0,
-                y: colorScheme == .dark ? 6 : 4
+                y: themeManager.currentTheme == .bea ? 3 : (colorScheme == .dark ? 6 : 4)
             )
     }
 }
 
 struct ThemeAwareHeader: ViewModifier {
     @Environment(\.colorScheme) private var colorScheme
+    @EnvironmentObject var themeManager: ThemeManager
     
     func body(content: Content) -> some View {
         content
             .background(
                 Group {
-                    if colorScheme == .dark {
+                    if themeManager.currentTheme == .bea {
+                        // Bea theme - soft pastel header
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color(red: 1.0, green: 0.98, blue: 0.8).opacity(0.8), // Pastel yellow
+                                Color(red: 0.8, green: 0.9, blue: 1.0).opacity(0.6)  // Pastel blue
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    } else if colorScheme == .dark {
                         // Enhanced dark header with subtle gradient
                         LinearGradient(
                             gradient: Gradient(colors: [
@@ -169,12 +222,15 @@ struct ThemeAwareHeader: ViewModifier {
 
 struct ThemeAwareDivider: ViewModifier {
     @Environment(\.colorScheme) private var colorScheme
+    @EnvironmentObject var themeManager: ThemeManager
     
     func body(content: Content) -> some View {
         content
             .foregroundColor(
-                colorScheme == .dark ? 
-                    Color.white.opacity(0.15) : Color.gray.opacity(0.3)
+                themeManager.currentTheme == .bea ? 
+                    Color(red: 0.8, green: 0.9, blue: 1.0).opacity(0.6) : // Pastel blue
+                    (colorScheme == .dark ? 
+                        Color.white.opacity(0.15) : Color.gray.opacity(0.3))
             )
     }
 }
