@@ -560,53 +560,227 @@ struct BirthdayRibbon: View {
     }
 }
 
-struct BirthdayCakeBackground: View {
-    @State private var cakeScale: CGFloat = 1.0
-    @State private var cakeRotation: Double = 0
+struct BirthdayCakePopup: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var candleFlicker: [Bool] = [false, false, false, false, false, false, false, false, false, false]
+    @State private var cakeScale: CGFloat = 0.8
+    @State private var cakeOpacity: Double = 0.0
     
     var body: some View {
-        // Debug print to confirm this view is being rendered
-        let _ = print("🎂 BirthdayCakeBackground is being rendered!")
-        
-        // Super simple, obvious birthday cake
-        VStack(spacing: 0) {
-            // Top layer - cream with "46"
-            Rectangle()
-                .fill(Color.yellow)
-                .frame(width: 150, height: 40)
-                .overlay(
-                    Text("46")
-                        .font(.system(size: 30, weight: .bold))
-                        .foregroundColor(.black)
+        ZStack {
+            // Background gradient
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color(red: 1.0, green: 0.95, blue: 0.8), // Pastel yellow
+                    Color(red: 0.9, green: 0.95, blue: 1.0), // Pastel blue
+                    Color(red: 1.0, green: 0.9, blue: 0.95)  // Pastel pink
+                ]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
+            VStack(spacing: 30) {
+                // Title
+                Text("🎂 Happy Birthday! 🎂")
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .foregroundColor(.primary)
+                    .multilineTextAlignment(.center)
+                
+                // Beautiful birthday cake
+                ZStack {
+                    // Cake plate
+                    Ellipse()
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color.white.opacity(0.9),
+                                    Color.gray.opacity(0.3)
+                                ]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                        .frame(width: 280, height: 30)
+                        .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 3)
+                    
+                    // Cake layers
+                    VStack(spacing: 0) {
+                        // Bottom layer (largest)
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color(red: 0.8, green: 0.9, blue: 1.0), // Blue
+                                        Color(red: 0.7, green: 0.8, blue: 0.9)  // Darker blue
+                                    ]),
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
+                            .frame(width: 260, height: 70)
+                            .overlay(
+                                // Sprinkles
+                                HStack(spacing: 8) {
+                                    ForEach(0..<8, id: \.self) { _ in
+                                        Circle()
+                                            .fill(Color.white.opacity(0.8))
+                                            .frame(width: 5, height: 5)
+                                    }
+                                }
+                                .offset(y: 15)
+                            )
+                        
+                        // Middle layer
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color(red: 1.0, green: 0.8, blue: 0.9), // Pink
+                                        Color(red: 0.9, green: 0.7, blue: 0.8)  // Darker pink
+                                    ]),
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
+                            .frame(width: 220, height: 60)
+                            .overlay(
+                                // Sprinkles
+                                HStack(spacing: 6) {
+                                    ForEach(0..<6, id: \.self) { _ in
+                                        Circle()
+                                            .fill(Color.white.opacity(0.8))
+                                            .frame(width: 4, height: 4)
+                                    }
+                                }
+                                .offset(y: 12)
+                            )
+                        
+                        // Top layer
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color(red: 1.0, green: 0.9, blue: 0.8), // Cream
+                                        Color(red: 0.9, green: 0.8, blue: 0.7)  // Light brown
+                                    ]),
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
+                            .frame(width: 180, height: 50)
+                        
+                        // Candles
+                        HStack(spacing: 8) {
+                            // "4" candle
+                            VStack(spacing: 2) {
+                                // Candle flame
+                                Circle()
+                                    .fill(
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [
+                                                Color.yellow,
+                                                Color.orange,
+                                                Color.red
+                                            ]),
+                                            startPoint: .top,
+                                            endPoint: .bottom
+                                        )
+                                    )
+                                    .frame(width: 12, height: 12)
+                                    .scaleEffect(candleFlicker[0] ? 1.2 : 1.0)
+                                    .animation(.easeInOut(duration: 0.5).repeatForever(autoreverses: true), value: candleFlicker[0])
+                                
+                                // Candle
+                                Rectangle()
+                                    .fill(Color.white)
+                                    .frame(width: 6, height: 25)
+                                    .overlay(
+                                        Text("4")
+                                            .font(.system(size: 12, weight: .bold))
+                                            .foregroundColor(.black)
+                                    )
+                            }
+                            
+                            // "6" candle
+                            VStack(spacing: 2) {
+                                // Candle flame
+                                Circle()
+                                    .fill(
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [
+                                                Color.yellow,
+                                                Color.orange,
+                                                Color.red
+                                            ]),
+                                            startPoint: .top,
+                                            endPoint: .bottom
+                                        )
+                                    )
+                                    .frame(width: 12, height: 12)
+                                    .scaleEffect(candleFlicker[1] ? 1.2 : 1.0)
+                                    .animation(.easeInOut(duration: 0.5).repeatForever(autoreverses: true), value: candleFlicker[1])
+                                
+                                // Candle
+                                Rectangle()
+                                    .fill(Color.white)
+                                    .frame(width: 6, height: 25)
+                                    .overlay(
+                                        Text("6")
+                                            .font(.system(size: 12, weight: .bold))
+                                            .foregroundColor(.black)
+                                    )
+                            }
+                        }
+                        .offset(y: -10)
+                    }
+                }
+                .scaleEffect(cakeScale)
+                .opacity(cakeOpacity)
+                
+                // Message
+                Text("Wishing you a wonderful year ahead!")
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+                
+                // Close button
+                Button("Close") {
+                    dismiss()
+                }
+                .font(.headline)
+                .foregroundColor(.white)
+                .padding()
+                .background(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color(red: 1.0, green: 0.8, blue: 0.9), // Pink
+                            Color(red: 0.8, green: 0.9, blue: 1.0)  // Blue
+                        ]),
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
                 )
-            
-            // Middle layer - pink
-            Rectangle()
-                .fill(Color.pink)
-                .frame(width: 180, height: 50)
-            
-            // Bottom layer - blue
-            Rectangle()
-                .fill(Color.blue)
-                .frame(width: 210, height: 60)
-            
-            // Plate
-            Rectangle()
-                .fill(Color.white)
-                .frame(width: 240, height: 20)
+                .cornerRadius(12)
+                .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 2)
+            }
+            .padding()
         }
-        .background(Color.red.opacity(0.5)) // Red background to make it obvious
-        .border(Color.red, width: 5) // Red border
-        .scaleEffect(cakeScale)
-        .rotationEffect(.degrees(cakeRotation))
         .onAppear {
-            // Simple animation
-            withAnimation(
-                Animation.easeInOut(duration: 2)
-                    .repeatForever(autoreverses: true)
-            ) {
-                cakeScale = 1.1
-                cakeRotation = 5
+            // Animate cake appearance
+            withAnimation(.easeOut(duration: 0.8)) {
+                cakeScale = 1.0
+                cakeOpacity = 1.0
+            }
+            
+            // Start candle flickering
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                for i in 0..<candleFlicker.count {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * 0.1) {
+                        candleFlicker[i] = true
+                    }
+                }
             }
         }
     }

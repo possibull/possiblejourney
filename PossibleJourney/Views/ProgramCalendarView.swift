@@ -8,6 +8,7 @@ struct ProgramCalendarView: View {
     let onDateSelected: (Date) -> Void
     
     @State private var selectedMonthIndex: Int = 0
+    @State private var showingBirthdayCake: Bool = false
     @EnvironmentObject var themeManager: ThemeManager
     private var calendar: Calendar { Calendar.current }
     private var programDates: [Date] {
@@ -60,14 +61,34 @@ struct ProgramCalendarView: View {
     var body: some View {
         let enumeratedMonths = Array(months.enumerated())
         VStack {
-            // Temporary debug button to test Birthday theme
-            Button("🎂 Force Birthday Theme") {
-                themeManager.changeTheme(to: .birthday)
+            // Birthday cake button (only show when Birthday theme is active)
+            if themeManager.currentTheme == .birthday {
+                Button(action: {
+                    showingBirthdayCake = true
+                }) {
+                    HStack {
+                        Image(systemName: "birthday.cake.fill")
+                            .foregroundColor(.white)
+                        Text("🎂 Birthday Cake")
+                            .foregroundColor(.white)
+                            .font(.headline)
+                    }
+                    .padding()
+                    .background(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color(red: 1.0, green: 0.8, blue: 0.9), // Pink
+                                Color(red: 0.8, green: 0.9, blue: 1.0)  // Blue
+                            ]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .cornerRadius(12)
+                    .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 2)
+                }
+                .padding(.horizontal)
             }
-            .padding()
-            .background(Color.orange)
-            .foregroundColor(.white)
-            .cornerRadius(8)
             
             TabView(selection: $selectedMonthIndex) { // Vertical paging
                 ForEach(enumeratedMonths, id: \ .element.monthStart) { pair in
@@ -110,27 +131,9 @@ struct ProgramCalendarView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(
                     Group {
-                        // Debug print to see current theme
-                        let _ = print("🎨 Calendar view - Current theme: \(themeManager.currentTheme)")
-                        
                         if themeManager.currentTheme == .birthday {
-                            let _ = print("🎂 Birthday theme detected! Adding cake background...")
-                            ZStack {
-                                // Test background to make sure Birthday theme is working
-                                Color.pink.opacity(0.3)
-                                
-                                // Debug text to show theme is active
-                                VStack {
-                                    Text("🎂 BIRTHDAY THEME ACTIVE!")
-                                        .font(.title)
-                                        .foregroundColor(.white)
-                                        .background(Color.black.opacity(0.7))
-                                        .padding()
-                                }
-                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                            }
+                            Color.pink.opacity(0.3)
                         } else {
-                            let _ = print("🎨 Not birthday theme, using regular background")
                             Color(.systemBackground)
                         }
                     }
@@ -141,18 +144,12 @@ struct ProgramCalendarView: View {
         .tabViewStyle(.page(indexDisplayMode: .never)) // Enable paging, hide dots
         .ignoresSafeArea(edges: .bottom)
         .background(Color(.systemBackground))
-        .overlay(
-            // Birthday cake overlay - appears on top of everything
-            Group {
-                if themeManager.currentTheme == .birthday {
-                    BirthdayCakeBackground()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                        .allowsHitTesting(false) // Don't block interactions
-                }
-            }
-        )
+
         .onAppear {
             selectedMonthIndex = currentMonthIndex // Start on current month
+        }
+        .sheet(isPresented: $showingBirthdayCake) {
+            BirthdayCakePopup()
         }
     }
 }
