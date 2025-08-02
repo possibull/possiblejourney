@@ -153,13 +153,13 @@ struct BeaNumberSequenceView: View {
         let newX = CGFloat.random(in: 50...350)
         let newY = CGFloat.random(in: 50...600)
         
-        // Fast animation to new position
-        withAnimation(.easeInOut(duration: 0.3)) {
+        // Smooth, realistic animation to new position
+        withAnimation(.easeInOut(duration: 2.0)) {
             beePositions[beeIndex] = CGPoint(x: newX, y: newY)
         }
         
-        // Continue with next random position after a short delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+        // Continue with next random position after a longer delay
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
             self.animateBeeToRandomPosition(beeIndex: beeIndex)
         }
     }
