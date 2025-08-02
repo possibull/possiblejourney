@@ -26,19 +26,14 @@ struct GlobalThemeSelector: View {
                     }) {
                         HStack {
                             Image(systemName: theme.iconName)
-                                .foregroundColor(themeManager.currentTheme == theme ? .blue : .primary)
                             Text(theme.displayName)
-                                .foregroundColor(themeManager.currentTheme == theme ? .blue : .primary)
                             Spacer()
                             if themeManager.currentTheme == theme {
-                                Image(systemName: "checkmark.circle.fill")
+                                Image(systemName: "checkmark")
                                     .foregroundColor(.blue)
+                                    .fontWeight(.bold)
                             }
                         }
-                        .background(themeManager.currentTheme == theme ? Color.blue.opacity(0.1) : Color.clear)
-                        .cornerRadius(6)
-                        .padding(.horizontal, 4)
-                        .padding(.vertical, 2)
                     }
                 }
             } label: {
