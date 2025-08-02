@@ -25,14 +25,10 @@ struct GlobalThemeSelector: View {
                         }
                     }) {
                         HStack {
-                            Image(systemName: theme.iconName)
+                            Image(systemName: themeManager.currentTheme == theme ? "checkmark" : theme.iconName)
+                                .foregroundColor(themeManager.currentTheme == theme ? .blue : .primary)
                             Text(theme.displayName)
                             Spacer()
-                            if themeManager.currentTheme == theme {
-                                Image(systemName: "checkmark")
-                                    .foregroundColor(.blue)
-                                    .fontWeight(.bold)
-                            }
                         }
                     }
                 }
