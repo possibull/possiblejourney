@@ -34,9 +34,18 @@ struct GlobalThemeSelector: View {
                     }
                 }
             } label: {
-                Image(systemName: "paintbrush.fill")
-                    .foregroundColor(.blue)
-                    .font(.system(size: 18, weight: .medium))
+                HStack(spacing: 4) {
+                    Image(systemName: "paintbrush.fill")
+                        .foregroundColor(themeManager.currentTheme == .birthday ? .pink : .blue)
+                        .font(.system(size: 18, weight: .medium))
+                    
+                    // Show current theme indicator
+                    if themeManager.currentTheme != .system {
+                        Image(systemName: themeManager.currentTheme.iconName)
+                            .foregroundColor(themeManager.currentTheme == .birthday ? .pink : .blue)
+                            .font(.system(size: 14, weight: .medium))
+                    }
+                }
             }
             .accessibilityIdentifier("GlobalThemeSelector")
             
