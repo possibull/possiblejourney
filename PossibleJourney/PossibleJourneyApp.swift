@@ -104,7 +104,6 @@ struct BeaNumberSequenceView: View {
     }
     
     private func displayNextNumber() {
-        print("Displaying item \(currentIndex + 1) of \(currentSequence.count): '\(currentSequence[currentIndex])'")
         guard currentIndex < currentSequence.count else {
             // Sequence complete, dismiss the sheet
             print("Sequence complete, dismissing sheet")
@@ -113,6 +112,8 @@ struct BeaNumberSequenceView: View {
             }
             return
         }
+        
+        print("Displaying item \(currentIndex + 1) of \(currentSequence.count): '\(currentSequence[currentIndex])'")
         
         // Animate number appearance
         withAnimation(.easeInOut(duration: transitionDuration)) {
