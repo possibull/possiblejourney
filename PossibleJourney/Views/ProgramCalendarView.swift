@@ -119,9 +119,6 @@ struct ProgramCalendarView: View {
                                 // Test background to make sure Birthday theme is working
                                 Color.pink.opacity(0.3)
                                 
-                                // Birthday cake background decoration
-                                BirthdayCakeBackground()
-                                
                                 // Debug text to show theme is active
                                 VStack {
                                     Text("🎂 BIRTHDAY THEME ACTIVE!")
@@ -144,6 +141,16 @@ struct ProgramCalendarView: View {
         .tabViewStyle(.page(indexDisplayMode: .never)) // Enable paging, hide dots
         .ignoresSafeArea(edges: .bottom)
         .background(Color(.systemBackground))
+        .overlay(
+            // Birthday cake overlay - appears on top of everything
+            Group {
+                if themeManager.currentTheme == .birthday {
+                    BirthdayCakeBackground()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                        .allowsHitTesting(false) // Don't block interactions
+                }
+            }
+        )
         .onAppear {
             selectedMonthIndex = currentMonthIndex // Start on current month
         }
