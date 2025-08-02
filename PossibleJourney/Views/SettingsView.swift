@@ -19,8 +19,7 @@ struct SettingsView: View {
     @State private var forceRefresh = false
     
     var body: some View {
-        NavigationView {
-            ZStack {
+        ZStack {
                 // Theme-aware background
                 themeAwareBackground()
                     .ignoresSafeArea()
@@ -402,30 +401,25 @@ struct SettingsView: View {
                 }
                 .padding(.horizontal)
             }
-            }
             .background(Color(.systemBackground))
         }
         .id("\(themeManager.currentTheme)-\(forceRefresh)") // Force entire view to refresh when theme changes or after reset
         .onReceive(themeManager.$currentTheme) { _ in
             // Force view refresh when theme changes
         }
-        .navigationTitle("Settings")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button("Back") {
-                    presentationMode.wrappedValue.dismiss()
+        .overlay(
+            VStack {
+                HStack {
+                    Spacer()
+                    Button("Done") {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                    .fontWeight(.medium)
+                    .padding()
                 }
-                .fontWeight(.medium)
+                Spacer()
             }
-            
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button("Done") {
-                    presentationMode.wrappedValue.dismiss()
-                }
-                .fontWeight(.medium)
-            }
-        }
+        )
     }
 }
 

@@ -117,7 +117,7 @@ struct DailyChecklistView: View {
                 }
             }
         }
-        .fullScreenCover(isPresented: $showingSettings) {
+        .sheet(isPresented: $showingSettings) {
             SettingsView(endOfDayTime: $viewModel.program.endOfDayTime)
                 .environmentObject(debugState)
                 .environmentObject(appState)
