@@ -117,11 +117,14 @@ struct DailyChecklistView: View {
                 }
             }
         }
-        .sheet(isPresented: $showingSettings) {
+        .fullScreenCover(isPresented: $showingSettings) {
             SettingsView(endOfDayTime: $viewModel.program.endOfDayTime)
                 .environmentObject(debugState)
                 .environmentObject(appState)
                 .environmentObject(themeManager)
+                .onAppear {
+                    print("DEBUG: SettingsView appeared")
+                }
         }
         .sheet(isPresented: $showingCalendar) {
             NavigationView {
@@ -504,7 +507,9 @@ struct DailyChecklistView: View {
     
     private var settingsLink: some View {
         Button(action: {
+            print("DEBUG: Settings button tapped")
             showingSettings = true
+            print("DEBUG: showingSettings set to: \(showingSettings)")
         }) {
             Image(systemName: "gearshape.fill")
                 .foregroundColor(.blue)
