@@ -138,7 +138,34 @@ struct CalendarMonthGrid: View {
     let completedDates: Set<Date>
     let selectedDate: Date
     let onDateSelected: (Date) -> Void
+    @EnvironmentObject var themeManager: ThemeManager
     private var calendar: Calendar { Calendar.current }
+    
+    private var themeAccentColor: Color {
+        switch themeManager.currentTheme {
+        case .birthday:
+            return Color(red: 1.0, green: 0.8, blue: 0.9) // Pastel pink
+        case .bea:
+            return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
+        case .dark:
+            return Color.blue
+        case .light, .system:
+            return Color.blue
+        }
+    }
+    
+    private var themeSecondaryColor: Color {
+        switch themeManager.currentTheme {
+        case .birthday:
+            return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
+        case .bea:
+            return Color(red: 1.0, green: 0.98, blue: 0.8) // Pastel yellow
+        case .dark:
+            return Color.blue.opacity(0.7)
+        case .light, .system:
+            return Color.blue.opacity(0.7)
+        }
+    }
     
     var body: some View {
         guard let first = monthDates.first else { return AnyView(EmptyView()) }
@@ -192,9 +219,9 @@ struct CalendarMonthGrid: View {
                                 let isSelected = calendar.isDate(selectedDay, inSameDayAs: date)
                                 if isProgramDay && isCompleted, let progNum = programDayNumbers[calendar.startOfDay(for: date)] {
                                     ZStack {
-                                        // Blue circle for completed days
+                                        // Theme-aware circle for completed days
                                         Circle()
-                                            .fill(Color.blue)
+                                            .fill(themeAccentColor)
                                             .frame(width: 32, height: 32)
                                         // Day of month in white (centered)
                                         Text("\(calendar.component(.day, from: date))")
@@ -208,13 +235,13 @@ struct CalendarMonthGrid: View {
                                         // Today highlight (on top)
                                         if isToday {
                                             RoundedRectangle(cornerRadius: 12)
-                                                .stroke(Color.blue, lineWidth: 2)
+                                                .stroke(themeAccentColor, lineWidth: 2)
                                                 .frame(width: 48, height: 48)
                                         }
                                         // Selected date highlight
                                         if isSelected && !isToday {
                                             RoundedRectangle(cornerRadius: 12)
-                                                .stroke(Color.orange, lineWidth: 3)
+                                                .stroke(themeSecondaryColor, lineWidth: 3)
                                                 .frame(width: 48, height: 48)
                                         }
                                     }
@@ -224,20 +251,20 @@ struct CalendarMonthGrid: View {
                                     }
                                 } else {
                                     ZStack {
-                                        // Day of month (blue if program day, gray otherwise)
+                                        // Day of month (theme color if program day, gray otherwise)
                                         Text("\(calendar.component(.day, from: date))")
                                             .font(.system(size: 20, weight: isProgramDay ? .bold : .regular))
-                                            .foregroundColor(isProgramDay ? .blue : Color(.systemGray3))
+                                            .foregroundColor(isProgramDay ? themeAccentColor : Color(.systemGray3))
                                         // Today highlight
                                         if isToday {
                                             RoundedRectangle(cornerRadius: 12)
-                                                .stroke(Color.blue, lineWidth: 2)
+                                                .stroke(themeAccentColor, lineWidth: 2)
                                                 .frame(width: 48, height: 48)
                                         }
                                         // Selected date highlight
                                         if isSelected && !isToday {
                                             RoundedRectangle(cornerRadius: 12)
-                                                .stroke(Color.orange, lineWidth: 3)
+                                                .stroke(themeSecondaryColor, lineWidth: 3)
                                                 .frame(width: 48, height: 48)
                                         }
                                     }
