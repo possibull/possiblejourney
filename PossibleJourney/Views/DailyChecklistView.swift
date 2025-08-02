@@ -630,34 +630,16 @@ struct TaskRowView: View {
                     }
                 }) {
                     ZStack {
-                        let checkboxFill = isCompleted ? 
-                            (themeManager.colorScheme == .dark ? 
-                                LinearGradient(
-                                    gradient: Gradient(colors: [Color.blue, Color.blue.opacity(0.8)]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ) : Color.blue) : 
-                            Color.clear
-                        
-                        let strokeColor = isCompleted ? 
-                            (themeManager.colorScheme == .dark ? Color.blue.opacity(0.8) : Color.blue) : 
-                            (themeManager.colorScheme == .dark ? Color.white.opacity(0.3) : Color.gray.opacity(0.4))
-                        
-                        let shadowColor = isCompleted && themeManager.colorScheme == .dark ? 
-                            Color.blue.opacity(0.3) : Color.clear
-                        
-                        let shadowRadius: CGFloat = isCompleted && themeManager.colorScheme == .dark ? 4 : 0
-                        
                         Circle()
-                            .fill(checkboxFill)
+                            .fill(checkboxFillColor)
                             .frame(width: 28, height: 28)
                             .overlay(
                                 Circle()
-                                    .stroke(strokeColor, lineWidth: 2)
+                                    .stroke(checkboxStrokeColor, lineWidth: 2)
                             )
                             .shadow(
-                                color: shadowColor,
-                                radius: shadowRadius,
+                                color: checkboxShadowColor,
+                                radius: checkboxShadowRadius,
                                 x: 0,
                                 y: 2
                             )
@@ -779,21 +761,9 @@ struct TaskRowView: View {
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(
-                        isCompleted ? 
-                            (themeManager.colorScheme == .dark ? Color.green.opacity(0.5) : Color.green.opacity(0.3)) :
-                            (themeManager.colorScheme == .dark ? Color.white.opacity(0.1) : Color.gray.opacity(0.1)),
+                        isCompleted ? Color.green.opacity(0.3) : Color.gray.opacity(0.1),
                         lineWidth: isCompleted ? 2 : 1
                     )
-            )
-            .overlay(
-                // Add subtle glow effect for completed tasks in dark mode
-                Group {
-                    if isCompleted && themeManager.colorScheme == .dark {
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.green.opacity(0.2), lineWidth: 4)
-                            .blur(radius: 8)
-                    }
-                }
             )
             .scaleEffect(cardScale)
             .onTapGesture {
@@ -888,6 +858,27 @@ struct TaskRowView: View {
     }
     
     @State private var showingUncheckAlert = false
+    
+    // MARK: - Computed Properties for Checkbox Styling
+    private var checkboxFillColor: Color {
+        isCompleted ? Color.blue : Color.clear
+    }
+    
+    private var checkboxStrokeColor: Color {
+        if isCompleted {
+            return Color.blue
+        } else {
+            return themeManager.colorScheme == .dark ? Color.white.opacity(0.3) : Color.gray.opacity(0.4)
+        }
+    }
+    
+    private var checkboxShadowColor: Color {
+        (isCompleted && themeManager.colorScheme == .dark) ? Color.blue.opacity(0.3) : Color.clear
+    }
+    
+    private var checkboxShadowRadius: CGFloat {
+        (isCompleted && themeManager.colorScheme == .dark) ? 4 : 0
+    }
     
     private func handleCheckboxTap() {
         // If task requires photo and doesn't have one yet, show photo picker
