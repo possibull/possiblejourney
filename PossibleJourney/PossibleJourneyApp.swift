@@ -31,6 +31,7 @@ struct BeaNumberSequenceView: View {
     @State private var currentSequence: [String] = []
     @State private var isAnimating = false
     @State private var animationTimer: Timer?
+    @State private var sequenceActive = false
     private let displayDuration: TimeInterval = 0.8
     private let transitionDuration: TimeInterval = 0.3
     private let beeCount = 15
@@ -97,22 +98,45 @@ struct BeaNumberSequenceView: View {
             initializeBees()
             startNumberSequence()
         }
+        .onDisappear {
+            // Clean up any lingering timers
+            sequenceActive = false
+            isAnimating = false
+            animationTimer?.invalidate()
+            animationTimer = nil
+        }
     }
     
     private func startNumberSequence() {
+        // Prevent multiple sequences from starting
+        guard !sequenceActive else {
+            print("Sequence already active, ignoring start request")
+            return
+        }
+        
         // Randomly select a sequence
         currentSequence = sequences.randomElement() ?? sequences[0]
         currentIndex = 0
         isAnimating = false
+        sequenceActive = true
+        
+        print("Starting new sequence: \(currentSequence)")
         
         // Cancel any existing timer
         animationTimer?.invalidate()
+        animationTimer = nil
         
         // Start the sequence
         displayNextNumber()
     }
     
     private func displayNextNumber() {
+        // Double-check we're still active
+        guard sequenceActive else {
+            print("Sequence no longer active, stopping")
+            return
+        }
+        
         // Prevent multiple instances from running simultaneously
         guard !isAnimating else { 
             print("Animation already in progress, skipping")
@@ -122,6 +146,8 @@ struct BeaNumberSequenceView: View {
         guard currentIndex < currentSequence.count else {
             // Sequence complete, dismiss the sheet
             print("Sequence complete, dismissing sheet")
+            sequenceActive = false
+            isAnimating = false
             animationTimer?.invalidate()
             animationTimer = nil
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -142,6 +168,12 @@ struct BeaNumberSequenceView: View {
         // Create a single timer for the entire sequence
         animationTimer = Timer.scheduledTimer(withTimeInterval: displayDuration + transitionDuration, repeats: false) { _ in
             DispatchQueue.main.async {
+                // Check if sequence is still active
+                guard self.sequenceActive else {
+                    print("Sequence deactivated during timer, stopping")
+                    return
+                }
+                
                 // Animate number disappearance
                 withAnimation(.easeInOut(duration: self.transitionDuration)) {
                     self.numberOpacity = 0.0
