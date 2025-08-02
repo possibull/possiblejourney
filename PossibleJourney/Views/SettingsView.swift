@@ -299,10 +299,6 @@ struct SettingsView: View {
                 .padding(.horizontal)
             }
         }
-        .id("\(themeManager.currentTheme)-\(forceRefresh)")
-        .onReceive(themeManager.$currentTheme) { _ in
-            // Force view refresh when theme changes
-        }
         .overlay(
             VStack {
                 HStack {
@@ -347,7 +343,6 @@ struct ThemeSettingsCard: View {
         }
         .padding(20)
         .themeAwareCard()
-        .id(themeManager.currentTheme)
     }
 }
 
