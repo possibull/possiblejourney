@@ -8,12 +8,82 @@
 import SwiftUI
 import Foundation
 
+// MARK: - Bea Number Sequence View
+struct BeaNumberSequenceView: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var currentIndex = 0
+    @State private var numberOpacity: Double = 0.0
+    @State private var numberScale: CGFloat = 0.5
+    
+    private let numbers = ["1", "0", "0", "0", "1", "1", "1", "1"]
+    private let displayDuration: TimeInterval = 0.8
+    private let transitionDuration: TimeInterval = 0.3
+    
+    var body: some View {
+        ZStack {
+            // Background
+            Color.black
+                .ignoresSafeArea()
+            
+            // Giant number display
+            if currentIndex < numbers.count {
+                Text(numbers[currentIndex])
+                    .font(.system(size: 200, weight: .bold, design: .monospaced))
+                    .foregroundColor(.white)
+                    .opacity(numberOpacity)
+                    .scaleEffect(numberScale)
+                    .animation(.easeInOut(duration: transitionDuration), value: numberOpacity)
+                    .animation(.easeInOut(duration: transitionDuration), value: numberScale)
+            }
+        }
+        .onAppear {
+            startNumberSequence()
+        }
+    }
+    
+    private func startNumberSequence() {
+        displayNextNumber()
+    }
+    
+    private func displayNextNumber() {
+        guard currentIndex < numbers.count else {
+            // Sequence complete, dismiss the sheet
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                dismiss()
+            }
+            return
+        }
+        
+        // Animate number appearance
+        withAnimation(.easeInOut(duration: transitionDuration)) {
+            numberOpacity = 1.0
+            numberScale = 1.0
+        }
+        
+        // Display number for specified duration
+        DispatchQueue.main.asyncAfter(deadline: .now() + displayDuration) {
+            // Animate number disappearance
+            withAnimation(.easeInOut(duration: transitionDuration)) {
+                numberOpacity = 0.0
+                numberScale = 0.5
+            }
+            
+            // Move to next number after transition
+            DispatchQueue.main.asyncAfter(deadline: .now() + transitionDuration) {
+                currentIndex += 1
+                displayNextNumber()
+            }
+        }
+    }
+}
+
 // MARK: - Global Theme Selector
 struct GlobalThemeSelector: View {
     @EnvironmentObject var themeManager: ThemeManager
     @State private var showingThemeMenu = false
     @State private var beaTapCount = 0
     @State private var lastBeaTapTime: Date = Date()
+    @State private var showingBeaNumberSequence = false
     
     var body: some View {
         HStack(spacing: 8) {
@@ -22,6 +92,13 @@ struct GlobalThemeSelector: View {
                     Button(action: {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             themeManager.changeTheme(to: theme)
+                        }
+                        
+                        // Trigger Bea number sequence if Bea theme is selected
+                        if theme == .bea {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                showingBeaNumberSequence = true
+                            }
                         }
                     }) {
                         HStack {
@@ -68,6 +145,9 @@ struct GlobalThemeSelector: View {
                 }
                 .accessibilityIdentifier("EasterEggButton")
             }
+        }
+        .sheet(isPresented: $showingBeaNumberSequence) {
+            BeaNumberSequenceView()
         }
     }
 }
