@@ -117,6 +117,26 @@ struct DailyChecklistView: View {
                 }
             }
         }
+        // Add a custom header as backup in case navigation context is lost
+        .safeAreaInset(edge: .top) {
+            VStack(spacing: 0) {
+                HStack {
+                    Text("Daily Checklist")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                    Spacer()
+                    HStack(spacing: 16) {
+                        GlobalThemeSelector()
+                        calendarLink
+                        settingsLink
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+                .background(Color(.systemBackground))
+                Divider()
+            }
+        }
 
         .sheet(isPresented: $showingCalendar) {
             NavigationView {
