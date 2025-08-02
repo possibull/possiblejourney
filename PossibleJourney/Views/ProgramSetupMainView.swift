@@ -45,8 +45,6 @@ struct ProgramSetupMainView: View {
                 }
             }
         }
-        .navigationTitle("Create Program")
-        .navigationBarTitleDisplayMode(.large)
     }
 }
 
