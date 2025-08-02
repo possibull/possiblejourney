@@ -498,6 +498,7 @@ struct DailyChecklistView: View {
             Image(systemName: "gearshape.fill")
                 .foregroundColor(.blue)
         }
+        .accessibilityIdentifier("SettingsButton")
     }
     
     // Computed properties
@@ -790,24 +791,10 @@ struct TaskRowView: View {
                     })
                     
                     buttons.append(.cancel())
-                            return buttons
-                        }()
-                    )
-                }
-            }
-            
-            // Reminder button
-            Button(action: onSetReminder) {
-                Image(systemName: "bell")
-                    .font(.caption)
-                    .foregroundColor(.orange)
-            }
-            .buttonStyle(PlainButtonStyle())
+                    return buttons
+                }()
+            )
         }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 1)
         .sheet(isPresented: $showingImagePicker) {
             ImagePicker(selectedImage: $selectedImage, sourceType: imageSource)
         }

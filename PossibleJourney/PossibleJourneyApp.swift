@@ -36,6 +36,7 @@ struct PossibleJourneyApp: App {
     @StateObject private var appState = ProgramAppState()
     @StateObject private var debugState = DebugState()
     @StateObject private var updateChecker = AppUpdateChecker()
+    @StateObject private var themeManager = ThemeManager()
     @State private var showSplash = true
     
     init() {
@@ -192,8 +193,11 @@ struct PossibleJourneyApp: App {
                 }).padding(.top, 80)
                 .environmentObject(debugState)
             }
-            .environmentObject(appState)
-            .environmentObject(updateChecker)
+                                    .environmentObject(appState)
+                        .environmentObject(updateChecker)
+                        .environmentObject(themeManager)
+                        .preferredColorScheme(themeManager.colorScheme)
+                        .id(themeManager.currentTheme) // Force view refresh when theme changes
             .onAppear {
                 // Check for updates when main content appears (backup)
                 updateChecker.checkForUpdates()
