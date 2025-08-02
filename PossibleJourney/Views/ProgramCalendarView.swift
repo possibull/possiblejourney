@@ -8,6 +8,7 @@ struct ProgramCalendarView: View {
     let onDateSelected: (Date) -> Void
     
     @State private var selectedMonthIndex: Int = 0
+    @EnvironmentObject var themeManager: ThemeManager
     private var calendar: Calendar { Calendar.current }
     private var programDates: [Date] {
         (0..<numberOfDays).compactMap { calendar.date(byAdding: .day, value: $0, to: startDate) }
@@ -28,6 +29,28 @@ struct ProgramCalendarView: View {
     
     private var completedDaysCount: Int {
         completedDates.count
+    }
+    
+    private var themeAccentColor: Color {
+        switch themeManager.currentTheme {
+        case .bea:
+            return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
+        case .dark:
+            return Color.blue
+        case .light, .system:
+            return Color.blue
+        }
+    }
+    
+    private var themeSecondaryColor: Color {
+        switch themeManager.currentTheme {
+        case .bea:
+            return Color(red: 1.0, green: 0.98, blue: 0.8) // Pastel yellow
+        case .dark:
+            return Color.blue.opacity(0.7)
+        case .light, .system:
+            return Color.blue.opacity(0.7)
+        }
     }
     
     var body: some View {
@@ -66,9 +89,7 @@ struct ProgramCalendarView: View {
                         onDateSelected: onDateSelected
                     )
                         .padding(.vertical, 12)
-                        .background(Color(.systemGray6))
-                        .cornerRadius(20)
-                        .shadow(color: Color(.black).opacity(0.08), radius: 8, x: 0, y: 4)
+                        .themeAwareCard()
                         .padding(.horizontal, 8)
                 }
                 .tag(idx)

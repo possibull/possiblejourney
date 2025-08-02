@@ -711,12 +711,12 @@ struct TaskRowView: View {
                                     Text("Add Photo")
                                         .font(.system(size: 12, weight: .medium, design: .rounded))
                                 }
-                                .foregroundColor(.blue)
+                                .foregroundColor(themeAccentColor)
                                 .padding(.horizontal, 12)
                                 .padding(.vertical, 6)
                                 .background(
                                     RoundedRectangle(cornerRadius: 8)
-                                        .fill(Color.blue.opacity(0.1))
+                                        .fill(themeAccentColor.opacity(0.1))
                                 )
                             }
                             .buttonStyle(PlainButtonStyle())
@@ -761,7 +761,7 @@ struct TaskRowView: View {
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(
-                        isCompleted ? Color.green.opacity(0.3) : Color.gray.opacity(0.1),
+                        isCompleted ? themeAccentColor.opacity(0.3) : Color.gray.opacity(0.1),
                         lineWidth: isCompleted ? 2 : 1
                     )
             )
@@ -860,20 +860,42 @@ struct TaskRowView: View {
     @State private var showingUncheckAlert = false
     
     // MARK: - Computed Properties for Checkbox Styling
+    private var themeAccentColor: Color {
+        switch themeManager.currentTheme {
+        case .bea:
+            return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
+        case .dark:
+            return Color.blue
+        case .light, .system:
+            return Color.blue
+        }
+    }
+    
+    private var themeSecondaryColor: Color {
+        switch themeManager.currentTheme {
+        case .bea:
+            return Color(red: 1.0, green: 0.98, blue: 0.8) // Pastel yellow
+        case .dark:
+            return Color.blue.opacity(0.7)
+        case .light, .system:
+            return Color.blue.opacity(0.7)
+        }
+    }
+    
     private var checkboxFillColor: Color {
-        isCompleted ? Color.blue : Color.clear
+        isCompleted ? themeAccentColor : Color.clear
     }
     
     private var checkboxStrokeColor: Color {
         if isCompleted {
-            return Color.blue
+            return themeAccentColor
         } else {
             return themeManager.colorScheme == .dark ? Color.white.opacity(0.3) : Color.gray.opacity(0.4)
         }
     }
     
     private var checkboxShadowColor: Color {
-        (isCompleted && themeManager.colorScheme == .dark) ? Color.blue.opacity(0.3) : Color.clear
+        (isCompleted && themeManager.colorScheme == .dark) ? themeAccentColor.opacity(0.3) : Color.clear
     }
     
     private var checkboxShadowRadius: CGFloat {
