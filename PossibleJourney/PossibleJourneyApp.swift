@@ -128,88 +128,39 @@ struct BeaNumberSequenceView: View {
         beeRotations = []
         beeScales = []
         
-        // Start all bees off-screen
+        // Start all bees at random positions on screen
         for _ in 0..<beeCount {
-            beePositions.append(CGPoint(x: -100, y: -100)) // Off-screen
+            beePositions.append(CGPoint(x: CGFloat.random(in: 50...350), y: CGFloat.random(in: 50...600)))
             beeRotations.append(Double.random(in: -15...15))
             beeScales.append(CGFloat.random(in: 0.9...1.1))
         }
         
-        // Start sequential letter animations
-        startSequentialLetterAnimations()
+        // Start random flying animations
+        startRandomBeeAnimations()
     }
     
-    private func startSequentialLetterAnimations() {
-        let centerX: CGFloat = 200 // Center of screen
-        let baseY: CGFloat = 150   // Above the numbers
-        let letterSpacing: CGFloat = 80 // Space between letters
-        let beeSpacing: CGFloat = 25 // Space between bees in each letter
-        
-        // Letter "B" positions
-        let bStartX = centerX - letterSpacing
-        let bPositions = [
-            CGPoint(x: bStartX, y: baseY - 30), // Top left
-            CGPoint(x: bStartX, y: baseY),      // Middle left
-            CGPoint(x: bStartX, y: baseY + 30), // Bottom left
-            CGPoint(x: bStartX + beeSpacing, y: baseY - 15), // Top curve
-            CGPoint(x: bStartX + beeSpacing, y: baseY + 15)  // Bottom curve
-        ]
-        
-        // Letter "E" positions
-        let eStartX = centerX
-        let ePositions = [
-            CGPoint(x: eStartX, y: baseY - 30), // Top left
-            CGPoint(x: eStartX, y: baseY),      // Middle left
-            CGPoint(x: eStartX, y: baseY + 30), // Bottom left
-            CGPoint(x: eStartX + beeSpacing, y: baseY - 30), // Top bar
-            CGPoint(x: eStartX + beeSpacing, y: baseY + 30)  // Bottom bar
-        ]
-        
-        // Letter "A" positions
-        let aStartX = centerX + letterSpacing
-        let aPositions = [
-            CGPoint(x: aStartX, y: baseY + 30), // Bottom left
-            CGPoint(x: aStartX + beeSpacing, y: baseY + 30), // Bottom right
-            CGPoint(x: aStartX + beeSpacing/2, y: baseY - 30), // Top point
-            CGPoint(x: aStartX + beeSpacing/2, y: baseY),    // Middle cross
-            CGPoint(x: aStartX + beeSpacing/2, y: baseY + 15) // Middle cross lower
-        ]
-        
-        // Animate letter "B" first
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.animateLetter(positions: bPositions, startIndex: 0)
-        }
-        
-        // Animate letter "E" second
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            self.animateLetter(positions: ePositions, startIndex: 5)
-        }
-        
-        // Animate letter "A" third
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3.5) {
-            self.animateLetter(positions: aPositions, startIndex: 10)
+    private func startRandomBeeAnimations() {
+        // Animate each bee to fly randomly around the screen
+        for i in 0..<beeCount {
+            animateBeeToRandomPosition(beeIndex: i)
         }
     }
     
-    private func animateLetter(positions: [CGPoint], startIndex: Int) {
-        // Animate each bee in the letter to its position
-        for (index, position) in positions.enumerated() {
-            let beeIndex = startIndex + index
-            if beeIndex < beePositions.count {
-                DispatchQueue.main.asyncAfter(deadline: .now() + Double(index) * 0.1) {
-                    withAnimation(.easeOut(duration: 0.8)) {
-                        self.beePositions[beeIndex] = position
-                    }
-                    
-                    // Start gentle hovering after reaching position
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                        withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
-                            self.beePositions[beeIndex].x += CGFloat.random(in: -8...8)
-                            self.beePositions[beeIndex].y += CGFloat.random(in: -5...5)
-                        }
-                    }
-                }
-            }
+    private func animateBeeToRandomPosition(beeIndex: Int) {
+        guard beeIndex < beePositions.count else { return }
+        
+        // Generate random position within screen bounds
+        let newX = CGFloat.random(in: 50...350)
+        let newY = CGFloat.random(in: 50...600)
+        
+        // Fast animation to new position
+        withAnimation(.easeInOut(duration: 0.3)) {
+            beePositions[beeIndex] = CGPoint(x: newX, y: newY)
+        }
+        
+        // Continue with next random position after a short delay
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            self.animateBeeToRandomPosition(beeIndex: beeIndex)
         }
     }
 }
