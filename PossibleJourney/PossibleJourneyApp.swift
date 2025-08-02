@@ -65,17 +65,17 @@ struct BeaNumberSequenceView: View {
                         .position(beePositions[index])
                         .rotationEffect(.degrees(beeRotations[index]))
                         .scaleEffect(beeScales[index])
-                        .animation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true), value: beeRotations[index])
-                        .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: beeScales[index])
+                        .animation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true), value: beeRotations[index])
+                        .animation(.easeInOut(duration: 0.6).repeatForever(autoreverses: true), value: beeScales[index])
                 }
             }
             
             // Giant number display
             if currentIndex < numbers.count {
                 Text(numbers[currentIndex])
-                    .font(.system(size: 200, weight: .bold, design: .monospaced))
+                    .font(.system(size: 300, weight: .bold, design: .monospaced))
                     .foregroundColor(themeAccentColor)
-                    .shadow(color: .black, radius: 10, x: 0, y: 0)
+                    .shadow(color: .black, radius: 15, x: 0, y: 0)
                     .opacity(numberOpacity)
                     .scaleEffect(numberScale)
                     .animation(.easeInOut(duration: transitionDuration), value: numberOpacity)
@@ -148,12 +148,12 @@ struct BeaNumberSequenceView: View {
     private func startBeeAnimations() {
         // Animate bee positions in a buzzing pattern
         for i in 0..<beeCount {
-            let delay = Double(i) * 0.2
+            let delay = Double(i) * 0.1
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                withAnimation(.easeInOut(duration: 3.0).repeatForever(autoreverses: true)) {
+                withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
                     if i < beePositions.count {
-                        beePositions[i].x += CGFloat.random(in: -50...50)
-                        beePositions[i].y += CGFloat.random(in: -30...30)
+                        beePositions[i].x += CGFloat.random(in: -80...80)
+                        beePositions[i].y += CGFloat.random(in: -50...50)
                     }
                 }
             }
