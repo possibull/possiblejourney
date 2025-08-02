@@ -568,6 +568,10 @@ struct BirthdayCakeBackground: View {
         // Debug print to confirm this view is being rendered
         let _ = print("🎂 BirthdayCakeBackground is being rendered!")
         ZStack {
+            // Debug background to make sure the view is visible
+            Color.red.opacity(0.3)
+                .frame(width: 300, height: 300)
+                .border(Color.red, width: 3)
             // Birthday cake with "46" on top
             VStack(spacing: 0) {
                 // Cake top layer (smallest)
@@ -582,11 +586,11 @@ struct BirthdayCakeBackground: View {
                             endPoint: .bottom
                         )
                     )
-                    .frame(width: 120, height: 30)
+                    .frame(width: 200, height: 50)
                     .overlay(
                         // "46" on top of cake
                         Text("46")
-                            .font(.system(size: 22, weight: .bold, design: .rounded))
+                            .font(.system(size: 36, weight: .bold, design: .rounded))
                             .foregroundColor(.white)
                             .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 2)
                     )
@@ -603,7 +607,7 @@ struct BirthdayCakeBackground: View {
                             endPoint: .bottom
                         )
                     )
-                    .frame(width: 140, height: 35)
+                    .frame(width: 220, height: 55)
                     .overlay(
                         // Sprinkles
                         HStack(spacing: 4) {
@@ -628,7 +632,7 @@ struct BirthdayCakeBackground: View {
                             endPoint: .bottom
                         )
                     )
-                    .frame(width: 160, height: 40)
+                    .frame(width: 240, height: 60)
                     .overlay(
                         // More sprinkles
                         HStack(spacing: 6) {
@@ -653,7 +657,7 @@ struct BirthdayCakeBackground: View {
                             endPoint: .bottom
                         )
                     )
-                    .frame(width: 180, height: 20)
+                    .frame(width: 260, height: 25)
                     .shadow(color: .black.opacity(0.2), radius: 3, x: 0, y: 2)
             }
             .scaleEffect(cakeScale)
