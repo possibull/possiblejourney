@@ -98,7 +98,20 @@ struct ProgramCalendarView: View {
                 }
                 .tag(idx)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color(.systemBackground))
+                .background(
+                    Group {
+                        if themeManager.currentTheme == .birthday {
+                            ZStack {
+                                Color(.systemBackground)
+                                
+                                // Birthday cake background decoration
+                                BirthdayCakeBackground()
+                            }
+                        } else {
+                            Color(.systemBackground)
+                        }
+                    }
+                )
             }
         }
         .tabViewStyle(.page(indexDisplayMode: .never)) // Enable paging, hide dots

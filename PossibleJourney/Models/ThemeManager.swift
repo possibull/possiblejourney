@@ -560,6 +560,118 @@ struct BirthdayRibbon: View {
     }
 }
 
+struct BirthdayCakeBackground: View {
+    @State private var cakeScale: CGFloat = 1.0
+    @State private var cakeRotation: Double = 0
+    
+    var body: some View {
+        ZStack {
+            // Birthday cake with "46" on top
+            VStack(spacing: 0) {
+                // Cake top layer (smallest)
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color(red: 1.0, green: 0.9, blue: 0.8), // Cream
+                                Color(red: 0.9, green: 0.8, blue: 0.7)  // Light brown
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .frame(width: 80, height: 20)
+                    .overlay(
+                        // "46" on top of cake
+                        Text("46")
+                            .font(.system(size: 14, weight: .bold, design: .rounded))
+                            .foregroundColor(.white)
+                            .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 1)
+                    )
+                
+                // Cake middle layer
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color(red: 1.0, green: 0.8, blue: 0.9), // Pink
+                                Color(red: 0.9, green: 0.7, blue: 0.8)  // Darker pink
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .frame(width: 100, height: 25)
+                    .overlay(
+                        // Sprinkles
+                        HStack(spacing: 4) {
+                            ForEach(0..<5, id: \.self) { _ in
+                                Circle()
+                                    .fill(Color.white.opacity(0.8))
+                                    .frame(width: 3, height: 3)
+                            }
+                        }
+                        .offset(y: 5)
+                    )
+                
+                // Cake bottom layer (largest)
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color(red: 0.8, green: 0.9, blue: 1.0), // Blue
+                                Color(red: 0.7, green: 0.8, blue: 0.9)  // Darker blue
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .frame(width: 120, height: 30)
+                    .overlay(
+                        // More sprinkles
+                        HStack(spacing: 6) {
+                            ForEach(0..<6, id: \.self) { _ in
+                                Circle()
+                                    .fill(Color.white.opacity(0.8))
+                                    .frame(width: 4, height: 4)
+                            }
+                        }
+                        .offset(y: 8)
+                    )
+                
+                // Cake plate
+                Ellipse()
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color.white.opacity(0.9),
+                                Color.gray.opacity(0.3)
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .frame(width: 140, height: 15)
+                    .shadow(color: .black.opacity(0.2), radius: 3, x: 0, y: 2)
+            }
+            .scaleEffect(cakeScale)
+            .rotationEffect(.degrees(cakeRotation))
+            .offset(x: 120, y: 200) // Position in bottom right
+            .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 3)
+        }
+        .onAppear {
+            // Gentle floating animation
+            withAnimation(
+                Animation.easeInOut(duration: 4)
+                    .repeatForever(autoreverses: true)
+            ) {
+                cakeScale = 1.05
+                cakeRotation = 2
+            }
+        }
+    }
+}
+
 // MARK: - Birthday Theme Icons
 extension ThemeManager {
     func birthdayIcon(for systemIcon: String) -> String {
