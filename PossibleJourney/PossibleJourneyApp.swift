@@ -33,6 +33,8 @@ struct GlobalThemeSelector: View {
                                     .foregroundColor(.blue)
                             }
                         }
+                        .background(themeManager.currentTheme == theme ? Color.blue.opacity(0.1) : Color.clear)
+                        .cornerRadius(8)
                     }
                 }
             } label: {
