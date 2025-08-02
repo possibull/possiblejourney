@@ -30,6 +30,7 @@ struct BeaNumberSequenceView: View {
     ]
     @State private var currentSequence: [String] = []
     @State private var isAnimating = false
+    @State private var animationTimer: Timer?
     private let displayDuration: TimeInterval = 0.8
     private let transitionDuration: TimeInterval = 0.3
     private let beeCount = 15
@@ -101,16 +102,28 @@ struct BeaNumberSequenceView: View {
     private func startNumberSequence() {
         // Randomly select a sequence
         currentSequence = sequences.randomElement() ?? sequences[0]
+        currentIndex = 0
+        isAnimating = false
+        
+        // Cancel any existing timer
+        animationTimer?.invalidate()
+        
+        // Start the sequence
         displayNextNumber()
     }
     
     private func displayNextNumber() {
         // Prevent multiple instances from running simultaneously
-        guard !isAnimating else { return }
+        guard !isAnimating else { 
+            print("Animation already in progress, skipping")
+            return 
+        }
         
         guard currentIndex < currentSequence.count else {
             // Sequence complete, dismiss the sheet
             print("Sequence complete, dismissing sheet")
+            animationTimer?.invalidate()
+            animationTimer = nil
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 dismiss()
             }
@@ -126,19 +139,21 @@ struct BeaNumberSequenceView: View {
             numberScale = 1.0
         }
         
-        // Display number for specified duration
-        DispatchQueue.main.asyncAfter(deadline: .now() + displayDuration) {
-            // Animate number disappearance
-            withAnimation(.easeInOut(duration: transitionDuration)) {
-                numberOpacity = 0.0
-                numberScale = 0.5
-            }
-            
-            // Move to next number after transition
-            DispatchQueue.main.asyncAfter(deadline: .now() + transitionDuration) {
-                currentIndex += 1
-                isAnimating = false
-                displayNextNumber()
+        // Create a single timer for the entire sequence
+        animationTimer = Timer.scheduledTimer(withTimeInterval: displayDuration + transitionDuration, repeats: false) { _ in
+            DispatchQueue.main.async {
+                // Animate number disappearance
+                withAnimation(.easeInOut(duration: self.transitionDuration)) {
+                    self.numberOpacity = 0.0
+                    self.numberScale = 0.5
+                }
+                
+                // Move to next number after transition
+                DispatchQueue.main.asyncAfter(deadline: .now() + self.transitionDuration) {
+                    self.currentIndex += 1
+                    self.isAnimating = false
+                    self.displayNextNumber()
+                }
             }
         }
     }
