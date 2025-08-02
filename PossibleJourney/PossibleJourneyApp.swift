@@ -431,11 +431,6 @@ struct PossibleJourneyApp: App {
                             )
                         }
                     }
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarTrailing) {
-                            GlobalThemeSelector()
-                        }
-                    }
                 // Global DebugWindow always visible at top
                 GlobalDebugWindow(checklistDebugContent: {
                     let debugTime = currentTimeOverride ?? Date()
