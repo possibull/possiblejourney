@@ -132,6 +132,8 @@ struct BeaNumberSequenceView: View {
         sequenceActive = true
         
         print("Starting new sequence: \(currentSequence)")
+        print("Sequence length: \(currentSequence.count)")
+        print("Sequence index: \(currentIndex)")
         
         // Cancel any existing timer
         animationTimer?.invalidate()
@@ -169,7 +171,7 @@ struct BeaNumberSequenceView: View {
         }
         
         isAnimating = true
-        print("Displaying item \(currentIndex + 1) of \(currentSequence.count): '\(currentSequence[currentIndex])'")
+        print("Displaying item \(currentIndex + 1) of \(currentSequence.count): '\(currentSequence[currentIndex])' (index: \(currentIndex))")
         
         // Animate number appearance
         withAnimation(.easeInOut(duration: transitionDuration)) {
