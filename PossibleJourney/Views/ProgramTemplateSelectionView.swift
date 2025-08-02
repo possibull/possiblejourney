@@ -181,7 +181,7 @@ struct ProgramTemplateSelectionView: View {
                     HStack {
                         Spacer()
                         GlobalThemeSelector()
-                            .padding(.top, 60) // Position higher up
+                            .padding(.top, -20) // Move it higher up with negative padding
                             .padding(.trailing, 20)
                     }
                     Spacer()
