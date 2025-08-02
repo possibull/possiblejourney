@@ -427,7 +427,7 @@ struct DailyChecklistView: View {
                 .scaleEffect(x: 1, y: 2, anchor: .center)
         }
         .padding()
-        .background(Color(.systemGray6).opacity(themeManager.colorScheme == .dark ? 0.3 : 1.0))
+        .themeAwareHeader()
     }
     
     private var taskListView: some View {
@@ -465,6 +465,7 @@ struct DailyChecklistView: View {
                     // Add custom separator between cards (except for the last one)
                     if task.id != viewModel.program.tasks().last?.id {
                         Divider()
+                            .themeAwareDivider()
                             .padding(.horizontal, 16)
                             .padding(.top, 4)
                     }
@@ -629,12 +630,36 @@ struct TaskRowView: View {
                     }
                 }) {
                     ZStack {
+                        let checkboxFill = isCompleted ? 
+                            (themeManager.colorScheme == .dark ? 
+                                LinearGradient(
+                                    gradient: Gradient(colors: [Color.blue, Color.blue.opacity(0.8)]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ) : Color.blue) : 
+                            Color.clear
+                        
+                        let strokeColor = isCompleted ? 
+                            (themeManager.colorScheme == .dark ? Color.blue.opacity(0.8) : Color.blue) : 
+                            (themeManager.colorScheme == .dark ? Color.white.opacity(0.3) : Color.gray.opacity(0.4))
+                        
+                        let shadowColor = isCompleted && themeManager.colorScheme == .dark ? 
+                            Color.blue.opacity(0.3) : Color.clear
+                        
+                        let shadowRadius: CGFloat = isCompleted && themeManager.colorScheme == .dark ? 4 : 0
+                        
                         Circle()
-                            .fill(isCompleted ? Color.blue : Color.clear)
+                            .fill(checkboxFill)
                             .frame(width: 28, height: 28)
                             .overlay(
                                 Circle()
-                                    .stroke(isCompleted ? Color.blue : Color.gray.opacity(0.4), lineWidth: 2)
+                                    .stroke(strokeColor, lineWidth: 2)
+                            )
+                            .shadow(
+                                color: shadowColor,
+                                radius: shadowRadius,
+                                x: 0,
+                                y: 2
                             )
                         
                         if isCompleted {
@@ -754,9 +779,21 @@ struct TaskRowView: View {
             .overlay(
                 RoundedRectangle(cornerRadius: 16)
                     .stroke(
-                        isCompleted ? Color.green.opacity(0.3) : Color.gray.opacity(0.1),
-                        lineWidth: 1
+                        isCompleted ? 
+                            (themeManager.colorScheme == .dark ? Color.green.opacity(0.5) : Color.green.opacity(0.3)) :
+                            (themeManager.colorScheme == .dark ? Color.white.opacity(0.1) : Color.gray.opacity(0.1)),
+                        lineWidth: isCompleted ? 2 : 1
                     )
+            )
+            .overlay(
+                // Add subtle glow effect for completed tasks in dark mode
+                Group {
+                    if isCompleted && themeManager.colorScheme == .dark {
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color.green.opacity(0.2), lineWidth: 4)
+                            .blur(radius: 8)
+                    }
+                }
             )
             .scaleEffect(cardScale)
             .onTapGesture {
