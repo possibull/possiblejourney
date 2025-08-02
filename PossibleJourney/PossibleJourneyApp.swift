@@ -29,6 +29,7 @@ struct BeaNumberSequenceView: View {
         ["💜", "💛", "💛", "💛", "💜", "💜", "💜", "💜"]
     ]
     @State private var currentSequence: [String] = []
+    @State private var isAnimating = false
     private let displayDuration: TimeInterval = 0.8
     private let transitionDuration: TimeInterval = 0.3
     private let beeCount = 15
@@ -104,6 +105,9 @@ struct BeaNumberSequenceView: View {
     }
     
     private func displayNextNumber() {
+        // Prevent multiple instances from running simultaneously
+        guard !isAnimating else { return }
+        
         guard currentIndex < currentSequence.count else {
             // Sequence complete, dismiss the sheet
             print("Sequence complete, dismissing sheet")
@@ -113,6 +117,7 @@ struct BeaNumberSequenceView: View {
             return
         }
         
+        isAnimating = true
         print("Displaying item \(currentIndex + 1) of \(currentSequence.count): '\(currentSequence[currentIndex])'")
         
         // Animate number appearance
@@ -132,6 +137,7 @@ struct BeaNumberSequenceView: View {
             // Move to next number after transition
             DispatchQueue.main.asyncAfter(deadline: .now() + transitionDuration) {
                 currentIndex += 1
+                isAnimating = false
                 displayNextNumber()
             }
         }
