@@ -14,6 +14,7 @@ struct ProgramTemplateSelectionView: View {
     @State private var editingTemplate: ProgramTemplate?
     @State private var templateToDelete: ProgramTemplate?
     @State private var showingTemplateCreate = false
+    @EnvironmentObject var themeManager: ThemeManager
     
     let onTemplateSelected: (ProgramTemplate) -> Void
     let onProgramCreated: (Program) -> Void
@@ -120,10 +121,14 @@ struct ProgramTemplateSelectionView: View {
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Custom") {
-                        showingTemplateCreate = true
+                    HStack(spacing: 16) {
+                        GlobalThemeSelector()
+                        
+                        Button("Custom") {
+                            showingTemplateCreate = true
+                        }
+                        .fontWeight(.medium)
                     }
-                    .fontWeight(.medium)
                 }
             }
 

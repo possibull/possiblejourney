@@ -10,6 +10,7 @@ import SwiftUI
 struct ProgramSetupMainView: View {
     @State private var showingTemplateSelection = true
     @State private var showingCustomSetup = false
+    @EnvironmentObject var themeManager: ThemeManager
     
     let onProgramCreated: (Program) -> Void
     
@@ -28,6 +29,7 @@ struct ProgramSetupMainView: View {
                         showingCustomSetup = true
                     }
                 )
+                .environmentObject(themeManager)
             } else if showingCustomSetup {
                 ProgramSetupView(onSave: { program in
                     onProgramCreated(program)
