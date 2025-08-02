@@ -31,8 +31,8 @@ struct GlobalThemeSelector: View {
                 }
             }
         } label: {
-            Image(systemName: themeManager.currentTheme.iconName)
-                .foregroundColor(.purple)
+            Image(systemName: "paintbrush.fill")
+                .foregroundColor(.blue)
                 .font(.system(size: 18, weight: .medium))
         }
         .accessibilityIdentifier("GlobalThemeSelector")
