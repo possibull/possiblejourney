@@ -564,6 +564,12 @@ struct BirthdayCakePopup: View {
     @Environment(\.dismiss) private var dismiss
     @State private var cakeScale: CGFloat = 0.8
     @State private var cakeOpacity: Double = 0.0
+    @State private var streamerOffset1: CGFloat = -200
+    @State private var streamerOffset2: CGFloat = -200
+    @State private var streamerOffset3: CGFloat = -200
+    @State private var streamerRotation1: Double = 0
+    @State private var streamerRotation2: Double = 0
+    @State private var streamerRotation3: Double = 0
     
     var body: some View {
         ZStack {
@@ -578,6 +584,27 @@ struct BirthdayCakePopup: View {
                 endPoint: .bottomTrailing
             )
             .ignoresSafeArea()
+            
+            // Animated Streamers
+            ZStack {
+                // Streamer 1 - Pink
+                StreamerView(color: Color(red: 1.0, green: 0.8, blue: 0.9))
+                    .offset(x: streamerOffset1, y: -100)
+                    .rotationEffect(.degrees(streamerRotation1))
+                    .animation(.easeInOut(duration: 3).repeatForever(autoreverses: true), value: streamerRotation1)
+                
+                // Streamer 2 - Blue
+                StreamerView(color: Color(red: 0.8, green: 0.9, blue: 1.0))
+                    .offset(x: streamerOffset2, y: -50)
+                    .rotationEffect(.degrees(streamerRotation2))
+                    .animation(.easeInOut(duration: 2.5).repeatForever(autoreverses: true), value: streamerRotation2)
+                
+                // Streamer 3 - Yellow
+                StreamerView(color: Color(red: 1.0, green: 0.95, blue: 0.8))
+                    .offset(x: streamerOffset3, y: -150)
+                    .rotationEffect(.degrees(streamerRotation3))
+                    .animation(.easeInOut(duration: 3.5).repeatForever(autoreverses: true), value: streamerRotation3)
+            }
             
             VStack(spacing: 30) {
                 // Title
@@ -671,6 +698,20 @@ struct BirthdayCakePopup: View {
             withAnimation(.easeOut(duration: 0.8)) {
                 cakeScale = 1.0
                 cakeOpacity = 1.0
+            }
+            
+            // Animate streamers
+            withAnimation(.easeOut(duration: 1.0).delay(0.3)) {
+                streamerOffset1 = 0
+                streamerOffset2 = 0
+                streamerOffset3 = 0
+            }
+            
+            // Start streamer rotations
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                streamerRotation1 = 15
+                streamerRotation2 = -10
+                streamerRotation3 = 20
             }
             
 
@@ -776,6 +817,32 @@ struct BirthdayIconModifier: ViewModifier {
                 )
         } else {
             content
+        }
+    }
+}
+
+// Animated Streamer View
+struct StreamerView: View {
+    let color: Color
+    @State private var waveOffset: CGFloat = 0
+    
+    var body: some View {
+        Path { path in
+            path.move(to: CGPoint(x: 0, y: 0))
+            
+            // Create a wavy streamer effect
+            for i in 0...20 {
+                let x = CGFloat(i) * 15
+                let y = sin(Double(i) * 0.5 + waveOffset) * 20
+                path.addLine(to: CGPoint(x: x, y: y))
+            }
+        }
+        .stroke(color, lineWidth: 8)
+        .frame(width: 300, height: 200)
+        .onAppear {
+            withAnimation(.linear(duration: 2).repeatForever(autoreverses: false)) {
+                waveOffset = .pi * 2
+            }
         }
     }
 } 
