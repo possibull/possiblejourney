@@ -433,33 +433,44 @@ struct DailyChecklistView: View {
     private var taskListView: some View {
         List {
             ForEach(viewModel.program.tasks(), id: \.id) { task in
-                TaskRowView(
-                    task: task,
-                    isCompleted: viewModel.dailyProgress.completedTaskIDs.contains(task.id),
-                    currentDailyProgress: viewModel.dailyProgress,
-                    onToggle: {
-                        toggleTask(task)
-                    },
-                    onSetReminder: {
-                        // TODO: Implement reminder functionality
-                        print("Set reminder for task: \(task.title)")
-                    },
-                    onUpdateDailyProgress: { newProgress in
-                        viewModel.dailyProgress = newProgress
-                        DailyProgressStorage().save(progress: newProgress)
-                    },
-                    onPhotoRemoved: {
-                        // Clear photo state when task is unchecked
-                        print("DEBUG: Photo removed for task: \(task.title)")
+                VStack(spacing: 0) {
+                    TaskRowView(
+                        task: task,
+                        isCompleted: viewModel.dailyProgress.completedTaskIDs.contains(task.id),
+                        currentDailyProgress: viewModel.dailyProgress,
+                        onToggle: {
+                            toggleTask(task)
+                        },
+                        onSetReminder: {
+                            // TODO: Implement reminder functionality
+                            print("Set reminder for task: \(task.title)")
+                        },
+                        onUpdateDailyProgress: { newProgress in
+                            viewModel.dailyProgress = newProgress
+                            DailyProgressStorage().save(progress: newProgress)
+                        },
+                        onPhotoRemoved: {
+                            // Clear photo state when task is unchecked
+                            print("DEBUG: Photo removed for task: \(task.title)")
+                        }
+                    )
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button("Reminder") {
+                            // TODO: Implement reminder functionality
+                            print("Set reminder for task: \(task.title)")
+                        }
+                        .tint(.orange)
                     }
-                )
-                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                    Button("Reminder") {
-                        // TODO: Implement reminder functionality
-                        print("Set reminder for task: \(task.title)")
+                    
+                    // Add custom separator between cards (except for the last one)
+                    if task.id != viewModel.program.tasks().last?.id {
+                        Divider()
+                            .padding(.horizontal, 16)
+                            .padding(.top, 4)
                     }
-                    .tint(.orange)
                 }
+                .listRowInsets(EdgeInsets())
+                .listRowSeparator(.hidden)
             }
             .onMove(perform: moveTasks)
         }
