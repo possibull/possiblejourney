@@ -57,51 +57,44 @@ class ThemeManager: ObservableObject {
 
 }
 
-// MARK: - Theme-Aware View Modifiers
+// MARK: - Theme-Aware View Modifiers (Fixed)
 struct ThemeAwareBackground: ViewModifier {
-    @EnvironmentObject var themeManager: ThemeManager
+    @Environment(\.colorScheme) private var colorScheme
     
     func body(content: Content) -> some View {
         content
             .background(
-                Group {
-                    if themeManager.colorScheme == .dark {
-                        // Enhanced dark theme with rich gradients
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color.black,
-                                Color(red: 0.1, green: 0.05, blue: 0.15),
-                                Color(red: 0.05, green: 0.1, blue: 0.2),
-                                Color(red: 0.08, green: 0.08, blue: 0.12)
-                            ]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    } else {
-                        // Light theme with subtle gradients
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color(.systemBackground),
-                                Color.blue.opacity(0.05),
-                                Color.purple.opacity(0.03)
-                            ]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    }
-                }
+                colorScheme == .dark ?
+                    // Simplified dark theme - single gradient
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color.black,
+                            Color(red: 0.1, green: 0.05, blue: 0.15)
+                        ]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    ) :
+                    // Simplified light theme - single gradient
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color(.systemBackground),
+                            Color.blue.opacity(0.02)
+                        ]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
             )
     }
 }
 
 struct ThemeAwareCard: ViewModifier {
-    @EnvironmentObject var themeManager: ThemeManager
+    @Environment(\.colorScheme) private var colorScheme
     
     func body(content: Content) -> some View {
         content
             .background(
                 Group {
-                    if themeManager.colorScheme == .dark {
+                    if colorScheme == .dark {
                         // Enhanced dark card with subtle gradient and glow
                         RoundedRectangle(cornerRadius: 16)
                             .fill(
@@ -140,23 +133,23 @@ struct ThemeAwareCard: ViewModifier {
                 }
             )
             .shadow(
-                color: themeManager.colorScheme == .dark ? 
+                color: colorScheme == .dark ? 
                     Color.black.opacity(0.4) : Color.black.opacity(0.05),
-                radius: themeManager.colorScheme == .dark ? 12 : 8,
+                radius: colorScheme == .dark ? 12 : 8,
                 x: 0,
-                y: themeManager.colorScheme == .dark ? 6 : 4
+                y: colorScheme == .dark ? 6 : 4
             )
     }
 }
 
 struct ThemeAwareHeader: ViewModifier {
-    @EnvironmentObject var themeManager: ThemeManager
+    @Environment(\.colorScheme) private var colorScheme
     
     func body(content: Content) -> some View {
         content
             .background(
                 Group {
-                    if themeManager.colorScheme == .dark {
+                    if colorScheme == .dark {
                         // Enhanced dark header with subtle gradient
                         LinearGradient(
                             gradient: Gradient(colors: [
@@ -175,12 +168,12 @@ struct ThemeAwareHeader: ViewModifier {
 }
 
 struct ThemeAwareDivider: ViewModifier {
-    @EnvironmentObject var themeManager: ThemeManager
+    @Environment(\.colorScheme) private var colorScheme
     
     func body(content: Content) -> some View {
         content
             .foregroundColor(
-                themeManager.colorScheme == .dark ? 
+                colorScheme == .dark ? 
                     Color.white.opacity(0.15) : Color.gray.opacity(0.3)
             )
     }

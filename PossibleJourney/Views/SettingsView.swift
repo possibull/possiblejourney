@@ -16,8 +16,10 @@ struct SettingsView: View {
     
     var body: some View {
         ZStack {
-            // Use regular background instead of theme-aware background
-            Color(.systemBackground)
+            // Test simplified theme-aware background
+            Rectangle()
+                .fill(Color.clear)
+                .themeAwareBackground()
                 .ignoresSafeArea()
             
             ScrollView {
