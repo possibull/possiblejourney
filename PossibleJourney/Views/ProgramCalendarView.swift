@@ -61,35 +61,6 @@ struct ProgramCalendarView: View {
     var body: some View {
         let enumeratedMonths = Array(months.enumerated())
         VStack {
-            // Birthday cake button (only show when Birthday theme is active)
-            if themeManager.currentTheme == .birthday {
-                Button(action: {
-                    showingBirthdayCake = true
-                }) {
-                    HStack {
-                        Image(systemName: "birthday.cake.fill")
-                            .foregroundColor(.white)
-                        Text("🎂 Birthday Cake")
-                            .foregroundColor(.white)
-                            .font(.headline)
-                    }
-                    .padding()
-                    .background(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color(red: 1.0, green: 0.8, blue: 0.9), // Pink
-                                Color(red: 0.8, green: 0.9, blue: 1.0)  // Blue
-                            ]),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .cornerRadius(12)
-                    .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 2)
-                }
-                .padding(.horizontal)
-            }
-            
             TabView(selection: $selectedMonthIndex) { // Vertical paging
                 ForEach(enumeratedMonths, id: \ .element.monthStart) { pair in
                     let idx = pair.offset
@@ -147,6 +118,13 @@ struct ProgramCalendarView: View {
 
         .onAppear {
             selectedMonthIndex = currentMonthIndex // Start on current month
+            
+            // Automatically show birthday cake popup when Birthday theme is active
+            if themeManager.currentTheme == .birthday {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    showingBirthdayCake = true
+                }
+            }
         }
         .sheet(isPresented: $showingBirthdayCake) {
             BirthdayCakePopup()
