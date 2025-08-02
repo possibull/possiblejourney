@@ -16,53 +16,58 @@ struct GlobalThemeSelector: View {
     @State private var lastBeaTapTime: Date = Date()
     
     var body: some View {
-        Menu {
-            ForEach(ThemeMode.allCases.filter { $0 != .birthday }, id: \.self) { theme in
-                Button(action: {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        themeManager.changeTheme(to: theme)
-                    }
-                }) {
-                    HStack {
-                        Image(systemName: theme.iconName)
-                        Text(theme.displayName)
-                        if themeManager.currentTheme == theme {
-                            Image(systemName: "checkmark")
+        HStack(spacing: 8) {
+            Menu {
+                ForEach(ThemeMode.allCases.filter { $0 != .birthday }, id: \.self) { theme in
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            themeManager.changeTheme(to: theme)
+                        }
+                    }) {
+                        HStack {
+                            Image(systemName: theme.iconName)
+                            Text(theme.displayName)
+                            if themeManager.currentTheme == theme {
+                                Image(systemName: "checkmark")
+                            }
                         }
                     }
                 }
+            } label: {
+                Image(systemName: "paintbrush.fill")
+                    .foregroundColor(.blue)
+                    .font(.system(size: 18, weight: .medium))
             }
-        } label: {
-            Image(systemName: "paintbrush.fill")
-                .foregroundColor(.blue)
-                .font(.system(size: 18, weight: .medium))
-        }
-        .accessibilityIdentifier("GlobalThemeSelector")
-        .onTapGesture {
-            // Only detect taps when Bea theme is active
+            .accessibilityIdentifier("GlobalThemeSelector")
+            
+            // Hidden Easter egg button (only visible when Bea theme is active)
             if themeManager.currentTheme == .bea {
-                print("🎨 Bea theme tap detected! Count: \(beaTapCount + 1)")
-                let now = Date()
-                if now.timeIntervalSince(lastBeaTapTime) < 2.0 {
-                    beaTapCount += 1
-                    print("🎨 Bea tap count: \(beaTapCount)")
-                    if beaTapCount >= 5 {
-                        print("🎂 BIRTHDAY THEME UNLOCKED!")
-                        // Activate Birthday theme as Easter egg
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                Button(action: {
+                    print("🎨 Easter egg button tapped! Count: \(beaTapCount + 1)")
+                    let now = Date()
+                    if now.timeIntervalSince(lastBeaTapTime) < 2.0 {
+                        beaTapCount += 1
+                        print("🎨 Bea tap count: \(beaTapCount)")
+                        if beaTapCount >= 5 {
+                            print("🎂 BIRTHDAY THEME UNLOCKED!")
+                            // Activate Birthday theme as Easter egg
                             withAnimation(.easeInOut(duration: 0.3)) {
                                 themeManager.changeTheme(to: .birthday)
                             }
+                            beaTapCount = 0
                         }
-                        beaTapCount = 0
+                    } else {
+                        beaTapCount = 1
+                        print("🎨 Bea tap count reset to: \(beaTapCount)")
                     }
-                } else {
-                    beaTapCount = 1
-                    print("🎨 Bea tap count reset to: \(beaTapCount)")
+                    lastBeaTapTime = now
+                }) {
+                    Image(systemName: "sparkles")
+                        .foregroundColor(.clear) // Invisible but tappable
+                        .font(.system(size: 18, weight: .medium))
+                        .frame(width: 44, height: 44) // Minimum tap target
                 }
-                lastBeaTapTime = now
-            } else {
-                print("🎨 Tap detected but Bea theme not active. Current theme: \(themeManager.currentTheme)")
+                .accessibilityIdentifier("EasterEggButton")
             }
         }
     }
