@@ -8,6 +8,37 @@
 import SwiftUI
 import Foundation
 
+// MARK: - Global Theme Selector
+struct GlobalThemeSelector: View {
+    @EnvironmentObject var themeManager: ThemeManager
+    @State private var showingThemeMenu = false
+    
+    var body: some View {
+        Menu {
+            ForEach(ThemeMode.allCases, id: \.self) { theme in
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        themeManager.changeTheme(to: theme)
+                    }
+                }) {
+                    HStack {
+                        Image(systemName: theme.iconName)
+                        Text(theme.displayName)
+                        if themeManager.currentTheme == theme {
+                            Image(systemName: "checkmark")
+                        }
+                    }
+                }
+            }
+        } label: {
+            Image(systemName: "paintbrush.fill")
+                .foregroundColor(.purple)
+                .font(.system(size: 18, weight: .medium))
+        }
+        .accessibilityIdentifier("GlobalThemeSelector")
+    }
+}
+
 // Global DebugWindow for all screens
 import SwiftUI
 
@@ -77,6 +108,11 @@ struct PossibleJourneyApp: App {
                                 })
                                 .environmentObject(debugState)
                             )
+                        }
+                    }
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            GlobalThemeSelector()
                         }
                     }
                 // Global DebugWindow always visible at top
