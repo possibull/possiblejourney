@@ -106,15 +106,24 @@ struct DailyChecklistView: View {
                 }
             }
         }
-        .navigationTitle("Daily Checklist")
-        .navigationBarTitleDisplayMode(.large)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                HStack(spacing: 16) {
-                    GlobalThemeSelector()
-                    calendarLink
-                    settingsLink
+        // Custom header since navigation context is unreliable
+        .safeAreaInset(edge: .top) {
+            VStack(spacing: 0) {
+                HStack {
+                    Text("Daily Checklist")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                    Spacer()
+                    HStack(spacing: 16) {
+                        GlobalThemeSelector()
+                        calendarLink
+                        settingsLink
+                    }
                 }
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+                .background(Color(.systemBackground))
+                Divider()
             }
         }
 
