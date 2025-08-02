@@ -111,6 +111,7 @@ struct DailyChecklistView: View {
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 HStack(spacing: 16) {
+                    GlobalThemeSelector()
                     calendarLink
                     settingsLink
                 }
