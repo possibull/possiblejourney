@@ -130,7 +130,7 @@ struct BeaNumberSequenceView: View {
         
         // Start all bees at random positions on screen
         for _ in 0..<beeCount {
-            beePositions.append(CGPoint(x: CGFloat.random(in: 50...350), y: CGFloat.random(in: 50...600)))
+            beePositions.append(CGPoint(x: CGFloat.random(in: 50...350), y: CGFloat.random(in: 50...800)))
             beeRotations.append(Double.random(in: -15...15))
             beeScales.append(CGFloat.random(in: 0.9...1.1))
         }
@@ -151,7 +151,7 @@ struct BeaNumberSequenceView: View {
         
         // Generate random position within screen bounds
         let newX = CGFloat.random(in: 50...350)
-        let newY = CGFloat.random(in: 50...600)
+        let newY = CGFloat.random(in: 50...800)
         
         // Smooth, realistic animation to new position
         withAnimation(.easeInOut(duration: 2.0)) {
