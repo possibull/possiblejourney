@@ -16,8 +16,8 @@ struct SettingsView: View {
     
     var body: some View {
         ZStack {
-            // Theme-aware background
-            themeAwareBackground()
+            // Use regular background instead of theme-aware background
+            Color(.systemBackground)
                 .ignoresSafeArea()
             
             ScrollView {
@@ -296,7 +296,6 @@ struct SettingsView: View {
                 }
                 .padding(.horizontal)
             }
-            .background(Color(.systemBackground))
         }
         .id("\(themeManager.currentTheme)-\(forceRefresh)")
         .onReceive(themeManager.$currentTheme) { _ in
