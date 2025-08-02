@@ -570,6 +570,8 @@ struct BirthdayCakePopup: View {
     @State private var streamerRotation1: Double = 0
     @State private var streamerRotation2: Double = 0
     @State private var streamerRotation3: Double = 0
+    @State private var confettiPieces: [ConfettiPiece] = []
+    @State private var showConfetti: Bool = false
     
     var body: some View {
         ZStack {
@@ -588,22 +590,29 @@ struct BirthdayCakePopup: View {
             // Animated Streamers
             ZStack {
                 // Streamer 1 - Pink
-                StreamerView(color: Color(red: 1.0, green: 0.8, blue: 0.9))
+                StreamerView(color: Color(red: 1.0, green: 0.8, blue: 0.9), offset: streamerOffset1, rotation: streamerRotation1)
                     .offset(x: streamerOffset1, y: -100)
                     .rotationEffect(.degrees(streamerRotation1))
                     .animation(.easeInOut(duration: 3).repeatForever(autoreverses: true), value: streamerRotation1)
                 
                 // Streamer 2 - Blue
-                StreamerView(color: Color(red: 0.8, green: 0.9, blue: 1.0))
+                StreamerView(color: Color(red: 0.8, green: 0.9, blue: 1.0), offset: streamerOffset2, rotation: streamerRotation2)
                     .offset(x: streamerOffset2, y: -50)
                     .rotationEffect(.degrees(streamerRotation2))
                     .animation(.easeInOut(duration: 2.5).repeatForever(autoreverses: true), value: streamerRotation2)
                 
                 // Streamer 3 - Yellow
-                StreamerView(color: Color(red: 1.0, green: 0.95, blue: 0.8))
+                StreamerView(color: Color(red: 1.0, green: 0.95, blue: 0.8), offset: streamerOffset3, rotation: streamerRotation3)
                     .offset(x: streamerOffset3, y: -150)
                     .rotationEffect(.degrees(streamerRotation3))
                     .animation(.easeInOut(duration: 3.5).repeatForever(autoreverses: true), value: streamerRotation3)
+            }
+            
+            // Animated confetti
+            if showConfetti {
+                ForEach(confettiPieces.indices, id: \.self) { index in
+                    ConfettiPieceView(piece: confettiPieces[index])
+                }
             }
             
             VStack(spacing: 30) {
@@ -714,7 +723,39 @@ struct BirthdayCakePopup: View {
                 streamerRotation3 = 20
             }
             
+            // Create and launch confetti
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                createConfetti()
+                showConfetti = true
+            }
+            
 
+        }
+    }
+    
+    private func createConfetti() {
+        confettiPieces = []
+        let colors: [Color] = [
+            Color(red: 1.0, green: 0.8, blue: 0.9), // Pink
+            Color(red: 0.8, green: 0.9, blue: 1.0), // Blue
+            Color(red: 1.0, green: 0.95, blue: 0.7), // Yellow
+            Color(red: 1.0, green: 0.9, blue: 0.8), // Cream
+            Color(red: 0.9, green: 0.8, blue: 1.0)  // Purple
+        ]
+        
+        for _ in 0..<50 {
+            let piece = ConfettiPiece(
+                color: colors.randomElement() ?? .pink,
+                size: CGFloat.random(in: 4...12),
+                startX: CGFloat.random(in: -150...150),
+                startY: 400,
+                endX: CGFloat.random(in: -200...200),
+                endY: CGFloat.random(in: -300...100),
+                rotation: Double.random(in: 0...360),
+                duration: Double.random(in: 2.0...4.0),
+                delay: Double.random(in: 0...0.5)
+            )
+            confettiPieces.append(piece)
         }
     }
 }
@@ -824,24 +865,83 @@ struct BirthdayIconModifier: ViewModifier {
 // Animated Streamer View
 struct StreamerView: View {
     let color: Color
+    let offset: CGFloat
+    let rotation: Double
     @State private var waveOffset: CGFloat = 0
     
     var body: some View {
         Path { path in
             path.move(to: CGPoint(x: 0, y: 0))
-            
-            // Create a wavy streamer effect
-            for i in 0...20 {
-                let x = CGFloat(i) * 15
-                let y = sin(Double(i) * 0.5 + waveOffset) * 20
-                path.addLine(to: CGPoint(x: x, y: y))
+            for x in stride(from: 0, through: 200, by: 2) {
+                let y = sin((CGFloat(x) + waveOffset) * 0.1) * 20
+                path.addLine(to: CGPoint(x: CGFloat(x), y: y))
             }
         }
         .stroke(color, lineWidth: 8)
-        .frame(width: 300, height: 200)
         .onAppear {
-            withAnimation(.linear(duration: 2).repeatForever(autoreverses: false)) {
-                waveOffset = .pi * 2
+            withAnimation(.linear(duration: 2.0).repeatForever(autoreverses: false)) {
+                waveOffset = 100
+            }
+        }
+    }
+}
+
+// MARK: - Confetti Animation
+struct ConfettiPiece {
+    let color: Color
+    let size: CGFloat
+    let startX: CGFloat
+    let startY: CGFloat
+    let endX: CGFloat
+    let endY: CGFloat
+    let rotation: Double
+    let duration: Double
+    let delay: Double
+}
+
+struct ConfettiPieceView: View {
+    let piece: ConfettiPiece
+    @State private var offsetX: CGFloat
+    @State private var offsetY: CGFloat
+    @State private var rotation: Double
+    @State private var opacity: Double = 1.0
+    
+    init(piece: ConfettiPiece) {
+        self.piece = piece
+        self._offsetX = State(initialValue: piece.startX)
+        self._offsetY = State(initialValue: piece.startY)
+        self._rotation = State(initialValue: piece.rotation)
+    }
+    
+    var body: some View {
+        // Confetti piece shape
+        Group {
+            if Bool.random() {
+                // Square confetti
+                Rectangle()
+                    .fill(piece.color)
+                    .frame(width: piece.size, height: piece.size)
+            } else {
+                // Circle confetti
+                Circle()
+                    .fill(piece.color)
+                    .frame(width: piece.size, height: piece.size)
+            }
+        }
+        .offset(x: offsetX, y: offsetY)
+        .rotationEffect(.degrees(rotation))
+        .opacity(opacity)
+        .onAppear {
+            // Animate confetti shooting up and falling
+            withAnimation(.easeOut(duration: piece.duration).delay(piece.delay)) {
+                offsetX = piece.endX
+                offsetY = piece.endY
+                rotation = piece.rotation + 360
+            }
+            
+            // Fade out
+            withAnimation(.easeIn(duration: 0.5).delay(piece.duration + piece.delay - 0.5)) {
+                opacity = 0.0
             }
         }
     }
