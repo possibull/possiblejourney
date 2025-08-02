@@ -197,19 +197,9 @@ struct SettingsView: View {
                                 appState.loadedProgram = nil
                                 print("Settings: Set loadedProgram to nil")
                                 
-                                // Force multiple UI updates to ensure the change is observed
+                                // Force UI update
                                 DispatchQueue.main.async {
-                                    print("Settings: Forcing UI update 1")
-                                    forceRefresh.toggle()
-                                }
-                                
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    print("Settings: Forcing UI update 2")
-                                    forceRefresh.toggle()
-                                }
-                                
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                    print("Settings: Forcing UI update 3")
+                                    print("Settings: Forcing UI update")
                                     forceRefresh.toggle()
                                 }
                             }) {

@@ -387,11 +387,14 @@ struct PossibleJourneyApp: App {
     @StateObject private var updateChecker = AppUpdateChecker()
     @StateObject private var themeManager = ThemeManager()
     @State private var showSplash = true
+    @State private var forceNavigationUpdate = false
     
     init() {
         resetForUITestingIfNeeded()
         // Always minimize debug window on launch
         UserDefaults.standard.set(false, forKey: "debugWindowExpanded")
+        
+
     }
     var currentTimeOverride: Date? {
         if let idx = CommandLine.arguments.firstIndex(of: "--uitesting-current-time"),
@@ -418,6 +421,7 @@ struct PossibleJourneyApp: App {
                             DailyChecklistView()
                                 .environmentObject(debugState)
                                 .environmentObject(themeManager)
+                                .environmentObject(appState)
                         } else {
                             ProgramSetupMainView(onProgramCreated: { program in
                                 appState.loadedProgram = program
@@ -425,6 +429,7 @@ struct PossibleJourneyApp: App {
                             })
                             .environmentObject(debugState)
                             .environmentObject(themeManager)
+                                .environmentObject(appState)
                         }
                     }
                 // Global DebugWindow always visible at top
