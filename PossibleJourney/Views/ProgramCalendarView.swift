@@ -35,7 +35,7 @@ struct ProgramCalendarView: View {
     private var themeAccentColor: Color {
         switch themeManager.currentTheme {
         case .birthday:
-            return Color(red: 1.0, green: 0.8, blue: 0.9) // Pastel pink
+            return Color(red: 1.0, green: 0.95, blue: 0.7) // Pastel yellow
         case .bea:
             return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
         case .dark:
@@ -144,7 +144,7 @@ struct CalendarMonthGrid: View {
     private var themeAccentColor: Color {
         switch themeManager.currentTheme {
         case .birthday:
-            return Color(red: 1.0, green: 0.8, blue: 0.9) // Pastel pink
+            return Color(red: 1.0, green: 0.95, blue: 0.7) // Pastel yellow
         case .bea:
             return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
         case .dark:
