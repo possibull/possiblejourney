@@ -23,21 +23,6 @@ struct SettingsView: View {
             
             ScrollView {
                 VStack(spacing: 32) {
-                    // Header
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Settings")
-                            .font(.system(size: 36, weight: .bold, design: .rounded))
-                            .foregroundColor(.primary)
-                            .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
-                        
-                        Text("Customize your program experience")
-                            .font(.system(size: 18, weight: .medium, design: .rounded))
-                            .foregroundColor(.secondary)
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 20)
-                    .padding(.top, 20)
-                    
                     // Settings Cards
                     VStack(spacing: 20) {
                         // Program Settings Card
