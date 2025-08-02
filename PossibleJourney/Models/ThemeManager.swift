@@ -567,112 +567,46 @@ struct BirthdayCakeBackground: View {
     var body: some View {
         // Debug print to confirm this view is being rendered
         let _ = print("🎂 BirthdayCakeBackground is being rendered!")
-        ZStack {
-            // Debug background to make sure the view is visible
-            Color.red.opacity(0.3)
-                .frame(width: 300, height: 300)
-                .border(Color.red, width: 3)
-            // Birthday cake with "46" on top
-            VStack(spacing: 0) {
-                // Cake top layer (smallest)
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color(red: 1.0, green: 0.9, blue: 0.8), // Cream
-                                Color(red: 0.9, green: 0.8, blue: 0.7)  // Light brown
-                            ]),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .frame(width: 200, height: 50)
-                    .overlay(
-                        // "46" on top of cake
-                        Text("46")
-                            .font(.system(size: 36, weight: .bold, design: .rounded))
-                            .foregroundColor(.white)
-                            .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 2)
-                    )
-                
-                // Cake middle layer
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color(red: 1.0, green: 0.8, blue: 0.9), // Pink
-                                Color(red: 0.9, green: 0.7, blue: 0.8)  // Darker pink
-                            ]),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .frame(width: 220, height: 55)
-                    .overlay(
-                        // Sprinkles
-                        HStack(spacing: 4) {
-                            ForEach(0..<5, id: \.self) { _ in
-                                Circle()
-                                    .fill(Color.white.opacity(0.8))
-                                    .frame(width: 3, height: 3)
-                            }
-                        }
-                        .offset(y: 5)
-                    )
-                
-                // Cake bottom layer (largest)
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color(red: 0.8, green: 0.9, blue: 1.0), // Blue
-                                Color(red: 0.7, green: 0.8, blue: 0.9)  // Darker blue
-                            ]),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .frame(width: 240, height: 60)
-                    .overlay(
-                        // More sprinkles
-                        HStack(spacing: 6) {
-                            ForEach(0..<6, id: \.self) { _ in
-                                Circle()
-                                    .fill(Color.white.opacity(0.8))
-                                    .frame(width: 4, height: 4)
-                            }
-                        }
-                        .offset(y: 8)
-                    )
-                
-                // Cake plate
-                Ellipse()
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color.white.opacity(0.9),
-                                Color.gray.opacity(0.3)
-                            ]),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .frame(width: 260, height: 25)
-                    .shadow(color: .black.opacity(0.2), radius: 3, x: 0, y: 2)
-            }
-            .scaleEffect(cakeScale)
-            .rotationEffect(.degrees(cakeRotation))
-            .offset(x: 0, y: 0) // Center position
-            .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
+        
+        // Super simple, obvious birthday cake
+        VStack(spacing: 0) {
+            // Top layer - cream with "46"
+            Rectangle()
+                .fill(Color.yellow)
+                .frame(width: 150, height: 40)
+                .overlay(
+                    Text("46")
+                        .font(.system(size: 30, weight: .bold))
+                        .foregroundColor(.black)
+                )
+            
+            // Middle layer - pink
+            Rectangle()
+                .fill(Color.pink)
+                .frame(width: 180, height: 50)
+            
+            // Bottom layer - blue
+            Rectangle()
+                .fill(Color.blue)
+                .frame(width: 210, height: 60)
+            
+            // Plate
+            Rectangle()
+                .fill(Color.white)
+                .frame(width: 240, height: 20)
         }
+        .background(Color.red.opacity(0.5)) // Red background to make it obvious
+        .border(Color.red, width: 5) // Red border
+        .scaleEffect(cakeScale)
+        .rotationEffect(.degrees(cakeRotation))
         .onAppear {
-            // Gentle floating animation
+            // Simple animation
             withAnimation(
-                Animation.easeInOut(duration: 4)
+                Animation.easeInOut(duration: 2)
                     .repeatForever(autoreverses: true)
             ) {
-                cakeScale = 1.05
-                cakeRotation = 2
+                cakeScale = 1.1
+                cakeRotation = 5
             }
         }
     }
