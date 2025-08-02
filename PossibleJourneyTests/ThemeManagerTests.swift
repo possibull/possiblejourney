@@ -19,34 +19,44 @@ class ThemeManagerTests: XCTestCase {
     // MARK: - ThemeMode Tests
     
     func testThemeModeAllCases() {
-        XCTAssertEqual(ThemeMode.allCases.count, 3)
+        XCTAssertEqual(ThemeMode.allCases.count, 5)
         XCTAssertTrue(ThemeMode.allCases.contains(.light))
         XCTAssertTrue(ThemeMode.allCases.contains(.dark))
         XCTAssertTrue(ThemeMode.allCases.contains(.system))
+        XCTAssertTrue(ThemeMode.allCases.contains(.bea))
+        XCTAssertTrue(ThemeMode.allCases.contains(.birthday))
     }
     
     func testThemeModeRawValues() {
         XCTAssertEqual(ThemeMode.light.rawValue, "light")
         XCTAssertEqual(ThemeMode.dark.rawValue, "dark")
         XCTAssertEqual(ThemeMode.system.rawValue, "system")
+        XCTAssertEqual(ThemeMode.bea.rawValue, "bea")
+        XCTAssertEqual(ThemeMode.birthday.rawValue, "birthday")
     }
     
     func testThemeModeDisplayNames() {
         XCTAssertEqual(ThemeMode.light.displayName, "Light")
         XCTAssertEqual(ThemeMode.dark.displayName, "Dark")
         XCTAssertEqual(ThemeMode.system.displayName, "System")
+        XCTAssertEqual(ThemeMode.bea.displayName, "Bea")
+        XCTAssertEqual(ThemeMode.birthday.displayName, "Birthday")
     }
     
     func testThemeModeIconNames() {
         XCTAssertEqual(ThemeMode.light.iconName, "sun.max.fill")
         XCTAssertEqual(ThemeMode.dark.iconName, "moon.fill")
         XCTAssertEqual(ThemeMode.system.iconName, "gear")
+        XCTAssertEqual(ThemeMode.bea.iconName, "heart.fill")
+        XCTAssertEqual(ThemeMode.birthday.iconName, "birthday.cake.fill")
     }
     
     func testThemeModeFromRawValue() {
         XCTAssertEqual(ThemeMode(rawValue: "light"), .light)
         XCTAssertEqual(ThemeMode(rawValue: "dark"), .dark)
         XCTAssertEqual(ThemeMode(rawValue: "system"), .system)
+        XCTAssertEqual(ThemeMode(rawValue: "bea"), .bea)
+        XCTAssertEqual(ThemeMode(rawValue: "birthday"), .birthday)
         XCTAssertNil(ThemeMode(rawValue: "invalid"))
     }
     

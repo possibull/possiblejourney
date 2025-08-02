@@ -59,11 +59,21 @@ struct ProgramCalendarView: View {
     
     var body: some View {
         let enumeratedMonths = Array(months.enumerated())
-        TabView(selection: $selectedMonthIndex) { // Vertical paging
-            ForEach(enumeratedMonths, id: \ .element.monthStart) { pair in
-                let idx = pair.offset
-                let month = pair.element
-                VStack(spacing: 0) {
+        VStack {
+            // Temporary debug button to test Birthday theme
+            Button("🎂 Force Birthday Theme") {
+                themeManager.changeTheme(to: .birthday)
+            }
+            .padding()
+            .background(Color.orange)
+            .foregroundColor(.white)
+            .cornerRadius(8)
+            
+            TabView(selection: $selectedMonthIndex) { // Vertical paging
+                ForEach(enumeratedMonths, id: \ .element.monthStart) { pair in
+                    let idx = pair.offset
+                    let month = pair.element
+                    VStack(spacing: 0) {
                     let comps = calendar.dateComponents([.year, .month], from: month.monthStart)
                     let yearString: String = {
                         if let year = comps.year {
@@ -106,17 +116,30 @@ struct ProgramCalendarView: View {
                         if themeManager.currentTheme == .birthday {
                             let _ = print("🎂 Birthday theme detected! Adding cake background...")
                             ZStack {
-                                Color(.systemBackground)
+                                // Test background to make sure Birthday theme is working
+                                Color.pink.opacity(0.3)
                                 
                                 // Birthday cake background decoration
                                 BirthdayCakeBackground()
+                                
+                                // Debug text to show theme is active
+                                VStack {
+                                    Text("🎂 BIRTHDAY THEME ACTIVE!")
+                                        .font(.title)
+                                        .foregroundColor(.white)
+                                        .background(Color.black.opacity(0.7))
+                                        .padding()
+                                }
+                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                             }
                         } else {
+                            let _ = print("🎨 Not birthday theme, using regular background")
                             Color(.systemBackground)
                         }
                     }
                 )
             }
+        }
         }
         .tabViewStyle(.page(indexDisplayMode: .never)) // Enable paging, hide dots
         .ignoresSafeArea(edges: .bottom)
