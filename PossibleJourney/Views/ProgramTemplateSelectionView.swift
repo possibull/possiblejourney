@@ -121,10 +121,14 @@ struct ProgramTemplateSelectionView: View {
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Custom") {
-                        showingTemplateCreate = true
+                    HStack(spacing: 16) {
+                        GlobalThemeSelector()
+                        
+                        Button("Custom") {
+                            showingTemplateCreate = true
+                        }
+                        .fontWeight(.medium)
                     }
-                    .fontWeight(.medium)
                 }
             }
 
@@ -176,17 +180,6 @@ struct ProgramTemplateSelectionView: View {
                     showingTemplateCreate = false
                 }
             }
-            .overlay(
-                VStack {
-                    HStack {
-                        Spacer()
-                        GlobalThemeSelector()
-                            .padding(.top, -20) // Move it higher up with negative padding
-                            .padding(.trailing, 20)
-                    }
-                    Spacer()
-                }
-            )
         }
     }
 }
