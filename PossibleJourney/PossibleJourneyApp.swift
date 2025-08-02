@@ -16,62 +16,55 @@ struct GlobalThemeSelector: View {
     @State private var lastBeaTapTime: Date = Date()
     
     var body: some View {
-        ZStack {
-            // Invisible tap area for Easter egg (only when Bea theme is active)
-            if themeManager.currentTheme == .bea {
+        Menu {
+            ForEach(ThemeMode.allCases.filter { $0 != .birthday }, id: \.self) { theme in
                 Button(action: {
-                    print("🎨 Bea theme tap detected! Count: \(beaTapCount + 1)")
-                    let now = Date()
-                    if now.timeIntervalSince(lastBeaTapTime) < 2.0 {
-                        beaTapCount += 1
-                        print("🎨 Bea tap count: \(beaTapCount)")
-                        if beaTapCount >= 5 {
-                            print("🎂 BIRTHDAY THEME UNLOCKED!")
-                            // Activate Birthday theme as Easter egg
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                withAnimation(.easeInOut(duration: 0.3)) {
-                                    themeManager.changeTheme(to: .birthday)
-                                }
-                            }
-                            beaTapCount = 0
-                        }
-                    } else {
-                        beaTapCount = 1
-                        print("🎨 Bea tap count reset to: \(beaTapCount)")
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        themeManager.changeTheme(to: theme)
                     }
-                    lastBeaTapTime = now
                 }) {
-                    Rectangle()
-                        .fill(Color.clear)
-                        .frame(width: 44, height: 44)
-                }
-                .buttonStyle(PlainButtonStyle())
-            }
-            
-            // Regular theme menu
-            Menu {
-                ForEach(ThemeMode.allCases.filter { $0 != .birthday }, id: \.self) { theme in
-                    Button(action: {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            themeManager.changeTheme(to: theme)
-                        }
-                    }) {
-                        HStack {
-                            Image(systemName: theme.iconName)
-                            Text(theme.displayName)
-                            if themeManager.currentTheme == theme {
-                                Image(systemName: "checkmark")
-                            }
+                    HStack {
+                        Image(systemName: theme.iconName)
+                        Text(theme.displayName)
+                        if themeManager.currentTheme == theme {
+                            Image(systemName: "checkmark")
                         }
                     }
                 }
-            } label: {
-                Image(systemName: "paintbrush.fill")
-                    .foregroundColor(.blue)
-                    .font(.system(size: 18, weight: .medium))
             }
+        } label: {
+            Image(systemName: "paintbrush.fill")
+                .foregroundColor(.blue)
+                .font(.system(size: 18, weight: .medium))
         }
         .accessibilityIdentifier("GlobalThemeSelector")
+        .onTapGesture {
+            // Only detect taps when Bea theme is active
+            if themeManager.currentTheme == .bea {
+                print("🎨 Bea theme tap detected! Count: \(beaTapCount + 1)")
+                let now = Date()
+                if now.timeIntervalSince(lastBeaTapTime) < 2.0 {
+                    beaTapCount += 1
+                    print("🎨 Bea tap count: \(beaTapCount)")
+                    if beaTapCount >= 5 {
+                        print("🎂 BIRTHDAY THEME UNLOCKED!")
+                        // Activate Birthday theme as Easter egg
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                themeManager.changeTheme(to: .birthday)
+                            }
+                        }
+                        beaTapCount = 0
+                    }
+                } else {
+                    beaTapCount = 1
+                    print("🎨 Bea tap count reset to: \(beaTapCount)")
+                }
+                lastBeaTapTime = now
+            } else {
+                print("🎨 Tap detected but Bea theme not active. Current theme: \(themeManager.currentTheme)")
+            }
+        }
     }
 }
 
