@@ -78,9 +78,6 @@ struct SettingsView: View {
                         .padding(20)
                         .themeAwareCard()
                         
-                        // Theme Settings Card
-                        ThemeSettingsCard()
-                        
                         // Development Settings Card
                         VStack(alignment: .leading, spacing: 20) {
                             HStack {
@@ -242,13 +239,11 @@ struct SettingsView: View {
                             Button(action: {
                                 ProgramStorage().clear()
                                 DailyProgressStorage().clearAll()
-                                UserDefaults.standard.removeObject(forKey: "selectedTheme")
                                 UserDefaults.standard.removeObject(forKey: "debug")
                                 UserDefaults.standard.removeObject(forKey: "debugWindowExpanded")
                                 appState.loadedProgram = nil
                                 debugState.debug = false
                                 debugState.debugWindowExpanded = false
-                                themeManager.changeTheme(to: .system)
                                 forceRefresh.toggle()
                             }) {
                                 HStack {
@@ -282,94 +277,5 @@ struct SettingsView: View {
         }
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.large)
-    }
-}
-
-// MARK: - Theme Settings Card
-struct ThemeSettingsCard: View {
-    @EnvironmentObject var themeManager: ThemeManager
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            HStack {
-                Image(systemName: "paintbrush.fill")
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(.purple)
-                    .frame(width: 40, height: 40)
-                    .background(Circle().fill(Color.purple.opacity(0.1)))
-                
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Theme")
-                        .font(.system(size: 18, weight: .bold, design: .rounded))
-                        .foregroundColor(.primary)
-                    Text("Choose your preferred appearance")
-                        .font(.system(size: 14, weight: .medium, design: .rounded))
-                        .foregroundColor(.secondary)
-                }
-                Spacer()
-            }
-            
-            ThemeSelectionView()
-        }
-        .padding(20)
-        .themeAwareCard()
-    }
-}
-
-// MARK: - Theme Selection View
-struct ThemeSelectionView: View {
-    @EnvironmentObject var themeManager: ThemeManager
-    
-    var body: some View {
-        VStack(spacing: 12) {
-            ForEach(ThemeMode.allCases, id: \.self) { theme in
-                ThemeButton(theme: theme)
-            }
-        }
-    }
-}
-
-// MARK: - Theme Button
-struct ThemeButton: View {
-    let theme: ThemeMode
-    @EnvironmentObject var themeManager: ThemeManager
-    
-    var body: some View {
-        Button(action: {
-            withAnimation(.easeInOut(duration: 0.3)) {
-                themeManager.changeTheme(to: theme)
-            }
-        }) {
-            HStack {
-                Image(systemName: theme.iconName)
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundColor(themeManager.currentTheme == theme ? .white : .purple)
-                    .frame(width: 32, height: 32)
-                    .background(Circle().fill(themeManager.currentTheme == theme ? Color.purple : Color.purple.opacity(0.1)))
-                
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(theme.displayName)
-                        .font(.system(size: 16, weight: .semibold, design: .rounded))
-                        .foregroundColor(themeManager.currentTheme == theme ? .white : .primary)
-                    Text(theme == .system ? "Follows system setting" : "Fixed appearance")
-                        .font(.system(size: 14, weight: .regular, design: .rounded))
-                        .foregroundColor(themeManager.currentTheme == theme ? .white.opacity(0.8) : .secondary)
-                }
-                
-                Spacer()
-                
-                if themeManager.currentTheme == theme {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundColor(.white)
-                }
-            }
-            .padding(.vertical, 12)
-            .padding(.horizontal, 16)
-            .background(RoundedRectangle(cornerRadius: 12).fill(themeManager.currentTheme == theme ? Color.purple : Color(.systemBackground)))
-            .overlay(RoundedRectangle(cornerRadius: 12).stroke(themeManager.currentTheme == theme ? Color.purple : Color.gray.opacity(0.2), lineWidth: 1))
-        }
-        .buttonStyle(PlainButtonStyle())
-        .accessibilityIdentifier(theme.displayName)
     }
 }
