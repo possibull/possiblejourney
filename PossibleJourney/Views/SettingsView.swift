@@ -193,11 +193,23 @@ struct SettingsView: View {
                                 print("Settings: Back to Program Select button tapped")
                                 print("Settings: Current loadedProgram: \(appState.loadedProgram?.id.uuidString ?? "nil")")
                                 
-                                // Clear the program and force a UI update
+                                // Clear the program immediately
+                                appState.loadedProgram = nil
+                                print("Settings: Set loadedProgram to nil")
+                                
+                                // Force multiple UI updates to ensure the change is observed
                                 DispatchQueue.main.async {
-                                    appState.loadedProgram = nil
-                                    print("Settings: Set loadedProgram to nil")
-                                    print("Settings: Forcing UI update")
+                                    print("Settings: Forcing UI update 1")
+                                    forceRefresh.toggle()
+                                }
+                                
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    print("Settings: Forcing UI update 2")
+                                    forceRefresh.toggle()
+                                }
+                                
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                    print("Settings: Forcing UI update 3")
                                     forceRefresh.toggle()
                                 }
                             }) {
