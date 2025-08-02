@@ -100,7 +100,11 @@ struct ProgramCalendarView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(
                     Group {
+                        // Debug print to see current theme
+                        let _ = print("🎨 Calendar view - Current theme: \(themeManager.currentTheme)")
+                        
                         if themeManager.currentTheme == .birthday {
+                            let _ = print("🎂 Birthday theme detected! Adding cake background...")
                             ZStack {
                                 Color(.systemBackground)
                                 

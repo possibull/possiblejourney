@@ -565,6 +565,8 @@ struct BirthdayCakeBackground: View {
     @State private var cakeRotation: Double = 0
     
     var body: some View {
+        // Debug print to confirm this view is being rendered
+        let _ = print("🎂 BirthdayCakeBackground is being rendered!")
         ZStack {
             // Birthday cake with "46" on top
             VStack(spacing: 0) {
@@ -580,13 +582,13 @@ struct BirthdayCakeBackground: View {
                             endPoint: .bottom
                         )
                     )
-                    .frame(width: 80, height: 20)
+                    .frame(width: 120, height: 30)
                     .overlay(
                         // "46" on top of cake
                         Text("46")
-                            .font(.system(size: 14, weight: .bold, design: .rounded))
+                            .font(.system(size: 22, weight: .bold, design: .rounded))
                             .foregroundColor(.white)
-                            .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 1)
+                            .shadow(color: .black.opacity(0.5), radius: 2, x: 0, y: 2)
                     )
                 
                 // Cake middle layer
@@ -601,7 +603,7 @@ struct BirthdayCakeBackground: View {
                             endPoint: .bottom
                         )
                     )
-                    .frame(width: 100, height: 25)
+                    .frame(width: 140, height: 35)
                     .overlay(
                         // Sprinkles
                         HStack(spacing: 4) {
@@ -626,7 +628,7 @@ struct BirthdayCakeBackground: View {
                             endPoint: .bottom
                         )
                     )
-                    .frame(width: 120, height: 30)
+                    .frame(width: 160, height: 40)
                     .overlay(
                         // More sprinkles
                         HStack(spacing: 6) {
@@ -651,13 +653,13 @@ struct BirthdayCakeBackground: View {
                             endPoint: .bottom
                         )
                     )
-                    .frame(width: 140, height: 15)
+                    .frame(width: 180, height: 20)
                     .shadow(color: .black.opacity(0.2), radius: 3, x: 0, y: 2)
             }
             .scaleEffect(cakeScale)
             .rotationEffect(.degrees(cakeRotation))
-            .offset(x: 120, y: 200) // Position in bottom right
-            .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 3)
+            .offset(x: 0, y: 0) // Center position
+            .shadow(color: .black.opacity(0.3), radius: 8, x: 0, y: 4)
         }
         .onAppear {
             // Gentle floating animation
