@@ -20,6 +20,28 @@ struct ProgramTemplateSelectionView: View {
     let onProgramCreated: (Program) -> Void
     let onCustomProgram: () -> Void
     
+    private var themeAccentColor: Color {
+        switch themeManager.currentTheme {
+        case .bea:
+            return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
+        case .dark:
+            return Color.blue
+        case .light, .system:
+            return Color.blue
+        }
+    }
+    
+    private var themeSecondaryColor: Color {
+        switch themeManager.currentTheme {
+        case .bea:
+            return Color(red: 1.0, green: 0.98, blue: 0.8) // Pastel yellow
+        case .dark:
+            return Color.blue.opacity(0.7)
+        case .light, .system:
+            return Color.blue.opacity(0.7)
+        }
+    }
+    
 
     
     var body: some View {
@@ -53,12 +75,12 @@ struct ProgramTemplateSelectionView: View {
                                         .font(.caption)
                                         .padding(.horizontal, 16)
                                         .padding(.vertical, 8)
-                                        .background(viewModel.selectedCategory == category ? Color.blue : Color(.systemGray5))
+                                        .background(viewModel.selectedCategory == category ? themeAccentColor : Color(.systemGray5))
                                         .foregroundColor(viewModel.selectedCategory == category ? .white : .primary)
                                         .cornerRadius(20)
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 20)
-                                                .stroke(viewModel.selectedCategory == category ? Color.blue : Color.gray.opacity(0.3), lineWidth: 1)
+                                                .stroke(viewModel.selectedCategory == category ? themeAccentColor : Color.gray.opacity(0.3), lineWidth: 1)
                                         )
                                 }
                             }
@@ -97,7 +119,7 @@ struct ProgramTemplateSelectionView: View {
                                 } label: {
                                     Label("Duplicate", systemImage: "plus.square.on.square")
                                 }
-                                .tint(.blue)
+                                .tint(themeAccentColor)
                             }
                             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                 // Delete action (for all templates) - full swipe triggers with confirmation
@@ -192,6 +214,7 @@ struct TemplateCardView: View {
     let template: ProgramTemplate
     let onTap: () -> Void
     @State private var isExpanded = false
+    @EnvironmentObject var themeManager: ThemeManager
     
     private func formatLastModified(_ date: Date) -> String {
         let calendar = Calendar.current
@@ -213,6 +236,28 @@ struct TemplateCardView: View {
         }
     }
     
+    private var themeAccentColor: Color {
+        switch themeManager.currentTheme {
+        case .bea:
+            return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
+        case .dark:
+            return Color.blue
+        case .light, .system:
+            return Color.blue
+        }
+    }
+    
+    private var themeSecondaryColor: Color {
+        switch themeManager.currentTheme {
+        case .bea:
+            return Color(red: 1.0, green: 0.98, blue: 0.8) // Pastel yellow
+        case .dark:
+            return Color.blue.opacity(0.7)
+        case .light, .system:
+            return Color.blue.opacity(0.7)
+        }
+    }
+    
     var body: some View {
         Button(action: onTap) {
             VStack(alignment: .leading, spacing: 12) {
@@ -220,8 +265,13 @@ struct TemplateCardView: View {
                 HStack {
                     Image(systemName: template.category.icon)
                         .font(.title2)
-                        .foregroundColor(.blue)
+                        .foregroundColor(themeAccentColor)
                         .frame(width: 30)
+                        .background(
+                            Circle()
+                                .fill(themeSecondaryColor.opacity(0.2))
+                                .frame(width: 40, height: 40)
+                        )
                     
                     VStack(alignment: .leading, spacing: 2) {
                         Text(template.name)
@@ -239,7 +289,7 @@ struct TemplateCardView: View {
                     VStack(alignment: .trailing, spacing: 2) {
                         Text("\(template.defaultNumberOfDays) days")
                             .font(.caption)
-                            .foregroundColor(.blue)
+                            .foregroundColor(themeAccentColor)
                             .fontWeight(.medium)
                         
                         Text(template.category.displayName)
@@ -267,7 +317,7 @@ struct TemplateCardView: View {
                         HStack {
                             Image(systemName: "circle.fill")
                                 .font(.system(size: 4))
-                                .foregroundColor(.blue)
+                                .foregroundColor(themeAccentColor)
                             Text(task.title)
                                 .font(.caption)
                                 .foregroundColor(.primary)
@@ -289,7 +339,7 @@ struct TemplateCardView: View {
                                 Text(isExpanded ? "Show less" : "+ \(template.tasks.count - 3) more tasks")
                                     .font(.caption)
                             }
-                            .foregroundColor(.blue)
+                            .foregroundColor(themeAccentColor)
                         }
                     }
                 }
