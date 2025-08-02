@@ -25,8 +25,9 @@ struct ProgramTemplateSelectionView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                // Light background
-                Color(.systemBackground)
+                // Theme-aware background
+                Color.clear
+                    .themeAwareBackground()
                     .ignoresSafeArea()
                 
                 VStack(spacing: 0) {
@@ -38,8 +39,7 @@ struct ProgramTemplateSelectionView: View {
                             .textFieldStyle(PlainTextFieldStyle())
                     }
                     .padding()
-                    .background(Color(.systemGray6))
-                    .cornerRadius(10)
+                    .themeAwareCard()
                     .padding(.horizontal)
                     
                     // Category filter
@@ -56,6 +56,10 @@ struct ProgramTemplateSelectionView: View {
                                         .background(viewModel.selectedCategory == category ? Color.blue : Color(.systemGray5))
                                         .foregroundColor(viewModel.selectedCategory == category ? .white : .primary)
                                         .cornerRadius(20)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 20)
+                                                .stroke(viewModel.selectedCategory == category ? Color.blue : Color.gray.opacity(0.3), lineWidth: 1)
+                                        )
                                 }
                             }
                         }
@@ -107,7 +111,7 @@ struct ProgramTemplateSelectionView: View {
                         }
                     }
                     .listStyle(PlainListStyle())
-                    .background(Color(.systemGroupedBackground))
+                    .background(Color.clear)
                 }
             }
             .navigationTitle("Choose Template")
@@ -292,9 +296,7 @@ struct TemplateCardView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
-            .background(Color(.systemBackground))
-            .cornerRadius(12)
-            .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+            .themeAwareCard()
         }
         .buttonStyle(PlainButtonStyle())
     }
