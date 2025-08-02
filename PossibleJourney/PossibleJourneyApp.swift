@@ -21,28 +21,6 @@ struct GlobalThemeSelector: View {
                 Button(action: {
                     withAnimation(.easeInOut(duration: 0.3)) {
                         themeManager.changeTheme(to: theme)
-                        
-                        // Check for Bea theme tap sequence
-                        if theme == .bea {
-                            let now = Date()
-                            if now.timeIntervalSince(lastBeaTapTime) < 2.0 {
-                                beaTapCount += 1
-                                if beaTapCount >= 5 {
-                                    // Activate Birthday theme as Easter egg
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                        withAnimation(.easeInOut(duration: 0.3)) {
-                                            themeManager.changeTheme(to: .birthday)
-                                        }
-                                    }
-                                    beaTapCount = 0
-                                }
-                            } else {
-                                beaTapCount = 1
-                            }
-                            lastBeaTapTime = now
-                        } else {
-                            beaTapCount = 0
-                        }
                     }
                 }) {
                     HStack {
@@ -58,6 +36,29 @@ struct GlobalThemeSelector: View {
             Image(systemName: "paintbrush.fill")
                 .foregroundColor(.blue)
                 .font(.system(size: 18, weight: .medium))
+                .onTapGesture {
+                    // Check if Bea theme is currently selected
+                    if themeManager.currentTheme == .bea {
+                        let now = Date()
+                        if now.timeIntervalSince(lastBeaTapTime) < 2.0 {
+                            beaTapCount += 1
+                            if beaTapCount >= 5 {
+                                // Activate Birthday theme as Easter egg
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        themeManager.changeTheme(to: .birthday)
+                                    }
+                                }
+                                beaTapCount = 0
+                            }
+                        } else {
+                            beaTapCount = 1
+                        }
+                        lastBeaTapTime = now
+                    } else {
+                        beaTapCount = 0
+                    }
+                }
         }
         .accessibilityIdentifier("GlobalThemeSelector")
     }
