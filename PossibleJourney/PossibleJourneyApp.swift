@@ -32,7 +32,9 @@ struct BeaNumberSequenceView: View {
     @State private var isAnimating = false
     @State private var animationTimer: Timer?
     @State private var sequenceActive = false
+    @State private var lastSequenceEndTime: Date = Date.distantPast
     private let displayDuration: TimeInterval = 0.8
+    private let cooldownPeriod: TimeInterval = 1.0
     private let transitionDuration: TimeInterval = 0.3
     private let beeCount = 15
     
@@ -100,14 +102,23 @@ struct BeaNumberSequenceView: View {
         }
         .onDisappear {
             // Clean up any lingering timers
+            print("View disappearing, cleaning up sequence state")
             sequenceActive = false
             isAnimating = false
+            lastSequenceEndTime = Date()
             animationTimer?.invalidate()
             animationTimer = nil
         }
     }
     
     private func startNumberSequence() {
+        // Check cooldown period
+        let timeSinceLastSequence = Date().timeIntervalSince(lastSequenceEndTime)
+        guard timeSinceLastSequence >= cooldownPeriod else {
+            print("Sequence in cooldown period (\(String(format: "%.1f", cooldownPeriod - timeSinceLastSequence))s remaining), ignoring start request")
+            return
+        }
+        
         // Prevent multiple sequences from starting
         guard !sequenceActive else {
             print("Sequence already active, ignoring start request")
@@ -148,6 +159,7 @@ struct BeaNumberSequenceView: View {
             print("Sequence complete, dismissing sheet")
             sequenceActive = false
             isAnimating = false
+            lastSequenceEndTime = Date()
             animationTimer?.invalidate()
             animationTimer = nil
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
