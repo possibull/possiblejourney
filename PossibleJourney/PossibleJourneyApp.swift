@@ -415,20 +415,16 @@ struct PossibleJourneyApp: App {
                     NavigationStack {
                         if let program = appState.loadedProgram {
                             let now = currentTimeOverride ?? Date()
-                            AnyView(
-                                DailyChecklistView()
+                            DailyChecklistView()
                                 .environmentObject(debugState)
                                 .environmentObject(themeManager)
-                            )
                         } else {
-                            AnyView(
-                                ProgramSetupMainView(onProgramCreated: { program in
-                                    appState.loadedProgram = program
-                                    ProgramStorage().save(program)
-                                })
-                                .environmentObject(debugState)
-                                .environmentObject(themeManager)
-                            )
+                            ProgramSetupMainView(onProgramCreated: { program in
+                                appState.loadedProgram = program
+                                ProgramStorage().save(program)
+                            })
+                            .environmentObject(debugState)
+                            .environmentObject(themeManager)
                         }
                     }
                 // Global DebugWindow always visible at top
