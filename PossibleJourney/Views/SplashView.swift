@@ -16,36 +16,16 @@ struct SplashView: View {
     @State private var taglineOffset: CGFloat = 30
     @State private var taglineOpacity: Double = 0.0
     @State private var backgroundRotation: Double = 0.0
-    @EnvironmentObject var themeManager: ThemeManager
-    
-    private var themeGradientColors: [Color] {
-        switch themeManager.currentTheme {
-        case .bea:
-            return [
-                Color(red: 0.6, green: 0.8, blue: 1.0), // Stronger pastel blue
-                Color(red: 1.0, green: 0.9, blue: 0.6), // Stronger pastel yellow
-                Color(red: 0.7, green: 0.9, blue: 1.0)  // Medium pastel blue
-            ]
-        case .dark:
-            return [
-                Color.blue.opacity(0.9),
-                Color.purple.opacity(0.7),
-                Color.blue.opacity(0.5)
-            ]
-        case .light, .system:
-            return [
-                Color.blue.opacity(0.9),
-                Color.purple.opacity(0.7),
-                Color.blue.opacity(0.5)
-            ]
-        }
-    }
     
     var body: some View {
         ZStack {
             // Animated gradient background
             LinearGradient(
-                gradient: Gradient(colors: themeGradientColors),
+                gradient: Gradient(colors: [
+                    Color.blue.opacity(0.8),
+                    Color.purple.opacity(0.6),
+                    Color.blue.opacity(0.4)
+                ]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
