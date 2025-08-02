@@ -19,7 +19,16 @@ struct BeaNumberSequenceView: View {
     @State private var beeRotations: [Double] = []
     @State private var beeScales: [CGFloat] = []
     
-    private let numbers = ["1", "0", "0", "0", "1", "1", "1", "1"]
+    private let sequences = [
+        ["1", "0", "0", "0", "1", "1", "1", "1"],
+        ["0", "x", "8", "F"],
+        ["1", "4", "3", "B"],
+        ["x", "o", "o", "o", "x", "x", "x", "x"],
+        ["X", "O", "O", "O", "X", "X", "X", "X"],
+        [".", "-", "-", "-", ".", ".", "."],
+        ["💜", "💛", "💜", "💜", "💜", "💜", "💜", "💜"]
+    ]
+    @State private var currentSequence: [String] = []
     private let displayDuration: TimeInterval = 0.8
     private let transitionDuration: TimeInterval = 0.3
     private let beeCount = 15
@@ -71,8 +80,8 @@ struct BeaNumberSequenceView: View {
             }
             
             // Giant number display
-            if currentIndex < numbers.count {
-                Text(numbers[currentIndex])
+            if currentIndex < currentSequence.count {
+                Text(currentSequence[currentIndex])
                     .font(.system(size: 300, weight: .bold, design: .monospaced))
                     .foregroundColor(themeAccentColor)
                     .shadow(color: .black, radius: 15, x: 0, y: 0)
@@ -89,11 +98,13 @@ struct BeaNumberSequenceView: View {
     }
     
     private func startNumberSequence() {
+        // Randomly select a sequence
+        currentSequence = sequences.randomElement() ?? sequences[0]
         displayNextNumber()
     }
     
     private func displayNextNumber() {
-        guard currentIndex < numbers.count else {
+        guard currentIndex < currentSequence.count else {
             // Sequence complete, dismiss the sheet
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 dismiss()
