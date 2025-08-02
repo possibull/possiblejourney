@@ -11,13 +11,44 @@ import Foundation
 // MARK: - Bea Number Sequence View
 struct BeaNumberSequenceView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var themeManager: ThemeManager
     @State private var currentIndex = 0
     @State private var numberOpacity: Double = 0.0
     @State private var numberScale: CGFloat = 0.5
+    @State private var beePositions: [CGPoint] = []
+    @State private var beeRotations: [Double] = []
+    @State private var beeScales: [CGFloat] = []
     
     private let numbers = ["1", "0", "0", "0", "1", "1", "1", "1"]
     private let displayDuration: TimeInterval = 0.8
     private let transitionDuration: TimeInterval = 0.3
+    private let beeCount = 8
+    
+    private var themeAccentColor: Color {
+        switch themeManager.currentTheme {
+        case .birthday:
+            return Color(red: 1.0, green: 0.95, blue: 0.7) // Pastel yellow
+        case .bea:
+            return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
+        case .dark:
+            return Color.blue
+        case .light, .system:
+            return Color.blue
+        }
+    }
+    
+    private var themeSecondaryColor: Color {
+        switch themeManager.currentTheme {
+        case .birthday:
+            return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
+        case .bea:
+            return Color(red: 1.0, green: 0.98, blue: 0.8) // Pastel yellow
+        case .dark:
+            return Color.blue.opacity(0.7)
+        case .light, .system:
+            return Color.blue.opacity(0.7)
+        }
+    }
     
     var body: some View {
         ZStack {
@@ -25,11 +56,25 @@ struct BeaNumberSequenceView: View {
             Color.clear
                 .ignoresSafeArea()
             
+            // Animated bees
+            ForEach(0..<beeCount, id: \.self) { index in
+                if index < beePositions.count {
+                    BeeView()
+                        .foregroundColor(themeSecondaryColor)
+                        .frame(width: 30, height: 30)
+                        .position(beePositions[index])
+                        .rotationEffect(.degrees(beeRotations[index]))
+                        .scaleEffect(beeScales[index])
+                        .animation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true), value: beeRotations[index])
+                        .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: beeScales[index])
+                }
+            }
+            
             // Giant number display
             if currentIndex < numbers.count {
                 Text(numbers[currentIndex])
                     .font(.system(size: 200, weight: .bold, design: .monospaced))
-                    .foregroundColor(.white)
+                    .foregroundColor(themeAccentColor)
                     .shadow(color: .black, radius: 10, x: 0, y: 0)
                     .opacity(numberOpacity)
                     .scaleEffect(numberScale)
@@ -38,6 +83,7 @@ struct BeaNumberSequenceView: View {
             }
         }
         .onAppear {
+            initializeBees()
             startNumberSequence()
         }
     }
@@ -74,6 +120,77 @@ struct BeaNumberSequenceView: View {
                 currentIndex += 1
                 displayNextNumber()
             }
+        }
+    }
+    
+    private func initializeBees() {
+        beePositions = []
+        beeRotations = []
+        beeScales = []
+        
+        for _ in 0..<beeCount {
+            // Random positions across the screen
+            let x = CGFloat.random(in: 50...350)
+            let y = CGFloat.random(in: 100...800)
+            beePositions.append(CGPoint(x: x, y: y))
+            
+            // Random rotations
+            beeRotations.append(Double.random(in: -30...30))
+            
+            // Random scales
+            beeScales.append(CGFloat.random(in: 0.8...1.2))
+        }
+        
+        // Start bee animations
+        startBeeAnimations()
+    }
+    
+    private func startBeeAnimations() {
+        // Animate bee positions in a buzzing pattern
+        for i in 0..<beeCount {
+            let delay = Double(i) * 0.2
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                withAnimation(.easeInOut(duration: 3.0).repeatForever(autoreverses: true)) {
+                    if i < beePositions.count {
+                        beePositions[i].x += CGFloat.random(in: -50...50)
+                        beePositions[i].y += CGFloat.random(in: -30...30)
+                    }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Bee View
+struct BeeView: View {
+    var body: some View {
+        ZStack {
+            // Bee body
+            Ellipse()
+                .fill(Color.yellow)
+                .frame(width: 20, height: 12)
+            
+            // Bee stripes
+            Rectangle()
+                .fill(Color.black)
+                .frame(width: 20, height: 2)
+                .offset(y: -2)
+            
+            Rectangle()
+                .fill(Color.black)
+                .frame(width: 20, height: 2)
+                .offset(y: 2)
+            
+            // Wings
+            Circle()
+                .fill(Color.white.opacity(0.8))
+                .frame(width: 8, height: 8)
+                .offset(x: -8, y: -4)
+            
+            Circle()
+                .fill(Color.white.opacity(0.8))
+                .frame(width: 8, height: 8)
+                .offset(x: 8, y: -4)
         }
     }
 }
