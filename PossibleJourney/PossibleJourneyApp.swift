@@ -128,17 +128,43 @@ struct BeaNumberSequenceView: View {
         beeRotations = []
         beeScales = []
         
+        // Position bees in the shape of "B E A" above the numbers
+        let centerX: CGFloat = 200 // Center of screen
+        let baseY: CGFloat = 150   // Above the numbers
+        let letterSpacing: CGFloat = 120 // Space between letters
+        let beeSpacing: CGFloat = 40 // Space between bees in each letter
+        
+        // Letter "B" - 5 bees
+        let bStartX = centerX - letterSpacing
+        beePositions.append(CGPoint(x: bStartX, y: baseY - 40)) // Top
+        beePositions.append(CGPoint(x: bStartX, y: baseY))      // Middle
+        beePositions.append(CGPoint(x: bStartX, y: baseY + 40)) // Bottom
+        beePositions.append(CGPoint(x: bStartX + beeSpacing, y: baseY - 20)) // Top curve
+        beePositions.append(CGPoint(x: bStartX + beeSpacing, y: baseY + 20)) // Bottom curve
+        
+        // Letter "E" - 5 bees
+        let eStartX = centerX
+        beePositions.append(CGPoint(x: eStartX, y: baseY - 40)) // Top
+        beePositions.append(CGPoint(x: eStartX, y: baseY))      // Middle
+        beePositions.append(CGPoint(x: eStartX, y: baseY + 40)) // Bottom
+        beePositions.append(CGPoint(x: eStartX + beeSpacing, y: baseY - 40)) // Top bar
+        beePositions.append(CGPoint(x: eStartX + beeSpacing, y: baseY + 40)) // Bottom bar
+        
+        // Letter "A" - 5 bees
+        let aStartX = centerX + letterSpacing
+        beePositions.append(CGPoint(x: aStartX, y: baseY - 40)) // Top left
+        beePositions.append(CGPoint(x: aStartX, y: baseY + 40)) // Bottom left
+        beePositions.append(CGPoint(x: aStartX + beeSpacing, y: baseY - 40)) // Top right
+        beePositions.append(CGPoint(x: aStartX + beeSpacing, y: baseY + 40)) // Bottom right
+        beePositions.append(CGPoint(x: aStartX + beeSpacing/2, y: baseY))    // Middle cross
+        
+        // Initialize rotations and scales for all bees
         for _ in 0..<beeCount {
-            // Random positions across the screen
-            let x = CGFloat.random(in: 50...350)
-            let y = CGFloat.random(in: 100...800)
-            beePositions.append(CGPoint(x: x, y: y))
+            // Subtle rotations for natural bee movement
+            beeRotations.append(Double.random(in: -15...15))
             
-            // Random rotations
-            beeRotations.append(Double.random(in: -30...30))
-            
-            // Random scales
-            beeScales.append(CGFloat.random(in: 0.8...1.2))
+            // Slightly varied scales for visual interest
+            beeScales.append(CGFloat.random(in: 0.9...1.1))
         }
         
         // Start bee animations
@@ -146,14 +172,15 @@ struct BeaNumberSequenceView: View {
     }
     
     private func startBeeAnimations() {
-        // Animate bee positions in a buzzing pattern
+        // Animate bee positions in a gentle hovering pattern around their letter positions
         for i in 0..<beeCount {
-            let delay = Double(i) * 0.05
+            let delay = Double(i) * 0.1
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
+                withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
                     if i < beePositions.count {
-                        beePositions[i].x += CGFloat.random(in: -100...100)
-                        beePositions[i].y += CGFloat.random(in: -60...60)
+                        // Gentle hover movement around the letter position
+                        beePositions[i].x += CGFloat.random(in: -15...15)
+                        beePositions[i].y += CGFloat.random(in: -10...10)
                     }
                 }
             }
