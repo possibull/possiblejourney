@@ -21,17 +21,9 @@ struct SettingsView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                // Modern gradient background
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color(.systemBackground),
-                        Color.blue.opacity(0.05),
-                        Color.purple.opacity(0.03)
-                    ]),
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
+                // Theme-aware background
+                themeAwareBackground()
+                    .ignoresSafeArea()
                 
                 ScrollView {
                     VStack(spacing: 32) {
@@ -113,15 +105,7 @@ struct SettingsView: View {
                             }
                         }
                         .padding(20)
-                        .background(
-                            RoundedRectangle(cornerRadius: 20)
-                                .fill(Color(.systemBackground))
-                                .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 5)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(Color.gray.opacity(0.1), lineWidth: 1)
-                        )
+                        .themeAwareCard()
                     
                         ThemeSettingsCard()
                     
@@ -180,15 +164,7 @@ struct SettingsView: View {
                             }
                         }
                         .padding(20)
-                        .background(
-                            RoundedRectangle(cornerRadius: 20)
-                                .fill(Color(.systemBackground))
-                                .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 5)
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(Color.gray.opacity(0.1), lineWidth: 1)
-                        )
+                        .themeAwareCard()
                         
                         // App Information Card
                         VStack(alignment: .leading, spacing: 20) {
@@ -246,52 +222,7 @@ struct SettingsView: View {
                                 .fill(Color(.systemBackground))
                                 .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 5)
                         )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(Color.gray.opacity(0.1), lineWidth: 1)
-                        )
-                    
-                    Section {
-                        HStack {
-                            Image(systemName: "info.circle.fill")
-                                .foregroundColor(.blue)
-                                .font(.title2)
-                            
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("App Version")
-                                    .font(.headline)
-                                    .foregroundColor(.primary)
-                                Text("Current version information")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
-                            
-                            Spacer()
-                            
-                            VStack(alignment: .trailing, spacing: 2) {
-                                Text("\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")")
-                                    .font(.headline)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.primary)
-                                    .accessibilityIdentifier("AppVersionText")
-                                Text("Build \(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1")")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                                    .accessibilityIdentifier("BuildNumberText")
-                            }
-                        }
-                        .padding(.vertical, 4)
-                    } header: {
-                        Text("About")
-                            .font(.headline)
-                            .foregroundColor(.blue)
-                            .textCase(.uppercase)
-                            .fontWeight(.semibold)
-                    }
-                    }
-                    .background(Color(.systemGroupedBackground))
-                    .cornerRadius(12)
-                    .padding(.horizontal)
+                        .themeAwareCard()
                     
                         // Reset Program Card
                         VStack(alignment: .leading, spacing: 20) {
@@ -364,11 +295,7 @@ struct SettingsView: View {
                             .accessibilityIdentifier("ResetProgramButton")
                         }
                         .padding(20)
-                        .background(
-                            RoundedRectangle(cornerRadius: 20)
-                                .fill(Color(.systemBackground))
-                                .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 5)
-                        )
+                        .themeAwareCard()
                         .overlay(
                             RoundedRectangle(cornerRadius: 20)
                                 .stroke(Color.red.opacity(0.2), lineWidth: 1)
@@ -465,11 +392,7 @@ struct SettingsView: View {
                             .accessibilityIdentifier("ResetPreferencesButton")
                         }
                         .padding(20)
-                        .background(
-                            RoundedRectangle(cornerRadius: 20)
-                                .fill(Color(.systemBackground))
-                                .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 5)
-                        )
+                        .themeAwareCard()
                         .overlay(
                             RoundedRectangle(cornerRadius: 20)
                                 .stroke(Color.orange.opacity(0.2), lineWidth: 1)
@@ -538,15 +461,7 @@ struct ThemeSettingsCard: View {
             ThemeSelectionView()
         }
         .padding(20)
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color(.systemBackground))
-                .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 5)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(Color.gray.opacity(0.1), lineWidth: 1)
-        )
+        .themeAwareCard()
         .id(themeManager.currentTheme) // Force refresh when theme changes
     }
 }
