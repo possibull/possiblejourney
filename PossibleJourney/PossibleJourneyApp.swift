@@ -31,7 +31,7 @@ struct GlobalThemeSelector: View {
                 }
             }
         } label: {
-            Image(systemName: "paintbrush.fill")
+            Image(systemName: themeManager.currentTheme.iconName)
                 .foregroundColor(.purple)
                 .font(.system(size: 18, weight: .medium))
         }
