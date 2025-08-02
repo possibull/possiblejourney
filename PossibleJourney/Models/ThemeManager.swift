@@ -729,6 +729,16 @@ struct BirthdayCakePopup: View {
                 showConfetti = true
             }
             
+            // Launch second wave of confetti for continuous celebration
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
+                createConfetti()
+            }
+            
+            // Launch third wave of confetti
+            DispatchQueue.main.asyncAfter(deadline: .now() + 7.0) {
+                createConfetti()
+            }
+            
 
         }
     }
@@ -743,17 +753,17 @@ struct BirthdayCakePopup: View {
             Color(red: 0.9, green: 0.8, blue: 1.0)  // Purple
         ]
         
-        for _ in 0..<50 {
+        for _ in 0..<150 {
             let piece = ConfettiPiece(
                 color: colors.randomElement() ?? .pink,
-                size: CGFloat.random(in: 4...12),
-                startX: CGFloat.random(in: -150...150),
-                startY: 400,
-                endX: CGFloat.random(in: -200...200),
-                endY: CGFloat.random(in: -300...100),
-                rotation: Double.random(in: 0...360),
-                duration: Double.random(in: 2.0...4.0),
-                delay: Double.random(in: 0...0.5)
+                size: CGFloat.random(in: 3...15),
+                startX: CGFloat.random(in: -200...200),
+                startY: 500,
+                endX: CGFloat.random(in: -300...300),
+                endY: CGFloat.random(in: -400...200),
+                rotation: Double.random(in: 0...720),
+                duration: Double.random(in: 4.0...8.0),
+                delay: Double.random(in: 0...2.0)
             )
             confettiPieces.append(piece)
         }
