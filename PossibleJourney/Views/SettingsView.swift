@@ -402,6 +402,7 @@ struct SettingsView: View {
                 }
                 .padding(.horizontal)
             }
+            }
             .background(Color(.systemBackground))
         }
         .id("\(themeManager.currentTheme)-\(forceRefresh)") // Force entire view to refresh when theme changes or after reset
