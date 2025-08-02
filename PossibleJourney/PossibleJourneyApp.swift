@@ -388,11 +388,14 @@ struct PossibleJourneyApp: App {
     @StateObject private var themeManager = ThemeManager()
     @State private var showSplash = true
     @State private var forceNavigationUpdate = false
+    @State private var navigationKey = UUID()
     
     init() {
         resetForUITestingIfNeeded()
         // Always minimize debug window on launch
         UserDefaults.standard.set(false, forKey: "debugWindowExpanded")
+        
+
         
 
     }
@@ -432,6 +435,7 @@ struct PossibleJourneyApp: App {
                                 .environmentObject(appState)
                         }
                     }
+                    .id(navigationKey)
                 // Global DebugWindow always visible at top
                 GlobalDebugWindow(checklistDebugContent: {
                     let debugTime = currentTimeOverride ?? Date()
