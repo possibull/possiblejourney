@@ -17,84 +17,31 @@ struct GlobalThemeSelector: View {
     
     var body: some View {
         HStack(spacing: 8) {
-            // Custom theme selector button
-            Button(action: {
-                showingThemeMenu.toggle()
-            }) {
-                HStack(spacing: 4) {
-                    Image(systemName: "paintbrush.fill")
-                        .foregroundColor(.blue)
-                        .font(.system(size: 18, weight: .medium))
-                    
-                    // Show current theme icon
-                    if themeManager.currentTheme != .system {
-                        Image(systemName: themeManager.currentTheme.iconName)
-                            .foregroundColor(.blue)
-                            .font(.system(size: 14, weight: .medium))
+            Menu {
+                ForEach(ThemeMode.allCases.filter { $0 != .birthday }, id: \.self) { theme in
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            themeManager.changeTheme(to: theme)
+                        }
+                    }) {
+                        HStack {
+                            Image(systemName: theme.iconName)
+                            Text(theme.displayName)
+                            Spacer()
+                            if themeManager.currentTheme == theme {
+                                Image(systemName: "checkmark")
+                                    .foregroundColor(.blue)
+                                    .fontWeight(.bold)
+                            }
+                        }
                     }
-                    
-                    Image(systemName: "chevron.down")
-                        .foregroundColor(.blue)
-                        .font(.system(size: 12, weight: .medium))
-                        .rotationEffect(.degrees(showingThemeMenu ? 180 : 0))
-                        .animation(.easeInOut(duration: 0.2), value: showingThemeMenu)
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(Color.blue.opacity(0.1))
-                )
+            } label: {
+                Image(systemName: "paintbrush.fill")
+                    .foregroundColor(.blue)
+                    .font(.system(size: 18, weight: .medium))
             }
             .accessibilityIdentifier("GlobalThemeSelector")
-            
-            // Custom dropdown menu
-            if showingThemeMenu {
-                VStack(alignment: .leading, spacing: 0) {
-                    ForEach(ThemeMode.allCases.filter { $0 != .birthday }, id: \.self) { theme in
-                        Button(action: {
-                            withAnimation(.easeInOut(duration: 0.3)) {
-                                themeManager.changeTheme(to: theme)
-                            }
-                            showingThemeMenu = false
-                        }) {
-                            HStack {
-                                Image(systemName: theme.iconName)
-                                    .foregroundColor(themeManager.currentTheme == theme ? .white : .primary)
-                                    .font(.system(size: 16, weight: .medium))
-                                Text(theme.displayName)
-                                    .foregroundColor(themeManager.currentTheme == theme ? .white : .primary)
-                                    .fontWeight(themeManager.currentTheme == theme ? .semibold : .regular)
-                                Spacer()
-                                if themeManager.currentTheme == theme {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(.white)
-                                        .font(.system(size: 16, weight: .semibold))
-                                }
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 12)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(themeManager.currentTheme == theme ? Color.blue : Color.clear)
-                            )
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        
-                        if theme != ThemeMode.allCases.filter({ $0 != .birthday }).last {
-                            Divider()
-                                .padding(.horizontal, 16)
-                        }
-                    }
-                }
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color(.systemBackground))
-                        .shadow(color: .black.opacity(0.2), radius: 8, x: 0, y: 4)
-                )
-                .transition(.opacity.combined(with: .scale(scale: 0.95)))
-                .zIndex(1000)
-            }
             
             // Hidden Easter egg button (only visible when Bea theme is active)
             if themeManager.currentTheme == .bea {
@@ -124,12 +71,6 @@ struct GlobalThemeSelector: View {
                         .frame(width: 44, height: 44) // Minimum tap target
                 }
                 .accessibilityIdentifier("EasterEggButton")
-            }
-        }
-        .onTapGesture {
-            // Close menu when tapping outside
-            if showingThemeMenu {
-                showingThemeMenu = false
             }
         }
     }
