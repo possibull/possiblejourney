@@ -87,6 +87,7 @@ struct PossibleJourneyApp: App {
         return WindowGroup {
             if showSplash {
                 SplashView(showSplash: $showSplash)
+                    .environmentObject(themeManager)
                     .onAppear {
                         // Check for updates when app starts
                         updateChecker.checkForUpdates()
@@ -99,6 +100,7 @@ struct PossibleJourneyApp: App {
                             AnyView(
                                 DailyChecklistView()
                                 .environmentObject(debugState)
+                                .environmentObject(themeManager)
                             )
                         } else {
                             AnyView(
@@ -107,6 +109,7 @@ struct PossibleJourneyApp: App {
                                     ProgramStorage().save(program)
                                 })
                                 .environmentObject(debugState)
+                                .environmentObject(themeManager)
                             )
                         }
                     }

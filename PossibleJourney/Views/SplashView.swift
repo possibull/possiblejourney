@@ -16,6 +16,44 @@ struct SplashView: View {
     @State private var taglineOffset: CGFloat = 30
     @State private var taglineOpacity: Double = 0.0
     @State private var backgroundRotation: Double = 0.0
+    @EnvironmentObject var themeManager: ThemeManager
+    
+    private var themeGradientColors: [Color] {
+        // Debug: Print the current theme
+        print("DEBUG: Current theme: \(themeManager.currentTheme)")
+        
+        switch themeManager.currentTheme {
+        case .bea:
+            print("DEBUG: Using Bea theme colors")
+            return [
+                Color(red: 0.6, green: 0.8, blue: 1.0), // Pastel blue
+                Color(red: 1.0, green: 0.9, blue: 0.6), // Pastel yellow
+                Color(red: 0.7, green: 0.9, blue: 1.0)  // Medium pastel blue
+            ]
+        case .dark:
+            print("DEBUG: Using Dark theme colors")
+            return [
+                Color.blue.opacity(0.9),
+                Color.purple.opacity(0.7),
+                Color.blue.opacity(0.5)
+            ]
+        case .light, .system:
+            print("DEBUG: Using Light/System theme colors")
+            return [
+                Color.blue.opacity(0.9),
+                Color.purple.opacity(0.7),
+                Color.blue.opacity(0.5)
+            ]
+        @unknown default:
+            print("DEBUG: Using default fallback colors")
+            // Fallback to original colors if theme is not recognized
+            return [
+                Color.blue.opacity(0.8),
+                Color.purple.opacity(0.6),
+                Color.blue.opacity(0.4)
+            ]
+        }
+    }
     
     var body: some View {
         ZStack {
