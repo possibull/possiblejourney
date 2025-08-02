@@ -26,26 +26,25 @@ struct GlobalThemeSelector: View {
                     }) {
                         HStack {
                             Image(systemName: theme.iconName)
+                                .foregroundColor(themeManager.currentTheme == theme ? .blue : .primary)
+                                .font(.system(size: 16, weight: themeManager.currentTheme == theme ? .semibold : .regular))
                             Text(theme.displayName)
+                                .foregroundColor(themeManager.currentTheme == theme ? .blue : .primary)
+                                .fontWeight(themeManager.currentTheme == theme ? .semibold : .regular)
+                            Spacer()
                             if themeManager.currentTheme == theme {
-                                Image(systemName: "checkmark")
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(.blue)
+                                    .font(.system(size: 16, weight: .semibold))
                             }
                         }
+                        .padding(.vertical, 4)
                     }
                 }
             } label: {
-                HStack(spacing: 4) {
-                    Image(systemName: "paintbrush.fill")
-                        .foregroundColor(themeManager.currentTheme == .birthday ? .pink : .blue)
-                        .font(.system(size: 18, weight: .medium))
-                    
-                    // Show current theme indicator
-                    if themeManager.currentTheme != .system {
-                        Image(systemName: themeManager.currentTheme.iconName)
-                            .foregroundColor(themeManager.currentTheme == .birthday ? .pink : .blue)
-                            .font(.system(size: 14, weight: .medium))
-                    }
-                }
+                Image(systemName: "paintbrush.fill")
+                    .foregroundColor(.blue)
+                    .font(.system(size: 18, weight: .medium))
             }
             .accessibilityIdentifier("GlobalThemeSelector")
             
