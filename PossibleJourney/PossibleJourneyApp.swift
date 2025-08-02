@@ -29,7 +29,7 @@ struct BeaNumberSequenceView: View {
         case .birthday:
             return Color(red: 1.0, green: 0.95, blue: 0.7) // Pastel yellow
         case .bea:
-            return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
+            return Color(red: 1.0, green: 0.98, blue: 0.8) // Pastel yellow for Bea theme
         case .dark:
             return Color.blue
         case .light, .system:
@@ -42,7 +42,7 @@ struct BeaNumberSequenceView: View {
         case .birthday:
             return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
         case .bea:
-            return Color(red: 1.0, green: 0.98, blue: 0.8) // Pastel yellow
+            return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue for Bea theme
         case .dark:
             return Color.blue.opacity(0.7)
         case .light, .system:
