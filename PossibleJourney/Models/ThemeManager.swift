@@ -562,7 +562,6 @@ struct BirthdayRibbon: View {
 
 struct BirthdayCakePopup: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var candleFlicker: [Bool] = [false, false, false, false, false, false, false, false, false, false]
     @State private var cakeScale: CGFloat = 0.8
     @State private var cakeOpacity: Double = 0.0
     
@@ -587,77 +586,19 @@ struct BirthdayCakePopup: View {
                     .foregroundColor(.primary)
                     .multilineTextAlignment(.center)
                 
-                // Beautiful birthday cake
+                // Beautiful birthday cake with real image
                 ZStack {
-                    // Cake plate
-                    Ellipse()
-                        .fill(
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    Color.white.opacity(0.9),
-                                    Color.gray.opacity(0.3)
-                                ]),
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
-                        .frame(width: 280, height: 30)
-                        .shadow(color: .black.opacity(0.2), radius: 5, x: 0, y: 3)
-                    
-                    // Cake layers
-                    VStack(spacing: 0) {
-                        // Bottom layer (largest)
+                    // Real birthday cake image
+                    AsyncImage(url: URL(string: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop&crop=center")) { image in
+                        image
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 300, height: 250)
+                            .cornerRadius(15)
+                            .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
+                    } placeholder: {
+                        // Fallback placeholder while loading
                         RoundedRectangle(cornerRadius: 15)
-                            .fill(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        Color(red: 0.8, green: 0.9, blue: 1.0), // Blue
-                                        Color(red: 0.7, green: 0.8, blue: 0.9)  // Darker blue
-                                    ]),
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
-                            )
-                            .frame(width: 260, height: 70)
-                            .overlay(
-                                // Sprinkles
-                                HStack(spacing: 8) {
-                                    ForEach(0..<8, id: \.self) { _ in
-                                        Circle()
-                                            .fill(Color.white.opacity(0.8))
-                                            .frame(width: 5, height: 5)
-                                    }
-                                }
-                                .offset(y: 15)
-                            )
-                        
-                        // Middle layer
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        Color(red: 1.0, green: 0.8, blue: 0.9), // Pink
-                                        Color(red: 0.9, green: 0.7, blue: 0.8)  // Darker pink
-                                    ]),
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
-                            )
-                            .frame(width: 220, height: 60)
-                            .overlay(
-                                // Sprinkles
-                                HStack(spacing: 6) {
-                                    ForEach(0..<6, id: \.self) { _ in
-                                        Circle()
-                                            .fill(Color.white.opacity(0.8))
-                                            .frame(width: 4, height: 4)
-                                    }
-                                }
-                                .offset(y: 12)
-                            )
-                        
-                        // Top layer
-                        RoundedRectangle(cornerRadius: 10)
                             .fill(
                                 LinearGradient(
                                     gradient: Gradient(colors: [
@@ -668,72 +609,30 @@ struct BirthdayCakePopup: View {
                                     endPoint: .bottom
                                 )
                             )
-                            .frame(width: 180, height: 50)
-                        
-                        // Candles
-                        HStack(spacing: 8) {
-                            // "4" candle
-                            VStack(spacing: 2) {
-                                // Candle flame
-                                Circle()
-                                    .fill(
-                                        LinearGradient(
-                                            gradient: Gradient(colors: [
-                                                Color.yellow,
-                                                Color.orange,
-                                                Color.red
-                                            ]),
-                                            startPoint: .top,
-                                            endPoint: .bottom
-                                        )
-                                    )
-                                    .frame(width: 12, height: 12)
-                                    .scaleEffect(candleFlicker[0] ? 1.2 : 1.0)
-                                    .animation(.easeInOut(duration: 0.5).repeatForever(autoreverses: true), value: candleFlicker[0])
-                                
-                                // Candle
-                                Rectangle()
-                                    .fill(Color.white)
-                                    .frame(width: 6, height: 25)
-                                    .overlay(
-                                        Text("4")
-                                            .font(.system(size: 12, weight: .bold))
-                                            .foregroundColor(.black)
-                                    )
-                            }
-                            
-                            // "6" candle
-                            VStack(spacing: 2) {
-                                // Candle flame
-                                Circle()
-                                    .fill(
-                                        LinearGradient(
-                                            gradient: Gradient(colors: [
-                                                Color.yellow,
-                                                Color.orange,
-                                                Color.red
-                                            ]),
-                                            startPoint: .top,
-                                            endPoint: .bottom
-                                        )
-                                    )
-                                    .frame(width: 12, height: 12)
-                                    .scaleEffect(candleFlicker[1] ? 1.2 : 1.0)
-                                    .animation(.easeInOut(duration: 0.5).repeatForever(autoreverses: true), value: candleFlicker[1])
-                                
-                                // Candle
-                                Rectangle()
-                                    .fill(Color.white)
-                                    .frame(width: 6, height: 25)
-                                    .overlay(
-                                        Text("6")
-                                            .font(.system(size: 12, weight: .bold))
-                                            .foregroundColor(.black)
-                                    )
-                            }
-                        }
-                        .offset(y: -10)
+                            .frame(width: 300, height: 250)
+                            .overlay(
+                                ProgressView()
+                                    .scaleEffect(1.5)
+                                    .foregroundColor(.white)
+                            )
                     }
+                    
+                    // "46" overlay on the cake
+                    VStack {
+                        Spacer()
+                        
+                        Text("46")
+                            .font(.system(size: 48, weight: .bold, design: .rounded))
+                            .foregroundColor(.white)
+                            .shadow(color: .black.opacity(0.8), radius: 3, x: 0, y: 2)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 8)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color.black.opacity(0.6))
+                            )
+                    }
+                    .frame(width: 300, height: 250)
                 }
                 .scaleEffect(cakeScale)
                 .opacity(cakeOpacity)
@@ -774,14 +673,7 @@ struct BirthdayCakePopup: View {
                 cakeOpacity = 1.0
             }
             
-            // Start candle flickering
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                for i in 0..<candleFlicker.count {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + Double(i) * 0.1) {
-                        candleFlicker[i] = true
-                    }
-                }
-            }
+
         }
     }
 }
