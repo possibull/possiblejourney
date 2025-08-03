@@ -647,11 +647,41 @@ struct TaskRowView: View {
             // Modern card design
             HStack(spacing: 16) {
                 // Modern checkbox with animation
-                SlotMachineCheckbox(
-                    isCompleted: isCompleted,
-                    themeAccentColor: themeAccentColor,
-                    onTap: handleCheckboxTap
-                )
+                Button(action: {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                        checkboxScale = 0.8
+                    }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                            checkboxScale = 1.0
+                        }
+                        handleCheckboxTap()
+                    }
+                }) {
+                    ZStack {
+                        Circle()
+                            .fill(checkboxFillColor)
+                            .frame(width: 28, height: 28)
+                            .overlay(
+                                Circle()
+                                    .stroke(checkboxStrokeColor, lineWidth: 2)
+                            )
+                            .shadow(
+                                color: checkboxShadowColor,
+                                radius: checkboxShadowRadius,
+                                x: 0,
+                                y: 2
+                            )
+                        
+                        if isCompleted {
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(.white)
+                        }
+                    }
+                }
+                .buttonStyle(PlainButtonStyle())
+                .scaleEffect(checkboxScale)
                 
                 // Task content
                 VStack(alignment: .leading, spacing: 8) {
