@@ -177,8 +177,14 @@ class DailyChecklistViewModel: ObservableObject {
         selectedDate = date
         // Update the current date to the selected date for missed day calculations
         now = date
-        // Clear the ignore flag when selecting a new date so missed day logic can evaluate
-        ignoreMissedDayForCurrentSession = false
+        // Only clear the ignore flag when selecting a new date if we're not in the middle of handling a missed day
+        // This prevents the missed day screen from reappearing when navigating to the first missed day
+        if ignoreMissedDayForCurrentSession {
+            // Don't clear the ignore flag if it's already set (we're handling a missed day)
+        } else {
+            // Clear the ignore flag when selecting a new date so missed day logic can evaluate
+            ignoreMissedDayForCurrentSession = false
+        }
         // Load the progress for the selected date
         let dailyProgressStorage = DailyProgressStorage()
         let progress = dailyProgressStorage.load(for: date) ?? DailyProgress(
