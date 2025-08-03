@@ -275,9 +275,9 @@ struct DailyChecklistView: View {
             if !dayProgress.isCompleted {
                 // Found the first missed day, navigate to it
                 print("🔍 Found first missed day: \(currentDate) (day \(dayNumber + 1))")
-                // Temporarily set ignore flag to prevent missed day screen from showing for the destination
+                // Set ignore flag and navigate without clearing it
                 viewModel.ignoreMissedDayForCurrentSession = true
-                viewModel.selectDate(currentDate)
+                viewModel.selectDate(currentDate, clearIgnoreFlag: false)
                 return
             }
             
