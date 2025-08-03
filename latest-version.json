@@ -1,7 +1,8 @@
 {
   "version": "1.7",
-  "build": 1,
-  "releaseNotes": "Enhanced User Experience & Performance - Improved UI/UX design and visual consistency - Enhanced app performance and responsiveness - Additional bug fixes and stability improvements - Better mobile experience and accessibility - Optimized data handling and storage - Improved user workflow and navigation - Enhanced feature reliability and consistency - Continued app improvements and refinements",
+  "build": 2,
+  "releaseNotes": "New version 1.7 build 2",
   "forceUpdate": false,
-  "lastUpdated": "2025-08-03T06:33:32Z"
+  "lastUpdated": "2025-08-03T06:39:33Z",
+  "branch": "v1.7-build2"
 }
