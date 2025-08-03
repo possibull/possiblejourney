@@ -125,10 +125,17 @@ struct ProgramCalendarView: View {
             selectedMonthIndex = currentMonthIndex // Start on current month
             
             // Check for August 4th birthday theme activation
+            print("📅 Calendar onAppear - Current theme: \(themeManager.currentTheme)")
             checkAugust4thBirthdayActivation()
         }
         .onChange(of: selectedDate) { oldValue, newValue in
             // Check for August 4th birthday theme activation when date changes
+            print("📅 Date changed from \(oldValue) to \(newValue)")
+            checkAugust4thBirthdayActivation()
+        }
+        .onChange(of: themeManager.currentTheme) { oldValue, newValue in
+            // Check for August 4th birthday theme activation when theme changes
+            print("🎨 Theme changed from \(oldValue) to \(newValue)")
             checkAugust4thBirthdayActivation()
         }
     }
