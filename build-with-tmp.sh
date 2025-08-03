@@ -103,14 +103,56 @@ if [ $BUILD_EXIT_CODE -eq 0 ]; then
     echo "🎯 Target: $SCHEME" >> "$SUCCESS_LOG"
     echo "⚙️  Configuration: $CONFIGURATION" >> "$SUCCESS_LOG"
     
-    # Commit changes after successful build
-    echo "🔀 Committing changes after successful build..."
-    if git add . && git commit -m "Build successful - $(date '+%Y-%m-%d %H:%M:%S') - $SCHEME $CONFIGURATION"; then
-        echo "✅ Changes committed successfully"
-        echo "📝 Commit message: Build successful - $(date '+%Y-%m-%d %H:%M:%S') - $SCHEME $CONFIGURATION" >> "$SUCCESS_LOG"
+    # Call auto-commit script after successful build
+    echo "🔀 Running auto-commit script after successful build..."
+    if [ -f "./auto-commit.sh" ]; then
+        # Create a temporary script that calls auto-commit with a build-specific comment
+        cat > /tmp/auto-commit-build.sh << 'EOF'
+#!/bin/bash
+# Temporary auto-commit script for build success
+
+# Function to commit changes with build-specific message
+commit_build_changes() {
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    
+    # Check if there are any changes
+    if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git ls-files --others --exclude-standard)" ]; then
+        echo "Changes detected at $timestamp"
+        
+        # Stage all changes
+        git add .
+        
+        # Get list of changed files for commit message
+        local changed_files=$(git diff --cached --name-only | head -5 | tr '\n' ' ')
+        
+        # Create build-specific commit message
+        local commit_msg="Build successful - $timestamp - $SCHEME $CONFIGURATION - $changed_files"
+        
+        # Commit changes
+        git commit -m "$commit_msg"
+        
+        echo "✅ Auto-committed: $commit_msg"
     else
-        echo "⚠️  Warning: Could not commit changes (no changes to commit or git error)"
-        echo "⚠️  Warning: Could not commit changes (no changes to commit or git error)" >> "$SUCCESS_LOG"
+        echo "⚠️  No changes to commit"
+    fi
+}
+
+# Run the commit function
+commit_build_changes
+EOF
+        
+        # Make the temporary script executable and run it
+        chmod +x /tmp/auto-commit-build.sh
+        /tmp/auto-commit-build.sh
+        
+        # Clean up temporary script
+        rm -f /tmp/auto-commit-build.sh
+        
+        echo "✅ Auto-commit completed after successful build"
+        echo "✅ Auto-commit completed after successful build" >> "$SUCCESS_LOG"
+    else
+        echo "⚠️  auto-commit.sh not found, skipping auto-commit"
+        echo "⚠️  auto-commit.sh not found, skipping auto-commit" >> "$SUCCESS_LOG"
     fi
 else
     echo "❌ Build failed with exit code: $BUILD_EXIT_CODE" > "$ERROR_LOG"
