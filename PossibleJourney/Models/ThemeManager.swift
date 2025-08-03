@@ -256,26 +256,26 @@ struct ThemeAwareBackground: ViewModifier {
                             USAPattern()
                         }
                     } else if themeManager.currentTheme == .lasVegas {
-                        // Las Vegas theme - neon night sky with fireworks and casino landmarks
+                        // Las Vegas theme - authentic sign colors: yellow, white, red, blue
                         ZStack {
-                            // Dark night sky gradient
+                            // Dark night sky gradient inspired by the sign's backdrop
                             LinearGradient(
                                 gradient: Gradient(colors: [
-                                    Color(red: 0.05, green: 0.05, blue: 0.15), // Deep night blue
-                                    Color(red: 0.1, green: 0.05, blue: 0.2), // Purple night
-                                    Color(red: 0.15, green: 0.05, blue: 0.25)  // Neon purple
+                                    Color(red: 0.02, green: 0.02, blue: 0.08), // Deep night black
+                                    Color(red: 0.05, green: 0.05, blue: 0.12), // Dark blue night
+                                    Color(red: 0.08, green: 0.08, blue: 0.15)  // Midnight blue
                                 ]),
                                 startPoint: .top,
                                 endPoint: .bottom
                             )
                             
-                            // Fireworks
+                            // Fireworks with authentic sign colors
                             LasVegasFireworks()
                             
-                            // Casino landmarks
+                            // Casino landmarks with sign colors
                             LasVegasLandmarks()
                             
-                            // Neon lights
+                            // Neon lights matching the sign
                             LasVegasNeonLights()
                         }
                     } else if colorScheme == .dark {
@@ -379,18 +379,19 @@ struct ThemeAwareCard: ViewModifier {
                             USAStripes()
                         }
                     } else if themeManager.currentTheme == .lasVegas {
-                        // Las Vegas theme - neon card with casino elements
+                        // Las Vegas theme - authentic sign colors card
                         ZStack {
                             RoundedRectangle(cornerRadius: 16)
-                                .fill(Color.black.opacity(0.8))
+                                .fill(Color.black.opacity(0.9))
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 16)
                                         .stroke(
                                             LinearGradient(
                                                 gradient: Gradient(colors: [
-                                                    Color(red: 1.0, green: 0.2, blue: 0.8), // Neon pink
-                                                    Color(red: 0.2, green: 0.8, blue: 1.0), // Neon blue
-                                                    Color(red: 1.0, green: 0.8, blue: 0.2)  // Neon gold
+                                                    Color(red: 1.0, green: 1.0, blue: 0.0), // Yellow neon (sign bulbs)
+                                                    Color(red: 1.0, green: 1.0, blue: 1.0), // White neon (silver dollars)
+                                                    Color(red: 1.0, green: 0.0, blue: 0.0), // Red neon (letters/star)
+                                                    Color(red: 0.0, green: 0.5, blue: 1.0)  // Blue (text)
                                                 ]),
                                                 startPoint: .topLeading,
                                                 endPoint: .bottomTrailing
@@ -399,7 +400,7 @@ struct ThemeAwareCard: ViewModifier {
                                         )
                                 )
                             
-                            // Casino elements
+                            // Casino elements with sign colors
                             LasVegasCardElements()
                         }
                     } else if colorScheme == .dark {
@@ -490,12 +491,13 @@ struct ThemeAwareHeader: ViewModifier {
                             endPoint: .bottom
                         )
                     } else if themeManager.currentTheme == .lasVegas {
-                        // Las Vegas theme - neon header
+                        // Las Vegas theme - authentic sign colors header
                         LinearGradient(
                             gradient: Gradient(colors: [
-                                Color(red: 1.0, green: 0.2, blue: 0.8).opacity(0.9), // Neon pink
-                                Color(red: 0.2, green: 0.8, blue: 1.0).opacity(0.7), // Neon blue
-                                Color(red: 1.0, green: 0.8, blue: 0.2).opacity(0.8)  // Neon gold
+                                Color(red: 1.0, green: 1.0, blue: 0.0).opacity(0.9), // Yellow neon (sign bulbs)
+                                Color(red: 1.0, green: 1.0, blue: 1.0).opacity(0.8), // White neon (silver dollars)
+                                Color(red: 1.0, green: 0.0, blue: 0.0).opacity(0.7), // Red neon (letters/star)
+                                Color(red: 0.0, green: 0.5, blue: 1.0).opacity(0.6)  // Blue (text)
                             ]),
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
@@ -530,7 +532,7 @@ struct ThemeAwareDivider: ViewModifier {
                     (themeManager.currentTheme == .bea ? 
                     Color(red: 0.8, green: 0.9, blue: 1.0).opacity(0.6) : // Pastel blue
                     (themeManager.currentTheme == .lasVegas ?
-                    Color(red: 1.0, green: 0.8, blue: 0.2).opacity(0.8) : // Neon gold
+                    Color(red: 1.0, green: 1.0, blue: 0.0).opacity(0.8) : // Yellow neon (sign bulbs)
                     (colorScheme == .dark ? 
                             Color.white.opacity(0.15) : Color.gray.opacity(0.3))))
             )
@@ -1239,20 +1241,20 @@ struct LasVegasFireworks: View {
     
     var body: some View {
         ZStack {
-            // Firework 1 - Pink
-            FireworkView(color: Color(red: 1.0, green: 0.2, blue: 0.8))
+            // Firework 1 - Yellow neon (sign bulbs)
+            FireworkView(color: Color(red: 1.0, green: 1.0, blue: 0.0))
                 .offset(x: -100, y: fireworkOffset1)
                 .scaleEffect(fireworkScale1)
                 .opacity(fireworkOpacity1)
             
-            // Firework 2 - Blue
-            FireworkView(color: Color(red: 0.2, green: 0.8, blue: 1.0))
+            // Firework 2 - Red neon (letters/star)
+            FireworkView(color: Color(red: 1.0, green: 0.0, blue: 0.0))
                 .offset(x: 150, y: fireworkOffset2)
                 .scaleEffect(fireworkScale2)
                 .opacity(fireworkOpacity2)
             
-            // Firework 3 - Gold
-            FireworkView(color: Color(red: 1.0, green: 0.8, blue: 0.2))
+            // Firework 3 - Blue (text)
+            FireworkView(color: Color(red: 0.0, green: 0.5, blue: 1.0))
                 .offset(x: 50, y: fireworkOffset3)
                 .scaleEffect(fireworkScale3)
                 .opacity(fireworkOpacity3)
@@ -1359,13 +1361,13 @@ struct LasVegasLandmarks: View {
                     ZStack {
                         // Fountain base
                         RoundedRectangle(cornerRadius: 8)
-                            .fill(Color(red: 0.2, green: 0.8, blue: 1.0).opacity(0.3))
+                            .fill(Color(red: 0.0, green: 0.5, blue: 1.0).opacity(0.3))
                             .frame(width: 60, height: 20)
                         
                         // Water streams
                         ForEach(0..<5, id: \.self) { index in
                             Rectangle()
-                                .fill(Color(red: 0.2, green: 0.8, blue: 1.0).opacity(0.6))
+                                .fill(Color(red: 0.0, green: 0.5, blue: 1.0).opacity(0.6))
                                 .frame(width: 2, height: 30)
                                 .offset(x: CGFloat(index * 12 - 24))
                                 .offset(y: -15 + landmarkOffset * 0.5)
@@ -1412,12 +1414,12 @@ struct LasVegasLandmarks: View {
                     ZStack {
                         // Pyramid base
                         Triangle()
-                            .fill(Color(red: 1.0, green: 0.8, blue: 0.2).opacity(0.4))
+                            .fill(Color(red: 1.0, green: 1.0, blue: 0.0).opacity(0.4))
                             .frame(width: 60, height: 40)
                         
                         // Pyramid light beam
                         Rectangle()
-                            .fill(Color(red: 1.0, green: 0.8, blue: 0.2).opacity(0.3))
+                            .fill(Color(red: 1.0, green: 1.0, blue: 0.0).opacity(0.3))
                             .frame(width: 4, height: 100)
                             .offset(y: -70)
                     }
@@ -1449,27 +1451,27 @@ struct LasVegasNeonLights: View {
     
     var body: some View {
         ZStack {
-            // Neon sign 1 - "CASINO"
-            Text("CASINO")
+            // Neon sign 1 - "WELCOME" (red neon like sign letters)
+            Text("WELCOME")
                 .font(.system(size: 16, weight: .bold))
-                .foregroundColor(Color(red: 1.0, green: 0.2, blue: 0.8))
-                .shadow(color: Color(red: 1.0, green: 0.2, blue: 0.8), radius: 5)
+                .foregroundColor(Color(red: 1.0, green: 0.0, blue: 0.0))
+                .shadow(color: Color(red: 1.0, green: 0.0, blue: 0.0), radius: 5)
                 .scaleEffect(neonPulse)
                 .offset(x: -100, y: -200)
             
-            // Neon sign 2 - "LUCKY"
-            Text("LUCKY")
+            // Neon sign 2 - "FABULOUS" (blue like sign text)
+            Text("FABULOUS")
                 .font(.system(size: 14, weight: .bold))
-                .foregroundColor(Color(red: 0.2, green: 0.8, blue: 1.0))
-                .shadow(color: Color(red: 0.2, green: 0.8, blue: 1.0), radius: 5)
+                .foregroundColor(Color(red: 0.0, green: 0.5, blue: 1.0))
+                .shadow(color: Color(red: 0.0, green: 0.5, blue: 1.0), radius: 5)
                 .scaleEffect(neonPulse * 0.8)
                 .offset(x: 120, y: -180)
             
-            // Neon sign 3 - "777"
-            Text("777")
+            // Neon sign 3 - "LAS VEGAS" (yellow neon like sign bulbs)
+            Text("LAS VEGAS")
                 .font(.system(size: 18, weight: .bold))
-                .foregroundColor(Color(red: 1.0, green: 0.8, blue: 0.2))
-                .shadow(color: Color(red: 1.0, green: 0.8, blue: 0.2), radius: 5)
+                .foregroundColor(Color(red: 1.0, green: 1.0, blue: 0.0))
+                .shadow(color: Color(red: 1.0, green: 1.0, blue: 0.0), radius: 5)
                 .scaleEffect(neonPulse * 1.2)
                 .offset(x: 0, y: -220)
         }

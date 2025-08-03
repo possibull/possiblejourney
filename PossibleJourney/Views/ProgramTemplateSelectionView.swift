@@ -29,7 +29,7 @@ struct ProgramTemplateSelectionView: View {
         case .usa:
             return Color(red: 0.8, green: 0.1, blue: 0.2) // Red for USA theme
         case .lasVegas:
-            return Color(red: 1.0, green: 0.8, blue: 0.2) // Neon gold for Las Vegas theme
+            return Color(red: 1.0, green: 1.0, blue: 0.0) // Yellow neon (sign bulbs) for Las Vegas theme
         case .dark:
             return Color.blue
         case .light, .system:
