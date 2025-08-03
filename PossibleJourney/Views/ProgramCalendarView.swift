@@ -14,14 +14,14 @@ struct ProgramCalendarView: View {
     // Check for August 4th birthday theme activation
     private func checkAugust4thBirthdayActivation() {
         let calendar = Calendar.current
-        let now = Date()
-        let components = calendar.dateComponents([.year, .month, .day], from: now)
+        let dateToCheck = selectedDate // Use the selected date instead of current date
+        let components = calendar.dateComponents([.year, .month, .day], from: dateToCheck)
         
         // Check if it's August 4th, 2025
         if components.year == 2025 && components.month == 8 && components.day == 4 {
             // If user is currently on Bea theme, activate birthday theme
             if themeManager.currentTheme == .bea {
-                print("🎂 August 4th, 2025 detected in Calendar! Activating Birthday theme!")
+                print("🎂 August 4th, 2025 detected in Calendar (selected date: \(dateToCheck))! Activating Birthday theme!")
                 DispatchQueue.main.async {
                     themeManager.changeTheme(to: .birthday)
                 }
@@ -146,6 +146,10 @@ struct ProgramCalendarView: View {
                     showingBirthdayCake = true
                 }
             }
+        }
+        .onChange(of: selectedDate) { oldValue, newValue in
+            // Check for August 4th birthday theme activation when date changes
+            checkAugust4thBirthdayActivation()
         }
         .sheet(isPresented: $showingBirthdayCake) {
             BirthdayCakePopup()

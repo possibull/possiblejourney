@@ -61,14 +61,14 @@ struct DailyChecklistView: View {
     // Check for August 4th birthday theme activation
     private func checkAugust4thBirthdayActivation() {
         let calendar = Calendar.current
-        let now = Date()
-        let components = calendar.dateComponents([.year, .month, .day], from: now)
+        let dateToCheck = viewModel.selectedDate // Use the view model's selected date
+        let components = calendar.dateComponents([.year, .month, .day], from: dateToCheck)
         
         // Check if it's August 4th, 2025
         if components.year == 2025 && components.month == 8 && components.day == 4 {
             // If user is currently on Bea theme, activate birthday theme
             if themeManager.currentTheme == .bea {
-                print("🎂 August 4th, 2025 detected in DailyChecklist! Activating Birthday theme!")
+                print("🎂 August 4th, 2025 detected in DailyChecklist (selected date: \(dateToCheck))! Activating Birthday theme!")
                 DispatchQueue.main.async {
                     themeManager.changeTheme(to: .birthday)
                 }
