@@ -617,6 +617,10 @@ struct BirthdayCakePopup: View {
     @State private var streamerRotation3: Double = 0
     @State private var confettiPieces: [ConfettiPiece] = []
     @State private var showConfetti: Bool = false
+    @State private var showCrackAnimation: Bool = false
+    @State private var crackScale: CGFloat = 1.0
+    @State private var crackRotation: Double = 0
+    @State private var reveal46: Bool = false
     
     var body: some View {
         ZStack {
@@ -662,7 +666,7 @@ struct BirthdayCakePopup: View {
             
             VStack(spacing: 30) {
                 // Title
-                Text("🎂 Happy Birthday! 🎂")
+                Text("🎂 Happy Birthday Bea! 🎂")
                     .font(.system(size: 32, weight: .bold, design: .rounded))
                     .foregroundColor(.primary)
                     .multilineTextAlignment(.center)
@@ -698,20 +702,36 @@ struct BirthdayCakePopup: View {
                             )
                     }
                     
-                    // "46" overlay on the cake
+                    // Dynamic number overlay on the cake
                     VStack {
                         Spacer()
                         
-                        Text("46")
-                            .font(.system(size: 48, weight: .bold, design: .rounded))
-                            .foregroundColor(.white)
-                            .shadow(color: .black.opacity(0.8), radius: 3, x: 0, y: 2)
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 8)
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color.black.opacity(0.6))
-                            )
+                        ZStack {
+                            // Background for the numbers
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color.black.opacity(0.6))
+                                .frame(width: 120, height: 60)
+                            
+                            // Show "50" initially, then "46" after cracking
+                            if reveal46 {
+                                Text("46")
+                                    .font(.system(size: 48, weight: .bold, design: .rounded))
+                                    .foregroundColor(.white)
+                                    .shadow(color: .black.opacity(0.8), radius: 3, x: 0, y: 2)
+                                    .transition(.scale.combined(with: .opacity))
+                            } else {
+                                Text("50")
+                                    .font(.system(size: 48, weight: .bold, design: .rounded))
+                                    .foregroundColor(.white)
+                                    .shadow(color: .black.opacity(0.8), radius: 3, x: 0, y: 2)
+                                    .scaleEffect(crackScale)
+                                    .rotationEffect(.degrees(crackRotation))
+                                    .animation(.easeInOut(duration: 0.3), value: crackScale)
+                                    .animation(.easeInOut(duration: 0.3), value: crackRotation)
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 8)
                     }
                     .frame(width: 300, height: 250)
                 }
@@ -784,7 +804,21 @@ struct BirthdayCakePopup: View {
                 createConfetti()
             }
             
-
+            // Start the cracking animation sequence
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                // First, make the "50" shake and crack
+                withAnimation(.easeInOut(duration: 0.2).repeatCount(3, autoreverses: true)) {
+                    crackScale = 1.1
+                    crackRotation = 5
+                }
+                
+                // Then reveal "46"
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                    withAnimation(.easeInOut(duration: 0.5)) {
+                        reveal46 = true
+                    }
+                }
+            }
         }
     }
     
