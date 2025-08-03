@@ -98,7 +98,10 @@ struct ProgramCalendarView: View {
                         startDate: startDate, 
                         completedDates: completedDates,
                         selectedDate: selectedDate,
-                        onDateSelected: onDateSelected
+                        onDateSelected: { date in
+                            print("📅 Date selected in CalendarMonthGrid: \(date)")
+                            onDateSelected(date)
+                        }
                     )
                         .padding(.vertical, 12)
                         .themeAwareCard()
@@ -121,9 +124,14 @@ struct ProgramCalendarView: View {
         .tabViewStyle(.page(indexDisplayMode: .never)) // Enable paging, hide dots
         .ignoresSafeArea(edges: .bottom)
         .background(Color(.systemBackground))
+        .onAppear {
+            print("📅 TabView onAppear - Calendar view is being presented")
+        }
 
         .onAppear {
             print("📅 Calendar onAppear - START")
+            print("📅 Calendar onAppear - selectedDate: \(selectedDate)")
+            print("📅 Calendar onAppear - currentMonthIndex: \(currentMonthIndex)")
             selectedMonthIndex = currentMonthIndex // Start on current month
             
             // Check for August 4th birthday theme activation
