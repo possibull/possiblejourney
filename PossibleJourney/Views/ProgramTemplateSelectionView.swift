@@ -285,12 +285,15 @@ struct TemplateCardView: View {
         Button(action: onTap) {
             VStack(alignment: .leading, spacing: 12) {
                 // Header
-                HStack {
-                    SlotMachineCardIcon(
-                        iconName: template.category.icon,
-                        themeAccentColor: themeAccentColor,
-                        themeSecondaryColor: themeSecondaryColor
-                    )
+                                            HStack {
+                                Image(systemName: template.category.icon)
+                                    .font(.system(size: 20, weight: .bold))
+                                    .foregroundColor(themeAccentColor)
+                                    .frame(width: 40, height: 40)
+                                    .background(
+                                        Circle()
+                                            .fill(themeSecondaryColor.opacity(0.2))
+                                    )
                     
                     VStack(alignment: .leading, spacing: 2) {
                         Text(template.name)

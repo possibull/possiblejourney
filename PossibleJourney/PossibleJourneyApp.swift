@@ -377,15 +377,12 @@ struct GlobalThemeSelector: View {
                             }
                         }
                     }) {
-                        HStack {
-                            SlotMachineThemeIcon(
-                                iconName: theme.iconName,
-                                isSelected: themeManager.currentTheme == theme
-                            )
-                            .foregroundColor(themeManager.currentTheme == theme ? .blue : .primary)
-                            Text(theme.displayName)
-                            Spacer()
-                        }
+                                                                HStack {
+                                            Image(systemName: theme.iconName)
+                                                .foregroundColor(themeManager.currentTheme == theme ? .blue : .primary)
+                                            Text(theme.displayName)
+                                            Spacer()
+                                        }
                     }
                 }
                 
@@ -408,15 +405,12 @@ struct GlobalThemeSelector: View {
                         // Check for August 4th birthday theme activation
                         checkAugust4thBirthdayActivation()
                     }) {
-                        HStack {
-                            SlotMachineThemeIcon(
-                                iconName: ThemeMode.birthday.iconName,
-                                isSelected: themeManager.currentTheme == .birthday
-                            )
-                            .foregroundColor(themeManager.currentTheme == .birthday ? .blue : .primary)
-                            Text(ThemeMode.birthday.displayName)
-                            Spacer()
-                        }
+                                                                HStack {
+                                            Image(systemName: ThemeMode.birthday.iconName)
+                                                .foregroundColor(themeManager.currentTheme == .birthday ? .blue : .primary)
+                                            Text(ThemeMode.birthday.displayName)
+                                            Spacer()
+                                        }
                     }
                     
                     // USA theme as second hidden theme
@@ -425,15 +419,12 @@ struct GlobalThemeSelector: View {
                             themeManager.changeTheme(to: .usa)
                         }
                     }) {
-                        HStack {
-                            SlotMachineThemeIcon(
-                                iconName: ThemeMode.usa.iconName,
-                                isSelected: themeManager.currentTheme == .usa
-                            )
-                            .foregroundColor(themeManager.currentTheme == .usa ? .blue : .primary)
-                            Text(ThemeMode.usa.displayName)
-                            Spacer()
-                        }
+                                                                HStack {
+                                            Image(systemName: ThemeMode.usa.iconName)
+                                                .foregroundColor(themeManager.currentTheme == .usa ? .blue : .primary)
+                                            Text(ThemeMode.usa.displayName)
+                                            Spacer()
+                                        }
                     }
                     
                     // Las Vegas theme as third hidden theme
@@ -442,15 +433,12 @@ struct GlobalThemeSelector: View {
                             themeManager.changeTheme(to: .lasVegas)
                         }
                     }) {
-                        HStack {
-                            SlotMachineThemeIcon(
-                                iconName: ThemeMode.lasVegas.iconName,
-                                isSelected: themeManager.currentTheme == .lasVegas
-                            )
-                            .foregroundColor(themeManager.currentTheme == .lasVegas ? .blue : .primary)
-                            Text(ThemeMode.lasVegas.displayName)
-                            Spacer()
-                        }
+                                                                HStack {
+                                            Image(systemName: ThemeMode.lasVegas.iconName)
+                                                .foregroundColor(themeManager.currentTheme == .lasVegas ? .blue : .primary)
+                                            Text(ThemeMode.lasVegas.displayName)
+                                            Spacer()
+                                        }
                     }
                     
                     Divider()

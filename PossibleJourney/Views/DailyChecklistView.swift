@@ -731,44 +731,34 @@ struct TaskRowView: View {
                     HStack(spacing: 12) {
                         // Photo button for tasks that require photos
                         if task.requiresPhoto && !hasPhoto {
-                            Button(action: {
-                                showingPhotoPicker = true
-                            }) {
-                                HStack(spacing: 6) {
-                                    SlotMachineIcon(
-                                        iconName: "camera",
-                                        finalIconName: "camera",
-                                        isSpinning: false,
-                                        spinDuration: 0.8
+                                                            Button(action: {
+                                    showingPhotoPicker = true
+                                }) {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "camera")
+                                            .font(.system(size: 12, weight: .medium))
+                                        Text("Add Photo")
+                                            .font(.system(size: 12, weight: .medium, design: .rounded))
+                                    }
+                                    .foregroundColor(themeAccentColor)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .fill(themeAccentColor.opacity(0.1))
                                     )
-                                    .font(.system(size: 12, weight: .medium))
-                                    Text("Add Photo")
-                                        .font(.system(size: 12, weight: .medium, design: .rounded))
                                 }
-                                .foregroundColor(themeAccentColor)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .fill(themeAccentColor.opacity(0.1))
-                                )
-                            }
                             .buttonStyle(PlainButtonStyle())
                         }
                         
                         // Photo indicator for tasks with photos
                         if task.requiresPhoto && hasPhoto {
-                            HStack(spacing: 4) {
-                                SlotMachineIcon(
-                                    iconName: "photo.fill",
-                                    finalIconName: "photo.fill",
-                                    isSpinning: false,
-                                    spinDuration: 0.8
-                                )
-                                .font(.system(size: 12, weight: .medium))
-                                Text("Photo Added")
-                                .font(.system(size: 12, weight: .medium, design: .rounded))
-                            }
+                                                            HStack(spacing: 4) {
+                                    Image(systemName: "photo.fill")
+                                        .font(.system(size: 12, weight: .medium))
+                                    Text("Photo Added")
+                                        .font(.system(size: 12, weight: .medium, design: .rounded))
+                                }
                             .foregroundColor(.green)
                             .padding(.horizontal, 12)
                             .padding(.vertical, 6)
@@ -781,21 +771,16 @@ struct TaskRowView: View {
                         Spacer()
                         
                         // Reminder button
-                        Button(action: onSetReminder) {
-                            SlotMachineIcon(
-                                iconName: "bell",
-                                finalIconName: "bell",
-                                isSpinning: false,
-                                spinDuration: 0.8
-                            )
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(themeAccentColor)
-                            .padding(8)
-                            .background(
-                                Circle()
-                                    .fill(themeAccentColor.opacity(0.1))
-                            )
-                        }
+                                                    Button(action: onSetReminder) {
+                                Image(systemName: "bell")
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(themeAccentColor)
+                                    .padding(8)
+                                    .background(
+                                        Circle()
+                                            .fill(themeAccentColor.opacity(0.1))
+                                    )
+                            }
                         .buttonStyle(PlainButtonStyle())
                     }
                 }
