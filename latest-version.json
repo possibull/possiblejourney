@@ -1,8 +1,8 @@
 {
-  "version": "1.6",
-  "build": 2,
-  "releaseNotes": "New version 1.6 build 2",
+  "version": "1.7",
+  "build": 1,
+  "releaseNotes": "New version 1.7 build 1",
   "forceUpdate": false,
-  "lastUpdated": "2025-08-03T05:54:22Z",
-  "branch": "v1.6-build2"
+  "lastUpdated": "2025-08-03T06:21:41Z",
+  "branch": "v1.7-build1"
 }

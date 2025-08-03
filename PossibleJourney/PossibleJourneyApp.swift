@@ -325,9 +325,7 @@ struct GlobalThemeSelector: View {
                         if beaTapCount >= 5 {
                             print("🎂 HIDDEN THEMES UNLOCKED!")
                             // Unlock hidden themes instead of directly activating birthday theme
-                            withAnimation(.easeInOut(duration: 0.3)) {
-                                hiddenThemesUnlocked = true
-                            }
+                            hiddenThemesUnlocked = true
                             beaTapCount = 0
                         }
                     } else {
@@ -421,6 +419,23 @@ struct GlobalThemeSelector: View {
                             Image(systemName: themeManager.currentTheme == .usa ? "checkmark" : ThemeMode.usa.iconName)
                                 .foregroundColor(themeManager.currentTheme == .usa ? .blue : .primary)
                             Text(ThemeMode.usa.displayName)
+                            Spacer()
+                        }
+                    }
+                    
+                    Divider()
+                    
+                    // Hide hidden themes option
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            hiddenThemesUnlocked = false
+                        }
+                    }) {
+                        HStack {
+                            Image(systemName: "eye.slash.fill")
+                                .foregroundColor(.secondary)
+                            Text("Hide Hidden Themes")
+                                .foregroundColor(.secondary)
                             Spacer()
                         }
                     }
