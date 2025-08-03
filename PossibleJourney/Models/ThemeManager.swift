@@ -1693,7 +1693,7 @@ struct SlotMachineIcon: View {
                     .font(.system(size: 20, weight: .bold))
             }
         }
-        .onChange(of: isSpinning) { newValue in
+        .onChange(of: isSpinning) { _, newValue in
             if newValue && !isAnimating {
                 startSpinAnimation()
             }
