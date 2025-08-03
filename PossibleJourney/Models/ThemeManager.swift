@@ -41,6 +41,7 @@ enum ThemeMode: String, CaseIterable, Codable {
 
 class ThemeManager: ObservableObject {
     @Published var currentTheme: ThemeMode
+    @Published var shouldShowBirthdayCake: Bool = false
     
     init() {
         let savedTheme = UserDefaults.standard.string(forKey: "selectedTheme") ?? ThemeMode.system.rawValue
@@ -59,6 +60,13 @@ class ThemeManager: ObservableObject {
         if theme == .bea {
             checkAndActivateBirthdayTheme()
         }
+        
+        // Trigger birthday cake popup when birthday theme is activated
+        if theme == .birthday {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.shouldShowBirthdayCake = true
+            }
+        }
     }
     
     private func checkAndActivateBirthdayTheme() {
@@ -74,9 +82,18 @@ class ThemeManager: ObservableObject {
                 DispatchQueue.main.async {
                     self.currentTheme = .birthday
                     UserDefaults.standard.set(ThemeMode.birthday.rawValue, forKey: "selectedTheme")
+                    
+                    // Trigger birthday cake popup when automatically activated
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        self.shouldShowBirthdayCake = true
+                    }
                 }
             }
         }
+    }
+    
+    func resetBirthdayCakeFlag() {
+        shouldShowBirthdayCake = false
     }
     
     var colorScheme: ColorScheme? {

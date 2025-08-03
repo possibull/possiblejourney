@@ -8,7 +8,6 @@ struct ProgramCalendarView: View {
     let onDateSelected: (Date) -> Void
     
     @State private var selectedMonthIndex: Int = 0
-    @State private var showingBirthdayCake: Bool = false
     @EnvironmentObject var themeManager: ThemeManager
     
     // Check for August 4th birthday theme activation
@@ -139,20 +138,10 @@ struct ProgramCalendarView: View {
             
             // Check for August 4th birthday theme activation
             checkAugust4thBirthdayActivation()
-            
-            // Automatically show birthday cake popup when Birthday theme is active
-            if themeManager.currentTheme == .birthday {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    showingBirthdayCake = true
-                }
-            }
         }
         .onChange(of: selectedDate) { oldValue, newValue in
             // Check for August 4th birthday theme activation when date changes
             checkAugust4thBirthdayActivation()
-        }
-        .sheet(isPresented: $showingBirthdayCake) {
-            BirthdayCakePopup()
         }
     }
 }
