@@ -297,6 +297,38 @@ struct ReleaseNotes {
                 "⚡ Better app startup performance and reliability"
             ],
             date: Date()
+        ),
+        ReleaseNotes(
+            version: "1.7",
+            buildNumber: 1,
+            title: "Las Vegas Theme & Enhanced Features",
+            notes: [
+                "🎰 Added hidden Las Vegas theme with authentic sign colors",
+                "🎆 Beautiful fireworks and casino landmarks in Las Vegas theme",
+                "🎨 Enhanced theme system with more visual elements",
+                "📱 Improved UI responsiveness and performance",
+                "🔧 Fixed checkbox functionality and task completion",
+                "⚡ Better app stability and user experience",
+                "🎯 Enhanced theme selection with hidden easter egg themes",
+                "🚀 Ready for TestFlight distribution with new features"
+            ],
+            date: Date()
+        ),
+        ReleaseNotes(
+            version: "1.7",
+            buildNumber: 2,
+            title: "UI Improvements & Bug Fixes",
+            notes: [
+                "🎨 Removed problematic slot machine animations",
+                "✅ Fixed checkbox functionality - no more disappearing rows",
+                "📱 Improved static icon performance and reliability",
+                "🔧 Enhanced app stability and user experience",
+                "⚡ Better UI responsiveness and smooth interactions",
+                "🎯 Cleaner, more reliable interface design",
+                "🐛 Fixed various UI glitches and animation issues",
+                "🚀 Ready for TestFlight distribution with improved stability"
+            ],
+            date: Date()
         )
     ]
     

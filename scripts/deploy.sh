@@ -49,6 +49,15 @@ case $DEPLOY_TYPE in
         print_status "Deploying to TestFlight..."
         fastlane beta
         print_success "Successfully deployed to TestFlight!"
+        
+        # Update latest-version.json on main branch after successful deployment
+        print_status "Updating latest-version.json on main branch..."
+        if [ -f "scripts/update-version-json.sh" ]; then
+            ./scripts/update-version-json.sh
+            print_success "Successfully updated latest-version.json on main branch!"
+        else
+            print_warning "update-version-json.sh script not found, skipping version update"
+        fi
         ;;
     "release")
         print_warning "This will deploy to the App Store. Are you sure? (y/N)"
@@ -57,6 +66,15 @@ case $DEPLOY_TYPE in
             print_status "Deploying to App Store..."
             fastlane release
             print_success "Successfully deployed to App Store!"
+            
+            # Update latest-version.json on main branch after successful deployment
+            print_status "Updating latest-version.json on main branch..."
+            if [ -f "scripts/update-version-json.sh" ]; then
+                ./scripts/update-version-json.sh
+                print_success "Successfully updated latest-version.json on main branch!"
+            else
+                print_warning "update-version-json.sh script not found, skipping version update"
+            fi
         else
             print_status "Deployment cancelled"
             exit 0
@@ -69,6 +87,15 @@ case $DEPLOY_TYPE in
             print_status "Running full release process..."
             fastlane full_release
             print_success "Successfully completed full release process!"
+            
+            # Update latest-version.json on main branch after successful deployment
+            print_status "Updating latest-version.json on main branch..."
+            if [ -f "scripts/update-version-json.sh" ]; then
+                ./scripts/update-version-json.sh
+                print_success "Successfully updated latest-version.json on main branch!"
+            else
+                print_warning "update-version-json.sh script not found, skipping version update"
+            fi
         else
             print_status "Deployment cancelled"
             exit 0
