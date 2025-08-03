@@ -8,6 +8,7 @@ enum ThemeMode: String, CaseIterable, Codable {
     case bea = "bea"
     case birthday = "birthday"
     case usa = "usa"
+    case lasVegas = "lasVegas"
     
     var displayName: String {
         switch self {
@@ -23,6 +24,8 @@ enum ThemeMode: String, CaseIterable, Codable {
             return "Birthday"
         case .usa:
             return "USA"
+        case .lasVegas:
+            return "Las Vegas"
         }
     }
     
@@ -40,6 +43,8 @@ enum ThemeMode: String, CaseIterable, Codable {
             return "birthday.cake.fill"
         case .usa:
             return "flag.fill"
+        case .lasVegas:
+            return "sparkles"
         }
     }
 }
@@ -179,6 +184,8 @@ class ThemeManager: ObservableObject {
             return .light
         case .usa:
             return .light
+        case .lasVegas:
+            return .dark
         }
     }
     
@@ -247,6 +254,29 @@ struct ThemeAwareBackground: ViewModifier {
                             
                             // Stars pattern
                             USAPattern()
+                        }
+                    } else if themeManager.currentTheme == .lasVegas {
+                        // Las Vegas theme - neon night sky with fireworks and casino landmarks
+                        ZStack {
+                            // Dark night sky gradient
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color(red: 0.05, green: 0.05, blue: 0.15), // Deep night blue
+                                    Color(red: 0.1, green: 0.05, blue: 0.2), // Purple night
+                                    Color(red: 0.15, green: 0.05, blue: 0.25)  // Neon purple
+                                ]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                            
+                            // Fireworks
+                            LasVegasFireworks()
+                            
+                            // Casino landmarks
+                            LasVegasLandmarks()
+                            
+                            // Neon lights
+                            LasVegasNeonLights()
                         }
                     } else if colorScheme == .dark {
                         // Simplified dark theme - single gradient
@@ -348,6 +378,30 @@ struct ThemeAwareCard: ViewModifier {
                             // USA stripes pattern
                             USAStripes()
                         }
+                    } else if themeManager.currentTheme == .lasVegas {
+                        // Las Vegas theme - neon card with casino elements
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.black.opacity(0.8))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .stroke(
+                                            LinearGradient(
+                                                gradient: Gradient(colors: [
+                                                    Color(red: 1.0, green: 0.2, blue: 0.8), // Neon pink
+                                                    Color(red: 0.2, green: 0.8, blue: 1.0), // Neon blue
+                                                    Color(red: 1.0, green: 0.8, blue: 0.2)  // Neon gold
+                                                ]),
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            ),
+                                            lineWidth: 3
+                                        )
+                                )
+                            
+                            // Casino elements
+                            LasVegasCardElements()
+                        }
                     } else if colorScheme == .dark {
                         // Enhanced dark card with subtle gradient and glow
                         RoundedRectangle(cornerRadius: 16)
@@ -435,6 +489,17 @@ struct ThemeAwareHeader: ViewModifier {
                             startPoint: .top,
                             endPoint: .bottom
                         )
+                    } else if themeManager.currentTheme == .lasVegas {
+                        // Las Vegas theme - neon header
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color(red: 1.0, green: 0.2, blue: 0.8).opacity(0.9), // Neon pink
+                                Color(red: 0.2, green: 0.8, blue: 1.0).opacity(0.7), // Neon blue
+                                Color(red: 1.0, green: 0.8, blue: 0.2).opacity(0.8)  // Neon gold
+                            ]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
                     } else if colorScheme == .dark {
                         // Enhanced dark header with subtle gradient
                         LinearGradient(
@@ -464,8 +529,10 @@ struct ThemeAwareDivider: ViewModifier {
                     Color(red: 1.0, green: 0.8, blue: 0.9).opacity(0.7) : // Pink
                     (themeManager.currentTheme == .bea ? 
                     Color(red: 0.8, green: 0.9, blue: 1.0).opacity(0.6) : // Pastel blue
+                    (themeManager.currentTheme == .lasVegas ?
+                    Color(red: 1.0, green: 0.8, blue: 0.2).opacity(0.8) : // Neon gold
                     (colorScheme == .dark ? 
-                            Color.white.opacity(0.15) : Color.gray.opacity(0.3)))
+                            Color.white.opacity(0.15) : Color.gray.opacity(0.3))))
             )
     }
 }
@@ -1157,6 +1224,326 @@ struct ConfettiPieceView: View {
         }
     }
 } 
+
+// MARK: - Las Vegas Theme Components
+struct LasVegasFireworks: View {
+    @State private var fireworkOffset1: CGFloat = 0
+    @State private var fireworkOffset2: CGFloat = 0
+    @State private var fireworkOffset3: CGFloat = 0
+    @State private var fireworkScale1: CGFloat = 0.1
+    @State private var fireworkScale2: CGFloat = 0.1
+    @State private var fireworkScale3: CGFloat = 0.1
+    @State private var fireworkOpacity1: Double = 0
+    @State private var fireworkOpacity2: Double = 0
+    @State private var fireworkOpacity3: Double = 0
+    
+    var body: some View {
+        ZStack {
+            // Firework 1 - Pink
+            FireworkView(color: Color(red: 1.0, green: 0.2, blue: 0.8))
+                .offset(x: -100, y: fireworkOffset1)
+                .scaleEffect(fireworkScale1)
+                .opacity(fireworkOpacity1)
+            
+            // Firework 2 - Blue
+            FireworkView(color: Color(red: 0.2, green: 0.8, blue: 1.0))
+                .offset(x: 150, y: fireworkOffset2)
+                .scaleEffect(fireworkScale2)
+                .opacity(fireworkOpacity2)
+            
+            // Firework 3 - Gold
+            FireworkView(color: Color(red: 1.0, green: 0.8, blue: 0.2))
+                .offset(x: 50, y: fireworkOffset3)
+                .scaleEffect(fireworkScale3)
+                .opacity(fireworkOpacity3)
+        }
+        .onAppear {
+            startFireworkAnimation()
+        }
+    }
+    
+    private func startFireworkAnimation() {
+        // Firework 1
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            withAnimation(.easeOut(duration: 0.5)) {
+                fireworkOpacity1 = 1.0
+                fireworkScale1 = 1.0
+                fireworkOffset1 = -200
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                withAnimation(.easeIn(duration: 0.3)) {
+                    fireworkOpacity1 = 0
+                }
+            }
+        }
+        
+        // Firework 2
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+            withAnimation(.easeOut(duration: 0.5)) {
+                fireworkOpacity2 = 1.0
+                fireworkScale2 = 1.0
+                fireworkOffset2 = -180
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                withAnimation(.easeIn(duration: 0.3)) {
+                    fireworkOpacity2 = 0
+                }
+            }
+        }
+        
+        // Firework 3
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
+            withAnimation(.easeOut(duration: 0.5)) {
+                fireworkOpacity3 = 1.0
+                fireworkScale3 = 1.0
+                fireworkOffset3 = -220
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                withAnimation(.easeIn(duration: 0.3)) {
+                    fireworkOpacity3 = 0
+                }
+            }
+        }
+        
+        // Repeat the sequence
+        DispatchQueue.main.asyncAfter(deadline: .now() + 6.0) {
+            startFireworkAnimation()
+        }
+    }
+}
+
+struct FireworkView: View {
+    let color: Color
+    @State private var sparkleRotation: Double = 0
+    
+    var body: some View {
+        ZStack {
+            // Main firework burst
+            ForEach(0..<12, id: \.self) { index in
+                Rectangle()
+                    .fill(color)
+                    .frame(width: 3, height: 20)
+                    .rotationEffect(.degrees(Double(index) * 30 + sparkleRotation))
+                    .offset(y: -10)
+            }
+            
+            // Inner sparkles
+            ForEach(0..<8, id: \.self) { index in
+                Circle()
+                    .fill(color)
+                    .frame(width: 4, height: 4)
+                    .offset(
+                        x: cos(Double(index) * .pi / 4) * 15,
+                        y: sin(Double(index) * .pi / 4) * 15
+                    )
+            }
+        }
+        .onAppear {
+            withAnimation(.linear(duration: 1.0).repeatForever(autoreverses: false)) {
+                sparkleRotation = 360
+            }
+        }
+    }
+}
+
+struct LasVegasLandmarks: View {
+    @State private var landmarkOffset: CGFloat = 0
+    
+    var body: some View {
+        ZStack {
+            // Bellagio fountains (simplified)
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    ZStack {
+                        // Fountain base
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(Color(red: 0.2, green: 0.8, blue: 1.0).opacity(0.3))
+                            .frame(width: 60, height: 20)
+                        
+                        // Water streams
+                        ForEach(0..<5, id: \.self) { index in
+                            Rectangle()
+                                .fill(Color(red: 0.2, green: 0.8, blue: 1.0).opacity(0.6))
+                                .frame(width: 2, height: 30)
+                                .offset(x: CGFloat(index * 12 - 24))
+                                .offset(y: -15 + landmarkOffset * 0.5)
+                        }
+                    }
+                    .offset(x: 80, y: -50)
+                }
+            }
+            
+            // Eiffel Tower replica (simplified)
+            VStack {
+                Spacer()
+                HStack {
+                    ZStack {
+                        // Tower base
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.4))
+                            .frame(width: 8, height: 80)
+                        
+                        // Tower top
+                        Triangle()
+                            .fill(Color.gray.opacity(0.6))
+                            .frame(width: 20, height: 30)
+                            .offset(y: -55)
+                        
+                        // Neon lights
+                        ForEach(0..<3, id: \.self) { index in
+                            Rectangle()
+                                .fill(Color(red: 1.0, green: 0.8, blue: 0.2))
+                                .frame(width: 12, height: 2)
+                                .offset(y: CGFloat(index * 20 - 20))
+                        }
+                    }
+                    .offset(x: -120, y: -50)
+                    Spacer()
+                }
+            }
+            
+            // Luxor pyramid (simplified)
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    ZStack {
+                        // Pyramid base
+                        Triangle()
+                            .fill(Color(red: 1.0, green: 0.8, blue: 0.2).opacity(0.4))
+                            .frame(width: 60, height: 40)
+                        
+                        // Pyramid light beam
+                        Rectangle()
+                            .fill(Color(red: 1.0, green: 0.8, blue: 0.2).opacity(0.3))
+                            .frame(width: 4, height: 100)
+                            .offset(y: -70)
+                    }
+                    .offset(x: 120, y: -50)
+                }
+            }
+        }
+        .onAppear {
+            withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
+                landmarkOffset = 10
+            }
+        }
+    }
+}
+
+struct Triangle: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.midX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+        path.closeSubpath()
+        return path
+    }
+}
+
+struct LasVegasNeonLights: View {
+    @State private var neonPulse: CGFloat = 1.0
+    
+    var body: some View {
+        ZStack {
+            // Neon sign 1 - "CASINO"
+            Text("CASINO")
+                .font(.system(size: 16, weight: .bold))
+                .foregroundColor(Color(red: 1.0, green: 0.2, blue: 0.8))
+                .shadow(color: Color(red: 1.0, green: 0.2, blue: 0.8), radius: 5)
+                .scaleEffect(neonPulse)
+                .offset(x: -100, y: -200)
+            
+            // Neon sign 2 - "LUCKY"
+            Text("LUCKY")
+                .font(.system(size: 14, weight: .bold))
+                .foregroundColor(Color(red: 0.2, green: 0.8, blue: 1.0))
+                .shadow(color: Color(red: 0.2, green: 0.8, blue: 1.0), radius: 5)
+                .scaleEffect(neonPulse * 0.8)
+                .offset(x: 120, y: -180)
+            
+            // Neon sign 3 - "777"
+            Text("777")
+                .font(.system(size: 18, weight: .bold))
+                .foregroundColor(Color(red: 1.0, green: 0.8, blue: 0.2))
+                .shadow(color: Color(red: 1.0, green: 0.8, blue: 0.2), radius: 5)
+                .scaleEffect(neonPulse * 1.2)
+                .offset(x: 0, y: -220)
+        }
+        .onAppear {
+            withAnimation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true)) {
+                neonPulse = 1.2
+            }
+        }
+    }
+}
+
+struct LasVegasCardElements: View {
+    @State private var diceRotation: Double = 0
+    @State private var cardOffset: CGFloat = 0
+    
+    var body: some View {
+        ZStack {
+            // Dice
+            ZStack {
+                RoundedRectangle(cornerRadius: 4)
+                    .fill(Color.white)
+                    .frame(width: 20, height: 20)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 4)
+                            .stroke(Color.black, lineWidth: 1)
+                    )
+                
+                // Dice dots
+                ForEach(0..<3, id: \.self) { index in
+                    Circle()
+                        .fill(Color.black)
+                        .frame(width: 3, height: 3)
+                        .offset(
+                            x: CGFloat(index - 1) * 6,
+                            y: 0
+                        )
+                }
+            }
+            .rotationEffect(.degrees(diceRotation))
+            .offset(x: -40, y: -20)
+            
+            // Playing card
+            ZStack {
+                RoundedRectangle(cornerRadius: 3)
+                    .fill(Color.white)
+                    .frame(width: 16, height: 24)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 3)
+                            .stroke(Color.black, lineWidth: 1)
+                    )
+                
+                Text("♠")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(.black)
+            }
+            .offset(x: 40, y: cardOffset)
+            
+            // Slot machine symbols
+            HStack(spacing: 4) {
+                ForEach(["🍒", "🍊", "7️⃣"], id: \.self) { symbol in
+                    Text(symbol)
+                        .font(.system(size: 12))
+                }
+            }
+            .offset(x: 0, y: 30)
+        }
+        .onAppear {
+            withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
+                diceRotation = 360
+                cardOffset = 5
+            }
+        }
+    }
+}
 
 // MARK: - USA Theme Components
 struct USAPattern: View {

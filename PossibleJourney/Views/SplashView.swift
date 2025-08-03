@@ -44,6 +44,13 @@ struct SplashView: View {
                     Color.white,
                     Color(red: 0.1, green: 0.3, blue: 0.8)  // Blue
                 ]
+            case .lasVegas:
+                print("DEBUG: Using Las Vegas theme colors - NEON NIGHT")
+                return [
+                    Color(red: 0.05, green: 0.05, blue: 0.15), // Deep night blue
+                    Color(red: 1.0, green: 0.2, blue: 0.8), // Neon pink
+                    Color(red: 1.0, green: 0.8, blue: 0.2)  // Neon gold
+                ]
         case .dark:
             print("DEBUG: Using Dark theme colors - RED")
             return [

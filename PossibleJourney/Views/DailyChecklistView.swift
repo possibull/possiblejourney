@@ -529,6 +529,8 @@ struct DailyChecklistView: View {
             return Color(red: 0.9, green: 0.8, blue: 1.0) // Pastel purple
         case .usa:
             return Color(red: 0.8, green: 0.1, blue: 0.2) // Red for USA theme
+        case .lasVegas:
+            return Color(red: 1.0, green: 0.8, blue: 0.2) // Neon gold for Las Vegas theme
         case .dark:
             return Color.blue
         case .light, .system:
@@ -895,6 +897,8 @@ struct TaskRowView: View {
                 return Color(red: 0.9, green: 0.8, blue: 1.0) // Pastel purple
             case .usa:
                 return Color(red: 0.8, green: 0.1, blue: 0.2) // Red for USA theme
+            case .lasVegas:
+                return Color(red: 1.0, green: 0.8, blue: 0.2) // Neon gold for Las Vegas theme
             case .dark:
                 return Color.blue
             case .light, .system:
@@ -910,6 +914,8 @@ struct TaskRowView: View {
                 return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
             case .usa:
                 return Color(red: 0.1, green: 0.3, blue: 0.8) // Blue for USA theme
+            case .lasVegas:
+                return Color(red: 1.0, green: 0.2, blue: 0.8) // Neon pink for Las Vegas theme
             case .dark:
                 return Color.blue.opacity(0.7)
             case .light, .system:
