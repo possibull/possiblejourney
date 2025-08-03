@@ -25,7 +25,7 @@ struct ProgramTemplateSelectionView: View {
         case .birthday:
             return Color(red: 1.0, green: 0.8, blue: 0.9) // Pastel pink
         case .bea:
-            return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
+            return Color(red: 0.9, green: 0.8, blue: 1.0) // Pastel purple
         case .dark:
             return Color.blue
         case .light, .system:

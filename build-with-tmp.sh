@@ -102,6 +102,16 @@ if [ $BUILD_EXIT_CODE -eq 0 ]; then
     echo "📱 App built successfully!" >> "$SUCCESS_LOG"
     echo "🎯 Target: $SCHEME" >> "$SUCCESS_LOG"
     echo "⚙️  Configuration: $CONFIGURATION" >> "$SUCCESS_LOG"
+    
+    # Commit changes after successful build
+    echo "🔀 Committing changes after successful build..."
+    if git add . && git commit -m "Build successful - $(date '+%Y-%m-%d %H:%M:%S') - $SCHEME $CONFIGURATION"; then
+        echo "✅ Changes committed successfully"
+        echo "📝 Commit message: Build successful - $(date '+%Y-%m-%d %H:%M:%S') - $SCHEME $CONFIGURATION" >> "$SUCCESS_LOG"
+    else
+        echo "⚠️  Warning: Could not commit changes (no changes to commit or git error)"
+        echo "⚠️  Warning: Could not commit changes (no changes to commit or git error)" >> "$SUCCESS_LOG"
+    fi
 else
     echo "❌ Build failed with exit code: $BUILD_EXIT_CODE" > "$ERROR_LOG"
 fi

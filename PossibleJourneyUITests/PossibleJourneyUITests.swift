@@ -89,10 +89,10 @@ final class PossibleJourneyUITests: XCTestCase {
         // Print debug completed task IDs before relaunch
         let debugCompletedTaskIDsBefore = app.staticTexts["DebugCompletedTaskIDsLabel"].label
         print("DEBUG: CompletedTaskIDsDebug before relaunch: \(debugCompletedTaskIDsBefore)")
-        // Minimize the debug window by tapping the spyglass icon
-        let debugIcon = app.images["magnifyingglass"]
-        if debugIcon.exists {
-            debugIcon.tap()
+        // Toggle debug mode off by tapping the debug toggle button
+        let debugToggleButton = app.buttons["DebugToggleButton"]
+        if debugToggleButton.exists {
+            debugToggleButton.tap()
         }
         // Get the Read task's ID (assume it's the first in the list)
         let taskIDsString = debugTaskIDsBefore.replacingOccurrences(of: "TaskIDs: ", with: "")
@@ -183,21 +183,25 @@ final class PossibleJourneyUITests: XCTestCase {
     }
 
     func enableDebugModeByTappingAllSwitchesInSettings(in app: XCUIApplication) {
-        let allSwitches = app.switches.allElementsBoundByIndex
-        for (index, sw) in allSwitches.enumerated() {
-            print("DEBUG: Switch[\(index)]: label='\(sw.label)', value='\(sw.value ?? "nil")'")
-            if sw.value as? String == "0" {
-                sw.tap()
-                print("DEBUG: Tapped switch[\(index)] with label '\(sw.label)'")
-                sleep(1)
-            }
+        // First, enable debug mode in settings
+        let debugToggle = app.switches["DebugToggle"]
+        if debugToggle.exists {
+            debugToggle.tap()
+            print("DEBUG: Tapped debug toggle in settings")
+            sleep(1)
         }
-        // Assert debug label is visible
-        let debugLabel = app.staticTexts["DEBUG"]
+        
+        // Then, tap the debug toggle button in the navigation bar to show debug window
+        let debugToggleButton = app.buttons["DebugToggleButton"]
+        if debugToggleButton.exists {
+            debugToggleButton.tap()
+            print("DEBUG: Tapped debug toggle button in navigation")
+            sleep(1)
+        }
+        
+        // Assert debug content is visible
         let debugNowLabel = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'DEBUG now:'"))
-        XCTAssertTrue(debugLabel.exists || debugNowLabel.count > 0, "Debug label should be visible in UI after toggling all switches")
-        // Maximize debug window using helper
-        expandAndAssertDebugWindow(in: app)
+        XCTAssertTrue(debugNowLabel.count > 0, "Debug content should be visible in UI after enabling debug mode and toggling debug window")
     }
 
     func testSettingsDebugToggleAndEODPicker() {
@@ -227,27 +231,9 @@ final class PossibleJourneyUITests: XCTestCase {
     }
 
     func expandAndAssertDebugWindow(in app: XCUIApplication) {
-        var didTapExpand = false
-        let expandButton = app.buttons["ExpandDebugWindow"]
-        if expandButton.exists {
-            expandButton.tap()
-            didTapExpand = true
-        } else {
-            let expandOther = app.otherElements["ExpandDebugWindow"]
-            if expandOther.exists {
-                expandOther.tap()
-                didTapExpand = true
-            } else {
-                let expandImage = app.images["ExpandDebugWindow"]
-                if expandImage.exists {
-                    expandImage.tap()
-                    didTapExpand = true
-                }
-            }
-        }
-        XCTAssertTrue(didTapExpand, "Expand debug window icon should exist and be tappable (button, other, or image)")
+        // Debug window is now always visible when debug mode is enabled
         let programUUIDLabel = app.staticTexts["DebugProgramUUIDLabel"]
-        XCTAssertTrue(programUUIDLabel.waitForExistence(timeout: 2), "Debug window should be maximized and show Program UUID label")
+        XCTAssertTrue(programUUIDLabel.waitForExistence(timeout: 2), "Debug window should be visible and show Program UUID label")
     }
 
     func testGoDirectlyToSettingsAndMaximizeDebug() {

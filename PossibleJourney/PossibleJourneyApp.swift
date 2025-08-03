@@ -43,7 +43,7 @@ struct BeaNumberSequenceView: View {
         case .birthday:
             return Color(red: 1.0, green: 0.95, blue: 0.7) // Pastel yellow
         case .bea:
-            return Color(red: 1.0, green: 0.98, blue: 0.8) // Pastel yellow for Bea theme
+            return Color(red: 0.9, green: 0.8, blue: 1.0) // Pastel purple for Bea theme
         case .dark:
             return Color.blue
         case .light, .system:
@@ -283,6 +283,7 @@ struct BeeView: View {
 // MARK: - Global Theme Selector
 struct GlobalThemeSelector: View {
     @EnvironmentObject var themeManager: ThemeManager
+    @EnvironmentObject var debugState: DebugState
     @State private var showingThemeMenu = false
     @State private var beaTapCount = 0
     @State private var lastBeaTapTime: Date = Date()
@@ -308,6 +309,37 @@ struct GlobalThemeSelector: View {
     
     var body: some View {
         HStack(spacing: 8) {
+            // Hidden Easter egg button (only visible when Bea theme is active) - moved to left
+            if themeManager.currentTheme == .bea {
+                Button(action: {
+                    print("🎨 Easter egg button tapped! Count: \(beaTapCount + 1)")
+                    let now = Date()
+                    if now.timeIntervalSince(lastBeaTapTime) < 2.0 {
+                        beaTapCount += 1
+                        print("🎨 Bea tap count: \(beaTapCount)")
+                        if beaTapCount >= 5 {
+                            print("🎂 BIRTHDAY THEME UNLOCKED!")
+                            // Activate Birthday theme as Easter egg
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                themeManager.changeTheme(to: .birthday)
+                            }
+                            beaTapCount = 0
+                        }
+                    } else {
+                        beaTapCount = 1
+                        print("🎨 Bea tap count reset to: \(beaTapCount)")
+                    }
+                    lastBeaTapTime = now
+                }) {
+                    Image(systemName: "sparkles")
+                        .foregroundColor(.clear) // Invisible but tappable
+                        .font(.system(size: 18, weight: .medium))
+                        .frame(width: 44, height: 44) // Minimum tap target
+                }
+                .accessibilityIdentifier("EasterEggButton")
+            }
+            
+            // Theme selector (paintbrush)
             Menu {
                 ForEach(ThemeMode.allCases.filter { $0 != .birthday }, id: \.self) { theme in
                     Button(action: {
@@ -352,34 +384,17 @@ struct GlobalThemeSelector: View {
             }
             .accessibilityIdentifier("GlobalThemeSelector")
             
-            // Hidden Easter egg button (only visible when Bea theme is active)
-            if themeManager.currentTheme == .bea {
+            // Debug toggle button (ladybug icon) - only show when debug mode is enabled
+            if debugState.debug {
                 Button(action: {
-                    print("🎨 Easter egg button tapped! Count: \(beaTapCount + 1)")
-                    let now = Date()
-                    if now.timeIntervalSince(lastBeaTapTime) < 2.0 {
-                        beaTapCount += 1
-                        print("🎨 Bea tap count: \(beaTapCount)")
-                        if beaTapCount >= 5 {
-                            print("🎂 BIRTHDAY THEME UNLOCKED!")
-                            // Activate Birthday theme as Easter egg
-                            withAnimation(.easeInOut(duration: 0.3)) {
-                                themeManager.changeTheme(to: .birthday)
-                            }
-                            beaTapCount = 0
-                        }
-                    } else {
-                        beaTapCount = 1
-                        print("🎨 Bea tap count reset to: \(beaTapCount)")
-                    }
-                    lastBeaTapTime = now
+                    debugState.debugWindowExpanded.toggle()
+                    print("🐛 Debug window toggled: \(debugState.debugWindowExpanded)")
                 }) {
-                    Image(systemName: "sparkles")
-                        .foregroundColor(.clear) // Invisible but tappable
+                    Image(systemName: "ladybug.fill")
+                        .foregroundColor(debugState.debugWindowExpanded ? .gray : .blue)
                         .font(.system(size: 18, weight: .medium))
-                        .frame(width: 44, height: 44) // Minimum tap target
                 }
-                .accessibilityIdentifier("EasterEggButton")
+                .accessibilityIdentifier("DebugToggleButton")
             }
         }
         .sheet(isPresented: $showingBeaNumberSequence) {
@@ -398,9 +413,21 @@ struct GlobalDebugWindow: View {
     @EnvironmentObject var appState: ProgramAppState
     var checklistDebugContent: () -> AnyView
     var body: some View {
-        if debugState.debug {
-            DebugWindow(isExpanded: $debugState.debugWindowExpanded) {
-                checklistDebugContent()
+        if debugState.debug && debugState.debugWindowExpanded {
+            VStack(spacing: 0) {
+                ScrollView(.vertical, showsIndicators: true) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        checklistDebugContent()
+                    }
+                    .padding(8)
+                }
+                .frame(maxHeight: UIScreen.main.bounds.height * 0.3)
+                .background(Color.black.opacity(0.8))
+                .cornerRadius(12)
+                .shadow(radius: 8)
+                .padding(.horizontal, 8)
+                .padding(.top, 8)
+                .zIndex(100)
             }
         }
     }

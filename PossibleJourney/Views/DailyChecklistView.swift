@@ -8,45 +8,7 @@ struct TaskIDWrapper: Identifiable, Equatable {
     let id: UUID
 }
 
-// Add DebugWindow reusable view
-struct DebugWindow<Content: View>: View {
-    @Binding var isExpanded: Bool
-    let content: () -> Content
 
-    var body: some View {
-        VStack(spacing: 0) {
-            HStack {
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(.white)
-                    .accessibilityIdentifier("ExpandDebugWindow")
-                // Removed the Debug (tap to expand/minimize) text
-                Spacer()
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
-            .background(Color.black.opacity(0.5))
-            .onTapGesture {
-                withAnimation { isExpanded.toggle() }
-            }
-            if isExpanded {
-                ScrollView(.vertical, showsIndicators: true) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        content()
-                    }
-                    .padding(8)
-                }
-                .frame(maxHeight: UIScreen.main.bounds.height * 0.5)
-                .background(Color.black.opacity(0.6))
-                .transition(.move(edge: .top).combined(with: .opacity))
-            }
-        }
-        .cornerRadius(12)
-        .shadow(radius: 8)
-        .padding(.horizontal, 8)
-        .padding(.top, 8)
-        .zIndex(100)
-    }
-}
 
 struct DailyChecklistView: View {
     @StateObject private var viewModel: DailyChecklistViewModel
@@ -460,7 +422,7 @@ struct DailyChecklistView: View {
             
             // Progress bar
             ProgressView(value: progressPercentage)
-                .progressViewStyle(LinearProgressViewStyle(tint: .blue))
+                .progressViewStyle(LinearProgressViewStyle(tint: themeAccentColor))
                 .scaleEffect(x: 1, y: 2, anchor: .center)
         }
         .padding()
@@ -496,7 +458,7 @@ struct DailyChecklistView: View {
                             // TODO: Implement reminder functionality
                             print("Set reminder for task: \(task.title)")
                         }
-                        .tint(.orange)
+                        .tint(themeAccentColor)
                     }
                     
                     // Add custom separator between cards (except for the last one)
@@ -547,6 +509,19 @@ struct DailyChecklistView: View {
     }
     
     // Computed properties
+    private var themeAccentColor: Color {
+        switch themeManager.currentTheme {
+        case .birthday:
+            return Color(red: 1.0, green: 0.8, blue: 0.9) // Pastel pink
+        case .bea:
+            return Color(red: 0.9, green: 0.8, blue: 1.0) // Pastel purple
+        case .dark:
+            return Color.blue
+        case .light, .system:
+            return Color.blue
+        }
+    }
+    
     private var currentDay: Int {
         let start = Calendar.current.startOfDay(for: viewModel.program.startDate)
         let selectedDay = Calendar.current.startOfDay(for: viewModel.selectedDate)
@@ -783,11 +758,11 @@ struct TaskRowView: View {
                         Button(action: onSetReminder) {
                             Image(systemName: "bell")
                                 .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(.orange)
+                                .foregroundColor(themeAccentColor)
                                 .padding(8)
                                 .background(
                                     Circle()
-                                        .fill(Color.orange.opacity(0.1))
+                                        .fill(themeAccentColor.opacity(0.1))
                                 )
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -903,7 +878,7 @@ struct TaskRowView: View {
         case .birthday:
             return Color(red: 1.0, green: 0.8, blue: 0.9) // Pastel pink
         case .bea:
-            return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
+            return Color(red: 0.9, green: 0.8, blue: 1.0) // Pastel purple
         case .dark:
             return Color.blue
         case .light, .system:
@@ -916,7 +891,7 @@ struct TaskRowView: View {
         case .birthday:
             return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
         case .bea:
-            return Color(red: 1.0, green: 0.98, blue: 0.8) // Pastel yellow
+            return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
         case .dark:
             return Color.blue.opacity(0.7)
         case .light, .system:

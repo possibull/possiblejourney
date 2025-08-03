@@ -215,11 +215,12 @@ struct ThemeAwareBackground: ViewModifier {
                             BirthdayStreamers()
                         }
                     } else if themeManager.currentTheme == .bea {
-                        // Bea theme - pastel yellow to pastel blue gradient
+                        // Bea theme - pastel yellow to pastel blue to pastel purple gradient
                         LinearGradient(
                             gradient: Gradient(colors: [
                                 Color(red: 1.0, green: 0.98, blue: 0.8), // Pastel yellow
-                                Color(red: 0.8, green: 0.9, blue: 1.0)  // Pastel blue
+                                Color(red: 0.8, green: 0.9, blue: 1.0), // Pastel blue
+                                Color(red: 0.9, green: 0.8, blue: 1.0)  // Pastel purple
                             ]),
                             startPoint: .top,
                             endPoint: .bottom

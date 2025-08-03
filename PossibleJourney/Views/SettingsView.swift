@@ -11,6 +11,7 @@ struct SettingsView: View {
     @EnvironmentObject var debugState: DebugState
     @EnvironmentObject var appState: ProgramAppState
     @EnvironmentObject var themeManager: ThemeManager
+    @Environment(\.dismiss) private var dismiss
     @State private var forceRefresh = false
     
     // Check for August 4th birthday theme activation
@@ -171,7 +172,7 @@ struct SettingsView: View {
                                         .font(.system(size: 16, weight: .semibold, design: .rounded))
                                         .foregroundColor(.primary)
                                     Spacer()
-                                    Text("1.0.0")
+                                    Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
                                         .font(.system(size: 16, weight: .medium, design: .rounded))
                                         .foregroundColor(.secondary)
                                 }
@@ -181,7 +182,7 @@ struct SettingsView: View {
                                         .font(.system(size: 16, weight: .semibold, design: .rounded))
                                         .foregroundColor(.primary)
                                     Spacer()
-                                    Text("18")
+                                    Text(Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1")
                                         .font(.system(size: 16, weight: .medium, design: .rounded))
                                         .foregroundColor(.secondary)
                                 }
@@ -190,20 +191,20 @@ struct SettingsView: View {
                         .padding(20)
                         .themeAwareCard()
                         
-                        // Reset Program Card
+                        // Select Another Program Card
                         VStack(alignment: .leading, spacing: 20) {
                             HStack {
-                                Image(systemName: "arrow.clockwise")
+                                Image(systemName: "list.bullet")
                                     .font(.system(size: 20, weight: .semibold))
-                                    .foregroundColor(.red)
+                                    .foregroundColor(.blue)
                                     .frame(width: 40, height: 40)
-                                    .background(Circle().fill(Color.red.opacity(0.1)))
+                                    .background(Circle().fill(Color.blue.opacity(0.1)))
                                 
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text("Back to Program Select")
+                                    Text("Select Another Program")
                                         .font(.system(size: 18, weight: .bold, design: .rounded))
                                         .foregroundColor(.primary)
-                                    Text("Return to program selection screen")
+                                    Text("Choose a different program to follow")
                                         .font(.system(size: 14, weight: .medium, design: .rounded))
                                         .foregroundColor(.secondary)
                                 }
@@ -211,42 +212,27 @@ struct SettingsView: View {
                             }
                             
                             Button(action: {
-                                // Navigate back to ProgramSelect screen without clearing data
-                                print("Settings: Back to Program Select button tapped")
+                                // Navigate to ProgramSelect screen by clearing the loaded program
+                                print("Settings: Select Another Program button tapped")
                                 print("Settings: Current loadedProgram: \(appState.loadedProgram?.id.uuidString ?? "nil")")
                                 
-                                // Clear the program and force immediate UI update
-                                DispatchQueue.main.async {
+                                // First dismiss the Settings view
+                                dismiss()
+                                
+                                // Then clear the program to trigger navigation to ProgramSelect
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                     appState.loadedProgram = nil
-                                    print("Settings: Set loadedProgram to nil in main queue")
-                                    
-                                    // Force multiple UI updates with increasing delays
-                                    DispatchQueue.main.async {
-                                        print("Settings: Forcing UI update 1")
-                                        forceRefresh.toggle()
-                                    }
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                                        print("Settings: Forcing UI update 2")
-                                        forceRefresh.toggle()
-                                    }
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                        print("Settings: Forcing UI update 3")
-                                        forceRefresh.toggle()
-                                    }
-                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                        print("Settings: Forcing UI update 4")
-                                        forceRefresh.toggle()
-                                    }
+                                    print("Settings: Set loadedProgram to nil - navigating to ProgramSelect")
                                 }
                             }) {
                                 HStack {
-                                    Image(systemName: "trash.fill")
+                                    Image(systemName: "list.bullet")
                                         .font(.system(size: 16, weight: .medium))
                                         .foregroundColor(.white)
                                         .frame(width: 32, height: 32)
-                                        .background(Circle().fill(Color.red))
+                                        .background(Circle().fill(Color.blue))
                                     
-                                    Text("Back to Program Select")
+                                    Text("Select Another Program")
                                         .font(.system(size: 16, weight: .semibold, design: .rounded))
                                         .foregroundColor(.white)
                                     
@@ -254,14 +240,14 @@ struct SettingsView: View {
                                 }
                                 .padding(.vertical, 12)
                                 .padding(.horizontal, 16)
-                                .background(RoundedRectangle(cornerRadius: 12).fill(Color.red))
-                                .shadow(color: .red.opacity(0.3), radius: 8, x: 0, y: 4)
+                                .background(RoundedRectangle(cornerRadius: 12).fill(Color.blue))
+                                .shadow(color: .blue.opacity(0.3), radius: 8, x: 0, y: 4)
                             }
-                            .accessibilityIdentifier("BackToProgramSelectButton")
+                            .accessibilityIdentifier("SelectAnotherProgramButton")
                         }
                         .padding(20)
                         .themeAwareCard()
-                        .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.red.opacity(0.2), lineWidth: 1))
+                        .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.blue.opacity(0.2), lineWidth: 1))
                         
                         // Reset All Preferences Card
                         VStack(alignment: .leading, spacing: 20) {
