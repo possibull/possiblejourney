@@ -26,6 +26,8 @@ struct ProgramTemplateSelectionView: View {
             return Color(red: 1.0, green: 0.8, blue: 0.9) // Pastel pink
         case .bea:
             return Color(red: 0.9, green: 0.8, blue: 1.0) // Pastel purple
+        case .usa:
+            return Color(red: 0.8, green: 0.1, blue: 0.2) // Red for USA theme
         case .dark:
             return Color.blue
         case .light, .system:
@@ -39,6 +41,8 @@ struct ProgramTemplateSelectionView: View {
             return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
         case .bea:
             return Color(red: 1.0, green: 0.98, blue: 0.8) // Pastel yellow
+        case .usa:
+            return Color(red: 0.1, green: 0.3, blue: 0.8) // Blue for USA theme
         case .dark:
             return Color.blue.opacity(0.7)
         case .light, .system:
@@ -245,6 +249,8 @@ struct TemplateCardView: View {
             return Color(red: 1.0, green: 0.8, blue: 0.9) // Pastel pink
         case .bea:
             return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
+        case .usa:
+            return Color(red: 0.8, green: 0.1, blue: 0.2) // Red for USA theme
         case .dark:
             return Color.blue
         case .light, .system:
@@ -258,6 +264,8 @@ struct TemplateCardView: View {
             return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
         case .bea:
             return Color(red: 1.0, green: 0.98, blue: 0.8) // Pastel yellow
+        case .usa:
+            return Color(red: 0.1, green: 0.3, blue: 0.8) // Blue for USA theme
         case .dark:
             return Color.blue.opacity(0.7)
         case .light, .system:
@@ -386,6 +394,8 @@ struct TemplateDetailView: View {
             return Color(red: 1.0, green: 0.8, blue: 0.9) // Pastel pink
         case .bea:
             return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
+        case .usa:
+            return Color(red: 0.8, green: 0.1, blue: 0.2) // Red for USA theme
         case .dark:
             return Color.blue
         case .light, .system:
@@ -399,6 +409,8 @@ struct TemplateDetailView: View {
             return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
         case .bea:
             return Color(red: 1.0, green: 0.98, blue: 0.8) // Pastel yellow
+        case .usa:
+            return Color(red: 0.1, green: 0.3, blue: 0.8) // Blue for USA theme
         case .dark:
             return Color.blue.opacity(0.7)
         case .light, .system:

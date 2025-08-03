@@ -7,6 +7,7 @@ enum ThemeMode: String, CaseIterable, Codable {
     case system = "system"
     case bea = "bea"
     case birthday = "birthday"
+    case usa = "usa"
     
     var displayName: String {
         switch self {
@@ -20,6 +21,8 @@ enum ThemeMode: String, CaseIterable, Codable {
             return "Bea"
         case .birthday:
             return "Birthday"
+        case .usa:
+            return "USA"
         }
     }
     
@@ -35,6 +38,8 @@ enum ThemeMode: String, CaseIterable, Codable {
             return "heart.fill"
         case .birthday:
             return "birthday.cake.fill"
+        case .usa:
+            return "flag.fill"
         }
     }
 }
@@ -172,6 +177,8 @@ class ThemeManager: ObservableObject {
             return .light
         case .birthday:
             return .light
+        case .usa:
+            return .light
         }
     }
     
@@ -225,6 +232,22 @@ struct ThemeAwareBackground: ViewModifier {
                             startPoint: .top,
                             endPoint: .bottom
                         )
+                    } else if themeManager.currentTheme == .usa {
+                        // USA theme - red, white, and blue gradient with stars
+                        ZStack {
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color(red: 0.8, green: 0.1, blue: 0.2), // Red
+                                    Color.white,
+                                    Color(red: 0.1, green: 0.3, blue: 0.8)  // Blue
+                                ]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                            
+                            // Stars pattern
+                            USAPattern()
+                        }
                     } else if colorScheme == .dark {
                         // Simplified dark theme - single gradient
                         LinearGradient(
@@ -301,6 +324,30 @@ struct ThemeAwareCard: ViewModifier {
                                         lineWidth: 2
                                     )
                             )
+                    } else if themeManager.currentTheme == .usa {
+                        // USA theme - patriotic card with stripes
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.white.opacity(0.95))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .stroke(
+                                            LinearGradient(
+                                                gradient: Gradient(colors: [
+                                                    Color(red: 0.8, green: 0.1, blue: 0.2), // Red
+                                                    Color.white,
+                                                    Color(red: 0.1, green: 0.3, blue: 0.8)  // Blue
+                                                ]),
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            ),
+                                            lineWidth: 3
+                                        )
+                                )
+                            
+                            // USA stripes pattern
+                            USAStripes()
+                        }
                     } else if colorScheme == .dark {
                         // Enhanced dark card with subtle gradient and glow
                         RoundedRectangle(cornerRadius: 16)
@@ -1106,6 +1153,101 @@ struct ConfettiPieceView: View {
             // Fade out
             withAnimation(.easeIn(duration: 0.5).delay(piece.duration + piece.delay - 0.5)) {
                 opacity = 0.0
+            }
+        }
+    }
+} 
+
+// MARK: - USA Theme Components
+struct USAPattern: View {
+    @State private var starRotation: Double = 0
+    @State private var starScale: CGFloat = 1.0
+    
+    var body: some View {
+        ZStack {
+            // Scattered stars
+            ForEach(0..<15, id: \.self) { index in
+                Image(systemName: "star.fill")
+                    .foregroundColor(.white)
+                    .font(.system(size: CGFloat.random(in: 8...16)))
+                    .offset(
+                        x: CGFloat.random(in: -150...150),
+                        y: CGFloat.random(in: -300...300)
+                    )
+                    .rotationEffect(.degrees(starRotation + Double(index * 24)))
+                    .scaleEffect(starScale)
+            }
+            
+            // Larger stars in corners
+            ForEach(0..<4, id: \.self) { index in
+                Image(systemName: "star.fill")
+                    .foregroundColor(.white)
+                    .font(.system(size: 20))
+                    .offset(
+                        x: index < 2 ? -180 : 180,
+                        y: index % 2 == 0 ? -350 : 350
+                    )
+                    .rotationEffect(.degrees(starRotation * 0.5 + Double(index * 90)))
+                    .scaleEffect(starScale * 1.2)
+            }
+        }
+        .onAppear {
+            withAnimation(
+                Animation.easeInOut(duration: 4)
+                    .repeatForever(autoreverses: true)
+            ) {
+                starRotation = 360
+                starScale = 1.3
+            }
+        }
+    }
+}
+
+struct USAStripes: View {
+    @State private var stripeOffset: CGFloat = 0
+    
+    var body: some View {
+        ZStack {
+            // Red and white stripes pattern
+            ForEach(0..<7, id: \.self) { index in
+                Rectangle()
+                    .fill(index % 2 == 0 ? Color(red: 0.8, green: 0.1, blue: 0.2) : Color.white)
+                    .frame(height: 3)
+                    .offset(y: CGFloat(index * 8 - 24) + stripeOffset)
+                    .opacity(0.3)
+            }
+            
+            // Blue corner with stars
+            VStack {
+                HStack {
+                    ZStack {
+                        Rectangle()
+                            .fill(Color(red: 0.1, green: 0.3, blue: 0.8))
+                            .frame(width: 40, height: 30)
+                            .opacity(0.4)
+                        
+                        // Small stars in blue corner
+                        ForEach(0..<5, id: \.self) { index in
+                            Image(systemName: "star.fill")
+                                .foregroundColor(.white)
+                                .font(.system(size: 6))
+                                .offset(
+                                    x: CGFloat(index % 3 - 1) * 8,
+                                    y: CGFloat(index / 3 - 1) * 8
+                                )
+                        }
+                    }
+                    Spacer()
+                }
+                Spacer()
+            }
+        }
+        .onAppear {
+            withAnimation(
+                Animation.easeInOut(duration: 3)
+                    .repeatForever(autoreverses: true)
+            ) {
+                stripeOffset = 5
             }
         }
     }

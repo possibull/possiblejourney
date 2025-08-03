@@ -44,6 +44,8 @@ struct BeaNumberSequenceView: View {
             return Color(red: 1.0, green: 0.95, blue: 0.7) // Pastel yellow
         case .bea:
             return Color(red: 0.9, green: 0.8, blue: 1.0) // Pastel purple for Bea theme
+        case .usa:
+            return Color(red: 0.8, green: 0.1, blue: 0.2) // Red for USA theme
         case .dark:
             return Color.blue
         case .light, .system:
@@ -57,6 +59,8 @@ struct BeaNumberSequenceView: View {
             return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue
         case .bea:
             return Color(red: 0.8, green: 0.9, blue: 1.0) // Pastel blue for Bea theme
+        case .usa:
+            return Color(red: 0.1, green: 0.3, blue: 0.8) // Blue for USA theme
         case .dark:
             return Color.blue.opacity(0.7)
         case .light, .system:
@@ -343,7 +347,7 @@ struct GlobalThemeSelector: View {
             // Theme selector (paintbrush)
             Menu {
                 // Regular themes
-                ForEach(ThemeMode.allCases.filter { $0 != .birthday }, id: \.self) { theme in
+                ForEach(ThemeMode.allCases.filter { $0 != .birthday && $0 != .usa }, id: \.self) { theme in
                     Button(action: {
 
                         
@@ -403,6 +407,20 @@ struct GlobalThemeSelector: View {
                             Image(systemName: themeManager.currentTheme == .birthday ? "checkmark" : ThemeMode.birthday.iconName)
                                 .foregroundColor(themeManager.currentTheme == .birthday ? .blue : .primary)
                             Text(ThemeMode.birthday.displayName)
+                            Spacer()
+                        }
+                    }
+                    
+                    // USA theme as second hidden theme
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            themeManager.changeTheme(to: .usa)
+                        }
+                    }) {
+                        HStack {
+                            Image(systemName: themeManager.currentTheme == .usa ? "checkmark" : ThemeMode.usa.iconName)
+                                .foregroundColor(themeManager.currentTheme == .usa ? .blue : .primary)
+                            Text(ThemeMode.usa.displayName)
                             Spacer()
                         }
                     }

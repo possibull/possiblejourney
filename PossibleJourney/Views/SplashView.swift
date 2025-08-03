@@ -30,13 +30,20 @@ struct SplashView: View {
                 Color(red: 0.9, green: 0.95, blue: 1.0), // Pastel blue
                 Color(red: 1.0, green: 0.9, blue: 0.95)  // Pastel pink
             ]
-        case .bea:
-            print("DEBUG: Using Bea theme colors - PASTEL YELLOW, BLUE, PURPLE")
-            return [
-                Color(red: 1.0, green: 0.98, blue: 0.8), // Pastel yellow
-                Color(red: 0.8, green: 0.9, blue: 1.0), // Pastel blue
-                Color(red: 0.9, green: 0.8, blue: 1.0)  // Pastel purple
-            ]
+                    case .bea:
+                print("DEBUG: Using Bea theme colors - PASTEL YELLOW, BLUE, PURPLE")
+                return [
+                    Color(red: 1.0, green: 0.98, blue: 0.8), // Pastel yellow
+                    Color(red: 0.8, green: 0.9, blue: 1.0), // Pastel blue
+                    Color(red: 0.9, green: 0.8, blue: 1.0)  // Pastel purple
+                ]
+            case .usa:
+                print("DEBUG: Using USA theme colors - RED, WHITE, BLUE")
+                return [
+                    Color(red: 0.8, green: 0.1, blue: 0.2), // Red
+                    Color.white,
+                    Color(red: 0.1, green: 0.3, blue: 0.8)  // Blue
+                ]
         case .dark:
             print("DEBUG: Using Dark theme colors - RED")
             return [
