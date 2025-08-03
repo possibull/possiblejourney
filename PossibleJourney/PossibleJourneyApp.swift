@@ -288,6 +288,7 @@ struct GlobalThemeSelector: View {
     @State private var beaTapCount = 0
     @State private var lastBeaTapTime: Date = Date()
     @State private var showingBeaNumberSequence = false
+    @State private var hiddenThemesUnlocked = false
     
     // Check for August 4th birthday theme activation
     private func checkAugust4thBirthdayActivation() {
@@ -318,10 +319,10 @@ struct GlobalThemeSelector: View {
                         beaTapCount += 1
                         print("🎨 Bea tap count: \(beaTapCount)")
                         if beaTapCount >= 5 {
-                            print("🎂 BIRTHDAY THEME UNLOCKED!")
-                            // Activate Birthday theme as Easter egg
+                            print("🎂 HIDDEN THEMES UNLOCKED!")
+                            // Unlock hidden themes instead of directly activating birthday theme
                             withAnimation(.easeInOut(duration: 0.3)) {
-                                themeManager.changeTheme(to: .birthday)
+                                hiddenThemesUnlocked = true
                             }
                             beaTapCount = 0
                         }
@@ -341,6 +342,7 @@ struct GlobalThemeSelector: View {
             
             // Theme selector (paintbrush)
             Menu {
+                // Regular themes
                 ForEach(ThemeMode.allCases.filter { $0 != .birthday }, id: \.self) { theme in
                     Button(action: {
 
@@ -373,6 +375,34 @@ struct GlobalThemeSelector: View {
                             Image(systemName: themeManager.currentTheme == theme ? "checkmark" : theme.iconName)
                                 .foregroundColor(themeManager.currentTheme == theme ? .blue : .primary)
                             Text(theme.displayName)
+                            Spacer()
+                        }
+                    }
+                }
+                
+                // Hidden themes section (only show when unlocked)
+                if hiddenThemesUnlocked {
+                    Divider()
+                    
+                    Text("Hidden Themes")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                    
+                    // Birthday theme as first hidden theme
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 0.3)) {
+                            themeManager.changeTheme(to: .birthday)
+                        }
+                        
+                        // Check for August 4th birthday theme activation
+                        checkAugust4thBirthdayActivation()
+                    }) {
+                        HStack {
+                            Image(systemName: themeManager.currentTheme == .birthday ? "checkmark" : ThemeMode.birthday.iconName)
+                                .foregroundColor(themeManager.currentTheme == .birthday ? .blue : .primary)
+                            Text(ThemeMode.birthday.displayName)
                             Spacer()
                         }
                     }

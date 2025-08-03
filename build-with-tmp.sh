@@ -1,11 +1,13 @@
 #!/bin/bash
 
-# Build script with temporary file error handling
-# Usage: ./build-with-tmp.sh [scheme] [configuration]
+# Build script with temporary file error handling and auto-commit
+# Usage: ./build-with-tmp.sh [scheme] [configuration] [commit_comment]
+# Example: ./build-with-tmp.sh PossibleJourney Debug "Fixed theme selection bug"
 
 # Set default values
 SCHEME=${1:-"PossibleJourney"}
 CONFIGURATION=${2:-"Debug"}
+COMMIT_COMMENT=${3:-""}
 PROJECT_NAME="PossibleJourney"
 
 # Create temporary directory for build artifacts
@@ -103,9 +105,8 @@ if [ $BUILD_EXIT_CODE -eq 0 ]; then
     echo "🎯 Target: $SCHEME" >> "$SUCCESS_LOG"
     echo "⚙️  Configuration: $CONFIGURATION" >> "$SUCCESS_LOG"
     
-    # Prompt for commit comment after successful build
-    echo "🔀 Build successful! Enter a commit comment (or press Enter for auto-generated):"
-    read -r user_comment
+    # Get commit comment from command line argument or use auto-generated
+    user_comment="$COMMIT_COMMENT"
     
     # Call auto-commit script after successful build
     echo "🔀 Running auto-commit script after successful build..."
