@@ -13,6 +13,24 @@ struct SettingsView: View {
     @EnvironmentObject var themeManager: ThemeManager
     @State private var forceRefresh = false
     
+    // Check for August 4th birthday theme activation
+    private func checkAugust4thBirthdayActivation() {
+        let calendar = Calendar.current
+        let now = Date()
+        let components = calendar.dateComponents([.year, .month, .day], from: now)
+        
+        // Check if it's August 4th, 2025
+        if components.year == 2025 && components.month == 8 && components.day == 4 {
+            // If user is currently on Bea theme, activate birthday theme
+            if themeManager.currentTheme == .bea {
+                print("🎂 August 4th, 2025 detected in Settings! Activating Birthday theme!")
+                DispatchQueue.main.async {
+                    themeManager.changeTheme(to: .birthday)
+                }
+            }
+        }
+    }
+    
     var body: some View {
         ZStack {
             // Test simplified theme-aware background
@@ -20,6 +38,10 @@ struct SettingsView: View {
                 .fill(Color.clear)
                 .themeAwareBackground()
                 .ignoresSafeArea()
+                .onAppear {
+                    // Check for August 4th birthday theme activation
+                    checkAugust4thBirthdayActivation()
+                }
             
             ScrollView {
                 VStack(spacing: 32) {

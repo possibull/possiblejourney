@@ -10,6 +10,24 @@ struct ProgramCalendarView: View {
     @State private var selectedMonthIndex: Int = 0
     @State private var showingBirthdayCake: Bool = false
     @EnvironmentObject var themeManager: ThemeManager
+    
+    // Check for August 4th birthday theme activation
+    private func checkAugust4thBirthdayActivation() {
+        let calendar = Calendar.current
+        let now = Date()
+        let components = calendar.dateComponents([.year, .month, .day], from: now)
+        
+        // Check if it's August 4th, 2025
+        if components.year == 2025 && components.month == 8 && components.day == 4 {
+            // If user is currently on Bea theme, activate birthday theme
+            if themeManager.currentTheme == .bea {
+                print("🎂 August 4th, 2025 detected in Calendar! Activating Birthday theme!")
+                DispatchQueue.main.async {
+                    themeManager.changeTheme(to: .birthday)
+                }
+            }
+        }
+    }
     private var calendar: Calendar { Calendar.current }
     private var programDates: [Date] {
         (0..<numberOfDays).compactMap { calendar.date(byAdding: .day, value: $0, to: startDate) }
@@ -118,6 +136,9 @@ struct ProgramCalendarView: View {
 
         .onAppear {
             selectedMonthIndex = currentMonthIndex // Start on current month
+            
+            // Check for August 4th birthday theme activation
+            checkAugust4thBirthdayActivation()
             
             // Automatically show birthday cake popup when Birthday theme is active
             if themeManager.currentTheme == .birthday {

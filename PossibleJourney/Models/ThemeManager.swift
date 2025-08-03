@@ -45,12 +45,38 @@ class ThemeManager: ObservableObject {
     init() {
         let savedTheme = UserDefaults.standard.string(forKey: "selectedTheme") ?? ThemeMode.system.rawValue
         self.currentTheme = ThemeMode(rawValue: savedTheme) ?? .system
+        
+        // Check if it's August 4th, 2025 and user is on Bea theme - activate birthday theme
+        checkAndActivateBirthdayTheme()
     }
     
     func changeTheme(to theme: ThemeMode) {
         self.currentTheme = theme
         // Persist immediately
         UserDefaults.standard.set(theme.rawValue, forKey: "selectedTheme")
+        
+        // Check for birthday theme activation when changing to Bea theme
+        if theme == .bea {
+            checkAndActivateBirthdayTheme()
+        }
+    }
+    
+    private func checkAndActivateBirthdayTheme() {
+        let calendar = Calendar.current
+        let now = Date()
+        let components = calendar.dateComponents([.year, .month, .day], from: now)
+        
+        // Check if it's August 4th, 2025
+        if components.year == 2025 && components.month == 8 && components.day == 4 {
+            // If user is currently on Bea theme, activate birthday theme
+            if self.currentTheme == .bea {
+                print("🎂 August 4th, 2025 detected! Activating Birthday theme for Bea user!")
+                DispatchQueue.main.async {
+                    self.currentTheme = .birthday
+                    UserDefaults.standard.set(ThemeMode.birthday.rawValue, forKey: "selectedTheme")
+                }
+            }
+        }
     }
     
     var colorScheme: ColorScheme? {

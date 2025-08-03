@@ -288,6 +288,24 @@ struct GlobalThemeSelector: View {
     @State private var lastBeaTapTime: Date = Date()
     @State private var showingBeaNumberSequence = false
     
+    // Check for August 4th birthday theme activation
+    private func checkAugust4thBirthdayActivation() {
+        let calendar = Calendar.current
+        let now = Date()
+        let components = calendar.dateComponents([.year, .month, .day], from: now)
+        
+        // Check if it's August 4th, 2025
+        if components.year == 2025 && components.month == 8 && components.day == 4 {
+            // If user is currently on Bea theme, activate birthday theme
+            if themeManager.currentTheme == .bea {
+                print("🎂 August 4th, 2025 detected in Theme Selector! Activating Birthday theme!")
+                DispatchQueue.main.async {
+                    themeManager.changeTheme(to: .birthday)
+                }
+            }
+        }
+    }
+    
     var body: some View {
         HStack(spacing: 8) {
             Menu {
@@ -296,6 +314,9 @@ struct GlobalThemeSelector: View {
                         withAnimation(.easeInOut(duration: 0.3)) {
                             themeManager.changeTheme(to: theme)
                         }
+                        
+                        // Check for August 4th birthday theme activation
+                        checkAugust4thBirthdayActivation()
                         
                         // Trigger Bea number sequence if Bea theme is selected
                         if theme == .bea {
@@ -394,10 +415,24 @@ struct PossibleJourneyApp: App {
         resetForUITestingIfNeeded()
         // Always minimize debug window on launch
         UserDefaults.standard.set(false, forKey: "debugWindowExpanded")
+    }
+    
+    // Check for August 4th birthday theme activation
+    private func checkAugust4thBirthdayActivation() {
+        let calendar = Calendar.current
+        let now = currentTimeOverride ?? Date()
+        let components = calendar.dateComponents([.year, .month, .day], from: now)
         
-
-        
-
+        // Check if it's August 4th, 2025
+        if components.year == 2025 && components.month == 8 && components.day == 4 {
+            // If user is currently on Bea theme, activate birthday theme
+            if themeManager.currentTheme == .bea {
+                print("🎂 August 4th, 2025 detected in main app! Activating Birthday theme!")
+                DispatchQueue.main.async {
+                    themeManager.changeTheme(to: .birthday)
+                }
+            }
+        }
     }
     var currentTimeOverride: Date? {
         if let idx = CommandLine.arguments.firstIndex(of: "--uitesting-current-time"),
@@ -415,6 +450,8 @@ struct PossibleJourneyApp: App {
                     .onAppear {
                         // Check for updates when app starts
                         updateChecker.checkForUpdates()
+                        // Check for August 4th birthday theme activation
+                        checkAugust4thBirthdayActivation()
                     }
             } else {
                 ZStack(alignment: .top) {
@@ -425,6 +462,10 @@ struct PossibleJourneyApp: App {
                                 .environmentObject(debugState)
                                 .environmentObject(themeManager)
                                 .environmentObject(appState)
+                                .onAppear {
+                                    // Check for August 4th birthday theme activation
+                                    checkAugust4thBirthdayActivation()
+                                }
                         } else {
                             ProgramSetupMainView(onProgramCreated: { program in
                                 appState.loadedProgram = program
@@ -433,6 +474,10 @@ struct PossibleJourneyApp: App {
                             .environmentObject(debugState)
                             .environmentObject(themeManager)
                                 .environmentObject(appState)
+                                .onAppear {
+                                    // Check for August 4th birthday theme activation
+                                    checkAugust4thBirthdayActivation()
+                                }
                         }
                     }
                     .id(navigationKey)

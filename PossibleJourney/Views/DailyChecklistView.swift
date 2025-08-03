@@ -58,6 +58,24 @@ struct DailyChecklistView: View {
     @State private var autoAdvanceTimer: Timer?
     @State private var showingReleaseNotes = false
     
+    // Check for August 4th birthday theme activation
+    private func checkAugust4thBirthdayActivation() {
+        let calendar = Calendar.current
+        let now = Date()
+        let components = calendar.dateComponents([.year, .month, .day], from: now)
+        
+        // Check if it's August 4th, 2025
+        if components.year == 2025 && components.month == 8 && components.day == 4 {
+            // If user is currently on Bea theme, activate birthday theme
+            if themeManager.currentTheme == .bea {
+                print("🎂 August 4th, 2025 detected in DailyChecklist! Activating Birthday theme!")
+                DispatchQueue.main.async {
+                    themeManager.changeTheme(to: .birthday)
+                }
+            }
+        }
+    }
+    
     init() {
         // Load the current program and daily progress from storage
         let programStorage = ProgramStorage()
@@ -94,6 +112,10 @@ struct DailyChecklistView: View {
             Color.clear
                 .themeAwareBackground()
                 .ignoresSafeArea()
+                .onAppear {
+                    // Check for August 4th birthday theme activation
+                    checkAugust4thBirthdayActivation()
+                }
             
             VStack(spacing: 0) {
                 // Update notification at the top
