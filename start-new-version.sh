@@ -59,9 +59,11 @@ git show main:latest-version.json > /tmp/latest-version.json
 if command -v jq &> /dev/null; then
     CURRENT_VERSION=$(jq -r '.version' /tmp/latest-version.json)
     CURRENT_BUILD=$(jq -r '.build' /tmp/latest-version.json)
+    CURRENT_BRANCH=$(jq -r '.branch // empty' /tmp/latest-version.json)
 else
     CURRENT_VERSION=$(grep '"version"' /tmp/latest-version.json | sed 's/.*"version": "\([^"]*\)".*/\1/')
     CURRENT_BUILD=$(grep '"build"' /tmp/latest-version.json | sed 's/.*"build": \([0-9]*\).*/\1/')
+    CURRENT_BRANCH=$(grep '"branch"' /tmp/latest-version.json | sed 's/.*"branch": "\([^"]*\)".*/\1/' 2>/dev/null || echo "")
 fi
 
 rm -f /tmp/latest-version.json
@@ -69,6 +71,16 @@ rm -f /tmp/latest-version.json
 if [ -z "$CURRENT_VERSION" ] || [ -z "$CURRENT_BUILD" ]; then
     print_error "Could not read current version from main branch's latest-version.json"
     exit 1
+fi
+
+# If we have a branch specified and we're not already on it, checkout that branch
+if [ -n "$CURRENT_BRANCH" ] && [ "$(git branch --show-current)" != "$CURRENT_BRANCH" ]; then
+    print_status "Current version is on branch '$CURRENT_BRANCH', checking it out..."
+    if git show-ref --verify --quiet refs/heads/$CURRENT_BRANCH; then
+        git checkout $CURRENT_BRANCH
+    else
+        print_warning "Branch '$CURRENT_BRANCH' not found, staying on current branch"
+    fi
 fi
 
 print_status "Current version: $CURRENT_VERSION build $CURRENT_BUILD"
@@ -137,7 +149,8 @@ if [ -f "latest-version.json" ]; then
            --arg build "$NEW_BUILD" \
            --arg notes "New version $NEW_VERSION build $NEW_BUILD" \
            --arg timestamp "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
-           '.version = $version | .build = ($build | tonumber) | .releaseNotes = $notes | .lastUpdated = $timestamp' \
+           --arg branch "$BRANCH_NAME" \
+           '.version = $version | .build = ($build | tonumber) | .releaseNotes = $notes | .lastUpdated = $timestamp | .branch = $branch' \
            latest-version.json > latest-version.json.tmp && mv latest-version.json.tmp latest-version.json
     else
         # Update version
@@ -152,6 +165,14 @@ if [ -f "latest-version.json" ]; then
         # Update timestamp
         TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
         sed -i.bak "s/\"lastUpdated\": \"[^\"]*\"/\"lastUpdated\": \"$TIMESTAMP\"/" latest-version.json
+        
+        # Add or update branch field
+        if grep -q '"branch"' latest-version.json; then
+            sed -i.bak "s/\"branch\": \"[^\"]*\"/\"branch\": \"$BRANCH_NAME\"/" latest-version.json
+        else
+            # Insert branch field before the closing brace
+            sed -i.bak "s/}$/  \"branch\": \"$BRANCH_NAME\"\n}/" latest-version.json
+        fi
         
         # Clean up backup files
         rm -f latest-version.json.bak
