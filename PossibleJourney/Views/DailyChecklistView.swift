@@ -647,41 +647,11 @@ struct TaskRowView: View {
             // Modern card design
             HStack(spacing: 16) {
                 // Modern checkbox with animation
-                Button(action: {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-                        checkboxScale = 0.8
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-                            checkboxScale = 1.0
-                        }
-                        handleCheckboxTap()
-                    }
-                }) {
-                    ZStack {
-                        Circle()
-                            .fill(checkboxFillColor)
-                            .frame(width: 28, height: 28)
-                            .overlay(
-                                Circle()
-                                    .stroke(checkboxStrokeColor, lineWidth: 2)
-                            )
-                            .shadow(
-                                color: checkboxShadowColor,
-                                radius: checkboxShadowRadius,
-                                x: 0,
-                                y: 2
-                            )
-                        
-                        if isCompleted {
-                            Image(systemName: "checkmark")
-                                .font(.system(size: 14, weight: .bold))
-                                .foregroundColor(.white)
-                        }
-                    }
-                }
-                .buttonStyle(PlainButtonStyle())
-                .scaleEffect(checkboxScale)
+                SlotMachineCheckbox(
+                    isCompleted: isCompleted,
+                    themeAccentColor: themeAccentColor,
+                    onTap: handleCheckboxTap
+                )
                 
                 // Task content
                 VStack(alignment: .leading, spacing: 8) {
@@ -735,8 +705,13 @@ struct TaskRowView: View {
                                 showingPhotoPicker = true
                             }) {
                                 HStack(spacing: 6) {
-                                    Image(systemName: "camera")
-                                        .font(.system(size: 12, weight: .medium))
+                                    SlotMachineIcon(
+                                        iconName: "camera",
+                                        finalIconName: "camera",
+                                        isSpinning: false,
+                                        spinDuration: 0.8
+                                    )
+                                    .font(.system(size: 12, weight: .medium))
                                     Text("Add Photo")
                                         .font(.system(size: 12, weight: .medium, design: .rounded))
                                 }
@@ -754,10 +729,15 @@ struct TaskRowView: View {
                         // Photo indicator for tasks with photos
                         if task.requiresPhoto && hasPhoto {
                             HStack(spacing: 4) {
-                                Image(systemName: "photo.fill")
-                                    .font(.system(size: 12, weight: .medium))
+                                SlotMachineIcon(
+                                    iconName: "photo.fill",
+                                    finalIconName: "photo.fill",
+                                    isSpinning: false,
+                                    spinDuration: 0.8
+                                )
+                                .font(.system(size: 12, weight: .medium))
                                 Text("Photo Added")
-                                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                                .font(.system(size: 12, weight: .medium, design: .rounded))
                             }
                             .foregroundColor(.green)
                             .padding(.horizontal, 12)
@@ -772,14 +752,19 @@ struct TaskRowView: View {
                         
                         // Reminder button
                         Button(action: onSetReminder) {
-                            Image(systemName: "bell")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(themeAccentColor)
-                                .padding(8)
-                                .background(
-                                    Circle()
-                                        .fill(themeAccentColor.opacity(0.1))
-                                )
+                            SlotMachineIcon(
+                                iconName: "bell",
+                                finalIconName: "bell",
+                                isSpinning: false,
+                                spinDuration: 0.8
+                            )
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(themeAccentColor)
+                            .padding(8)
+                            .background(
+                                Circle()
+                                    .fill(themeAccentColor.opacity(0.1))
+                            )
                         }
                         .buttonStyle(PlainButtonStyle())
                     }

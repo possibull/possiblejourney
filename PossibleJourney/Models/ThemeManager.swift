@@ -1641,3 +1641,206 @@ struct USAStripes: View {
         }
     }
 } 
+
+// MARK: - Slot Machine Icon Component
+struct SlotMachineIcon: View {
+    let iconName: String
+    let finalIconName: String
+    let isSpinning: Bool
+    let spinDuration: Double
+    let onSpinComplete: (() -> Void)?
+    
+    @State private var currentIconIndex: Int = 0
+    @State private var spinOffset: CGFloat = 0
+    @State private var isAnimating: Bool = false
+    
+    // Slot machine symbols that will cycle through during spin
+    private let slotSymbols = [
+        "🍒", "🍊", "🍇", "🍓", "🍎", "🍌", "🍉", "🍍",
+        "7️⃣", "🎰", "💎", "👑", "⭐", "🔔", "🍀", "🎯",
+        "🎪", "🎨", "🎭", "🎪", "🎯", "🎲", "🎳", "🎮"
+    ]
+    
+    init(iconName: String, finalIconName: String? = nil, isSpinning: Bool = false, spinDuration: Double = 2.0, onSpinComplete: (() -> Void)? = nil) {
+        self.iconName = iconName
+        self.finalIconName = finalIconName ?? iconName
+        self.isSpinning = isSpinning
+        self.spinDuration = spinDuration
+        self.onSpinComplete = onSpinComplete
+    }
+    
+    var body: some View {
+        ZStack {
+            if isSpinning && isAnimating {
+                // Spinning slot machine effect
+                VStack(spacing: 0) {
+                    ForEach(0..<slotSymbols.count, id: \.self) { index in
+                        Text(slotSymbols[index])
+                            .font(.system(size: 20, weight: .bold))
+                            .frame(height: 24)
+                            .opacity(index == currentIconIndex ? 1.0 : 0.3)
+                    }
+                }
+                .offset(y: spinOffset)
+                .clipped()
+                .frame(height: 24)
+                .onAppear {
+                    startSpinAnimation()
+                }
+            } else {
+                // Static icon (final result)
+                Image(systemName: finalIconName)
+                    .font(.system(size: 20, weight: .bold))
+            }
+        }
+        .onChange(of: isSpinning) { newValue in
+            if newValue && !isAnimating {
+                startSpinAnimation()
+            }
+        }
+    }
+    
+    private func startSpinAnimation() {
+        isAnimating = true
+        currentIconIndex = 0
+        spinOffset = 0
+        
+        // Create a spinning animation that cycles through symbols
+        withAnimation(.easeInOut(duration: spinDuration)) {
+            spinOffset = -CGFloat(slotSymbols.count - 1) * 24
+        }
+        
+        // Update the current icon index during the spin
+        let symbolCount = slotSymbols.count
+        let updateInterval = spinDuration / Double(symbolCount * 2)
+        
+        Timer.scheduledTimer(withTimeInterval: updateInterval, repeats: true) { timer in
+            currentIconIndex = (currentIconIndex + 1) % symbolCount
+            
+            if currentIconIndex == symbolCount - 1 {
+                timer.invalidate()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    isAnimating = false
+                    onSpinComplete?()
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Slot Machine Card Icon
+struct SlotMachineCardIcon: View {
+    let iconName: String
+    let themeAccentColor: Color
+    let themeSecondaryColor: Color
+    @State private var isSpinning: Bool = false
+    
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(themeSecondaryColor.opacity(0.2))
+                .frame(width: 40, height: 40)
+            
+            SlotMachineIcon(
+                iconName: iconName,
+                finalIconName: iconName,
+                isSpinning: isSpinning,
+                spinDuration: 1.5
+            ) {
+                // Spin complete callback
+                print("🎰 Slot machine spin complete for icon: \(iconName)")
+            }
+        }
+        .onTapGesture {
+            // Trigger spin on tap
+            isSpinning = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                isSpinning = false
+            }
+        }
+    }
+}
+
+// MARK: - Slot Machine Theme Icon
+struct SlotMachineThemeIcon: View {
+    let iconName: String
+    let isSelected: Bool
+    @State private var isSpinning: Bool = false
+    
+    var body: some View {
+        SlotMachineIcon(
+            iconName: iconName,
+            finalIconName: isSelected ? "checkmark" : iconName,
+            isSpinning: isSpinning,
+            spinDuration: 1.0
+        ) {
+            print("🎰 Theme slot machine spin complete for: \(iconName)")
+        }
+        .onTapGesture {
+            // Trigger spin on tap
+            isSpinning = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                isSpinning = false
+            }
+        }
+    }
+}
+
+// MARK: - Slot Machine Checkbox
+struct SlotMachineCheckbox: View {
+    let isCompleted: Bool
+    let themeAccentColor: Color
+    let onTap: () -> Void
+    @State private var isSpinning: Bool = false
+    @State private var checkboxScale: CGFloat = 1.0
+    
+    var body: some View {
+        Button(action: {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                checkboxScale = 0.8
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                    checkboxScale = 1.0
+                }
+                // Trigger slot machine spin
+                isSpinning = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    isSpinning = false
+                    onTap()
+                }
+            }
+        }) {
+            ZStack {
+                Circle()
+                    .fill(isCompleted ? themeAccentColor : Color.clear)
+                    .frame(width: 28, height: 28)
+                    .overlay(
+                        Circle()
+                            .stroke(isCompleted ? themeAccentColor : Color.gray.opacity(0.4), lineWidth: 2)
+                    )
+                    .shadow(
+                        color: isCompleted ? themeAccentColor.opacity(0.3) : Color.clear,
+                        radius: 4,
+                        x: 0,
+                        y: 2
+                    )
+                
+                if isCompleted {
+                    SlotMachineIcon(
+                        iconName: "checkmark",
+                        finalIconName: "checkmark",
+                        isSpinning: isSpinning,
+                        spinDuration: 1.0
+                    ) {
+                        print("🎰 Checkbox slot machine spin complete!")
+                    }
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.white)
+                }
+            }
+        }
+        .buttonStyle(PlainButtonStyle())
+        .scaleEffect(checkboxScale)
+    }
+} 

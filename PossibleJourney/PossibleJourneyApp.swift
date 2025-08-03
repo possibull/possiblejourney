@@ -378,8 +378,11 @@ struct GlobalThemeSelector: View {
                         }
                     }) {
                         HStack {
-                            Image(systemName: themeManager.currentTheme == theme ? "checkmark" : theme.iconName)
-                                .foregroundColor(themeManager.currentTheme == theme ? .blue : .primary)
+                            SlotMachineThemeIcon(
+                                iconName: theme.iconName,
+                                isSelected: themeManager.currentTheme == theme
+                            )
+                            .foregroundColor(themeManager.currentTheme == theme ? .blue : .primary)
                             Text(theme.displayName)
                             Spacer()
                         }
@@ -406,8 +409,11 @@ struct GlobalThemeSelector: View {
                         checkAugust4thBirthdayActivation()
                     }) {
                         HStack {
-                            Image(systemName: themeManager.currentTheme == .birthday ? "checkmark" : ThemeMode.birthday.iconName)
-                                .foregroundColor(themeManager.currentTheme == .birthday ? .blue : .primary)
+                            SlotMachineThemeIcon(
+                                iconName: ThemeMode.birthday.iconName,
+                                isSelected: themeManager.currentTheme == .birthday
+                            )
+                            .foregroundColor(themeManager.currentTheme == .birthday ? .blue : .primary)
                             Text(ThemeMode.birthday.displayName)
                             Spacer()
                         }
@@ -420,8 +426,11 @@ struct GlobalThemeSelector: View {
                         }
                     }) {
                         HStack {
-                            Image(systemName: themeManager.currentTheme == .usa ? "checkmark" : ThemeMode.usa.iconName)
-                                .foregroundColor(themeManager.currentTheme == .usa ? .blue : .primary)
+                            SlotMachineThemeIcon(
+                                iconName: ThemeMode.usa.iconName,
+                                isSelected: themeManager.currentTheme == .usa
+                            )
+                            .foregroundColor(themeManager.currentTheme == .usa ? .blue : .primary)
                             Text(ThemeMode.usa.displayName)
                             Spacer()
                         }
@@ -434,8 +443,11 @@ struct GlobalThemeSelector: View {
                         }
                     }) {
                         HStack {
-                            Image(systemName: themeManager.currentTheme == .lasVegas ? "checkmark" : ThemeMode.lasVegas.iconName)
-                                .foregroundColor(themeManager.currentTheme == .lasVegas ? .blue : .primary)
+                            SlotMachineThemeIcon(
+                                iconName: ThemeMode.lasVegas.iconName,
+                                isSelected: themeManager.currentTheme == .lasVegas
+                            )
+                            .foregroundColor(themeManager.currentTheme == .lasVegas ? .blue : .primary)
                             Text(ThemeMode.lasVegas.displayName)
                             Spacer()
                         }
