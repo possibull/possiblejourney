@@ -1678,7 +1678,7 @@ struct SlotMachineIcon: View {
                         Text(slotSymbols[index])
                             .font(.system(size: 20, weight: .bold))
                             .frame(height: 24)
-                            .opacity(index == currentIconIndex ? 1.0 : 0.3)
+                            .opacity(index == currentIconIndex ? 1.0 : 0.6)
                     }
                 }
                 .offset(y: spinOffset)
@@ -1701,6 +1701,7 @@ struct SlotMachineIcon: View {
     }
     
     private func startSpinAnimation() {
+        print("🎰 Starting spin animation for: \(iconName)")
         isAnimating = true
         currentIconIndex = 0
         spinOffset = 0
@@ -1752,6 +1753,7 @@ struct SlotMachineCardIcon: View {
             }
         }
         .onTapGesture {
+            print("🎰 Tapped card icon: \(iconName)")
             // Trigger spin on tap
             isSpinning = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
@@ -1777,6 +1779,7 @@ struct SlotMachineThemeIcon: View {
             print("🎰 Theme slot machine spin complete for: \(iconName)")
         }
         .onTapGesture {
+            print("🎰 Tapped theme icon: \(iconName)")
             // Trigger spin on tap
             isSpinning = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
@@ -1796,6 +1799,7 @@ struct SlotMachineCheckbox: View {
     
     var body: some View {
         Button(action: {
+            print("🎰 Tapped checkbox")
             withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
                 checkboxScale = 0.8
             }
