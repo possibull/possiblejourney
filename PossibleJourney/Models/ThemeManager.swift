@@ -42,6 +42,7 @@ enum ThemeMode: String, CaseIterable, Codable {
 class ThemeManager: ObservableObject {
     @Published var currentTheme: ThemeMode
     @Published var shouldShowBirthdayCake: Bool = false
+    @Published var selectedDate: Date? = nil
     
     init() {
         let savedTheme = UserDefaults.standard.string(forKey: "selectedTheme") ?? ThemeMode.system.rawValue
@@ -52,11 +53,41 @@ class ThemeManager: ObservableObject {
     }
     
     func changeTheme(to theme: ThemeMode) {
+        print("🎨 changeTheme called with theme: \(theme), current theme: \(currentTheme)")
+        
+        // Special logic for August 4th, 2025: Bea theme becomes birthday theme
+        if theme == .bea {
+            let calendar = Calendar.current
+            
+            // Use selected date as the "current" date for the app, fall back to real current date
+            let effectiveDate = self.selectedDate ?? Date()
+            let effectiveComponents = calendar.dateComponents([.year, .month, .day], from: effectiveDate)
+            
+            print("🎨 Bea theme selected - checking effective date: \(effectiveComponents)")
+            print("🎨 Using selected date as current: \(self.selectedDate != nil)")
+            print("🎨 Is effective date August 4th, 2025? \(effectiveComponents.year == 2025 && effectiveComponents.month == 8 && effectiveComponents.day == 4)")
+            
+            // Check if effective date is August 4th, 2025
+            if effectiveComponents.year == 2025 && effectiveComponents.month == 8 && effectiveComponents.day == 4 {
+                print("🎂 Effective date is August 4th, 2025! Bea theme request redirected to Birthday theme!")
+                self.currentTheme = .birthday
+                UserDefaults.standard.set(ThemeMode.birthday.rawValue, forKey: "selectedTheme")
+                
+                // Trigger birthday cake popup
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.shouldShowBirthdayCake = true
+                }
+                return
+            }
+            
+            print("🎨 Bea theme selected but effective date is not August 4th - proceeding normally")
+        }
+        
         self.currentTheme = theme
         // Persist immediately
         UserDefaults.standard.set(theme.rawValue, forKey: "selectedTheme")
         
-        // Check for birthday theme activation when changing to Bea theme
+        // Check for birthday theme activation when changing to Bea theme (for other dates)
         if theme == .bea {
             checkAndActivateBirthdayTheme()
         }
@@ -82,6 +113,7 @@ class ThemeManager: ObservableObject {
         // Check if it's August 4th, 2025
         if components.year == 2025 && components.month == 8 && components.day == 4 {
             print("🎂 August 4th, 2025 detected in ThemeManager! Current theme: \(self.currentTheme)")
+            
             // If user is currently on Bea theme, activate birthday theme
             if self.currentTheme == .bea {
                 print("🎂 August 4th, 2025 detected! Activating Birthday theme for Bea user!")
@@ -107,6 +139,20 @@ class ThemeManager: ObservableObject {
             self.shouldShowBirthdayCake = false
         }
     }
+    
+    func setSelectedDate(_ date: Date?) {
+        self.selectedDate = date
+        print("🎨 ThemeManager selected date set to: \(date?.description ?? "nil")")
+    }
+    
+    // Get the effective current date for the app (selected date if available, otherwise real current date)
+    func getEffectiveCurrentDate() -> Date {
+        return self.selectedDate ?? Date()
+    }
+    
+
+    
+
     
     // Public method for calendar view to check birthday activation with selected date
     func checkBirthdayActivationForDate(_ date: Date) {
@@ -692,36 +738,15 @@ struct BirthdayCakePopup: View {
                     .foregroundColor(.primary)
                     .multilineTextAlignment(.center)
                 
-                // Beautiful birthday cake with real image
+                // Beautiful birthday cake with bundled image
                 ZStack {
-                    // Real birthday cake image - yellow and white cake
-                    AsyncImage(url: URL(string: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=300&fit=crop&crop=center")) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 300, height: 250)
-                            .cornerRadius(15)
-                            .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
-                    } placeholder: {
-                        // Fallback placeholder while loading
-                        RoundedRectangle(cornerRadius: 15)
-                            .fill(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        Color(red: 1.0, green: 0.9, blue: 0.8), // Cream
-                                        Color(red: 0.9, green: 0.8, blue: 0.7)  // Light brown
-                                    ]),
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
-                            )
-                            .frame(width: 300, height: 250)
-                            .overlay(
-                                ProgressView()
-                                    .scaleEffect(1.5)
-                                    .foregroundColor(.white)
-                            )
-                    }
+                    // Local birthday cake image - yellow and white cake
+                    Image("BirthdayCake")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 300, height: 250)
+                        .cornerRadius(15)
+                        .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
                     
                     // Dynamic number overlay on the cake
                     VStack {

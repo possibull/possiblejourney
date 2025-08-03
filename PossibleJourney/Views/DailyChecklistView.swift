@@ -159,6 +159,12 @@ struct DailyChecklistView: View {
                     selectedDate: viewModel.selectedDate,
                     onDateSelected: { date in
                         viewModel.selectDate(date)
+                        // Set the selected date in ThemeManager for theme change logic
+                        themeManager.setSelectedDate(date)
+                        // Check for August 4th birthday theme activation
+                        print("🔍 DailyChecklist Birthday Check - Date selected: \(date)")
+                        print("🔍 DailyChecklist Birthday Check - Current theme: \(themeManager.currentTheme)")
+                        themeManager.checkBirthdayActivationForDate(date)
                         showingCalendar = false
                     }
                 )

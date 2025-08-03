@@ -51,11 +51,10 @@ class DailyChecklistViewModel: ObservableObject {
         let calendar = Calendar.current
         let startDate = calendar.startOfDay(for: program.startDate)
         let viewingDate = calendar.startOfDay(for: selectedDate)
+        let dailyProgressStorage = DailyProgressStorage()
         
         // Check all days from start date up to (but not including) the viewing date
         var currentDate = startDate
-        let dailyProgressStorage = DailyProgressStorage()
-        
         while currentDate < viewingDate {
             // Skip if we're past the program duration
             let dayNumber = calendar.dateComponents([.day], from: startDate, to: currentDate).day ?? 0
@@ -78,6 +77,28 @@ class DailyChecklistViewModel: ObservableObject {
             
             // Move to next day
             currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate)!
+        }
+        
+        // Also check if the current viewing date itself is missed
+        // Skip if we're past the program duration
+        let viewingDayNumber = calendar.dateComponents([.day], from: startDate, to: viewingDate).day ?? 0
+        if viewingDayNumber < program.numberOfDays() {
+            // Load the progress for the viewing date and check if it was completed
+            let viewingDayProgress = dailyProgressStorage.load(for: viewingDate) ?? DailyProgress(
+                id: UUID(),
+                date: viewingDate,
+                completedTaskIDs: [],
+                isCompleted: false // Default to not completed if no progress exists
+            )
+            
+            if !viewingDayProgress.isCompleted {
+                // Check if the viewing date is past its end-of-day (i.e., missed)
+                let now = Date()
+                let completedTaskIDs = Set(viewingDayProgress.completedTaskIDs)
+                if program.isDayMissed(for: now, completedTaskIDs: completedTaskIDs) {
+                    return true
+                }
+            }
         }
         
         // No missed days found

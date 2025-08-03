@@ -311,6 +311,8 @@ struct GlobalThemeSelector: View {
             Menu {
                 ForEach(ThemeMode.allCases.filter { $0 != .birthday }, id: \.self) { theme in
                     Button(action: {
+
+                        
                         withAnimation(.easeInOut(duration: 0.3)) {
                             themeManager.changeTheme(to: theme)
                         }
@@ -318,10 +320,20 @@ struct GlobalThemeSelector: View {
                         // Check for August 4th birthday theme activation
                         checkAugust4thBirthdayActivation()
                         
-                        // Trigger Bea number sequence if Bea theme is selected
+                        // Trigger Bea number sequence if Bea theme is selected AND it's not August 4th
                         if theme == .bea {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                showingBeaNumberSequence = true
+                            // Check if it's August 4th using the effective date
+                            let effectiveDate = themeManager.getEffectiveCurrentDate()
+                            let calendar = Calendar.current
+                            let components = calendar.dateComponents([.year, .month, .day], from: effectiveDate)
+                            
+                            let isAugust4th = components.year == 2025 && components.month == 8 && components.day == 4
+                            
+                            if !isAugust4th {
+                                // Only show Bea sequence if it's NOT August 4th
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                                    showingBeaNumberSequence = true
+                                }
                             }
                         }
                     }) {
@@ -400,6 +412,10 @@ func resetForUITestingIfNeeded() {
         DailyProgressStorage().clearAll()
     }
 }
+
+
+
+
 
 @main
 struct PossibleJourneyApp: App {

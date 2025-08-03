@@ -1,7 +1,7 @@
 {
   "version": "1.5",
-  "build": 10,
-  "releaseNotes": "Enhanced Navigation and User Experience - Fixed navigation bar display issues in DailyChecklistView - Improved Reset Program functionality for better navigation flow - Enhanced Settings view layout and scrolling behavior - Fixed UI layout issues affecting iPhone display - Improved app performance and responsiveness - Better user workflow and navigation consistency - Enhanced feature reliability and stability - Optimized data handling and storage - Continued app improvements and refinements - Multiple bug fixes and stability improvements",
+  "build": 11,
+  "releaseNotes": "Critical Bug Fixes and Improvements - Fixed critical bug where missed days weren't detected after app restart - Improved missed day detection logic for better user guidance - Enhanced navigation reliability in program reset functionality - Fixed navigation bar display issues in DailyChecklistView - Improved Settings view layout and scrolling behavior - Enhanced app performance and responsiveness - Better user workflow and navigation consistency - Enhanced feature reliability and stability - Optimized data handling and storage - Multiple bug fixes and stability improvements",
   "forceUpdate": false,
-  "lastUpdated": "2025-08-02T04:45:00Z"
+  "lastUpdated": "2025-08-02T21:45:00Z"
 }
