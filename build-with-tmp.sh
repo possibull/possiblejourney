@@ -103,35 +103,99 @@ if [ $BUILD_EXIT_CODE -eq 0 ]; then
     echo "🎯 Target: $SCHEME" >> "$SUCCESS_LOG"
     echo "⚙️  Configuration: $CONFIGURATION" >> "$SUCCESS_LOG"
     
+    # Prompt for commit comment after successful build
+    echo "🔀 Build successful! Enter a commit comment (or press Enter for auto-generated):"
+    read -r user_comment
+    
     # Call auto-commit script after successful build
     echo "🔀 Running auto-commit script after successful build..."
     if [ -f "./auto-commit.sh" ]; then
-        # Create a temporary script that calls auto-commit with a build-specific comment
-        cat > /tmp/auto-commit-build.sh << 'EOF'
+        # Create a temporary script that calls auto-commit with user comment or auto-generated
+        cat > /tmp/auto-commit-build.sh << EOF
 #!/bin/bash
 # Temporary auto-commit script for build success
 
 # Function to commit changes with build-specific message
 commit_build_changes() {
-    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    local timestamp=\$(date '+%Y-%m-%d %H:%M:%S')
     
     # Check if there are any changes
-    if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git ls-files --others --exclude-standard)" ]; then
-        echo "Changes detected at $timestamp"
+    if ! git diff --quiet || ! git diff --cached --quiet || [ -n "\$(git ls-files --others --exclude-standard)" ]; then
+        echo "Changes detected at \$timestamp"
         
         # Stage all changes
         git add .
         
         # Get list of changed files for commit message
-        local changed_files=$(git diff --cached --name-only | head -5 | tr '\n' ' ')
+        local changed_files=\$(git diff --cached --name-only | head -5 | tr '\n' ' ')
+        
+        # Use user comment if provided, otherwise auto-generate
+        local comment=""
+        if [ -n "$user_comment" ]; then
+            comment="$user_comment"
+        else
+            # Auto-generate comment based on file types (similar to auto-commit.sh logic)
+            local has_view_swift=false
+            local has_viewmodel_swift=false
+            local has_model_swift=false
+            local has_swift=false
+            local has_xcodeproj=false
+            local has_md=false
+            local has_sh=false
+            local has_json=false
+            
+            # Check each file type
+            IFS=' ' read -ra file_array <<< "\$changed_files"
+            for file in "\${file_array[@]}"; do
+                if [[ "\$file" == *".swift" ]]; then
+                    has_swift=true
+                    if [[ "\$file" == *"View"*".swift" ]]; then
+                        has_view_swift=true
+                    elif [[ "\$file" == *"ViewModel"*".swift" ]]; then
+                        has_viewmodel_swift=true
+                    elif [[ "\$file" == *"Model"*".swift" ]]; then
+                        has_model_swift=true
+                    fi
+                elif [[ "\$file" == *".xcodeproj" ]]; then
+                    has_xcodeproj=true
+                elif [[ "\$file" == *".md" ]]; then
+                    has_md=true
+                elif [[ "\$file" == *".sh" ]]; then
+                    has_sh=true
+                elif [[ "\$file" == *".json" ]]; then
+                    has_json=true
+                fi
+            done
+            
+            # Generate comment based on detected file types
+            if [ "\$has_view_swift" = true ]; then
+                comment="UI improvements and view updates"
+            elif [ "\$has_viewmodel_swift" = true ]; then
+                comment="View model logic updates"
+            elif [ "\$has_model_swift" = true ]; then
+                comment="Data model changes"
+            elif [ "\$has_swift" = true ]; then
+                comment="Swift code updates"
+            elif [ "\$has_xcodeproj" = true ]; then
+                comment="Xcode project configuration changes"
+            elif [ "\$has_md" = true ]; then
+                comment="Documentation updates"
+            elif [ "\$has_sh" = true ]; then
+                comment="Script and automation updates"
+            elif [ "\$has_json" = true ]; then
+                comment="Configuration and data updates"
+            else
+                comment="General project updates"
+            fi
+        fi
         
         # Create build-specific commit message
-        local commit_msg="Build successful - $timestamp - $SCHEME $CONFIGURATION - $changed_files"
+        local commit_msg="Build successful - \$timestamp - $SCHEME $CONFIGURATION - \$comment - \$changed_files"
         
         # Commit changes
-        git commit -m "$commit_msg"
+        git commit -m "\$commit_msg"
         
-        echo "✅ Auto-committed: $commit_msg"
+        echo "✅ Auto-committed: \$commit_msg"
     else
         echo "⚠️  No changes to commit"
     fi
