@@ -16,15 +16,22 @@ struct ProgramCalendarView: View {
         let dateToCheck = selectedDate // Use the selected date instead of current date
         let components = calendar.dateComponents([.year, .month, .day], from: dateToCheck)
         
+        print("🔍 Calendar Birthday Check - Selected Date: \(dateToCheck), Components: \(components)")
+        
         // Check if it's August 4th, 2025
         if components.year == 2025 && components.month == 8 && components.day == 4 {
+            print("🎂 August 4th, 2025 detected in Calendar! Current theme: \(themeManager.currentTheme)")
             // If user is currently on Bea theme, activate birthday theme
             if themeManager.currentTheme == .bea {
                 print("🎂 August 4th, 2025 detected in Calendar (selected date: \(dateToCheck))! Activating Birthday theme!")
                 DispatchQueue.main.async {
                     themeManager.changeTheme(to: .birthday)
                 }
+            } else {
+                print("🎂 August 4th detected but current theme is \(themeManager.currentTheme), not .bea")
             }
+        } else {
+            print("🔍 Not August 4th, 2025 - Year: \(components.year ?? 0), Month: \(components.month ?? 0), Day: \(components.day ?? 0)")
         }
     }
     private var calendar: Calendar { Calendar.current }
