@@ -1,7 +1,8 @@
 {
   "version": "1.7",
-  "build": 1,
-  "releaseNotes": "Fixed Continue Anyway button in missed day screen - now properly navigates to first missed day instead of staying on the sheet",
+  "build": 2,
+  "releaseNotes": "New version 1.7 build 2",
   "forceUpdate": false,
-  "lastUpdated": "2025-08-03T06:30:00Z"
+  "lastUpdated": "2025-08-03T06:39:33Z",
+  "branch": "v1.7-build2"
 }
