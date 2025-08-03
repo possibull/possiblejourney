@@ -275,6 +275,8 @@ struct DailyChecklistView: View {
             if !dayProgress.isCompleted {
                 // Found the first missed day, navigate to it
                 print("🔍 Found first missed day: \(currentDate) (day \(dayNumber + 1))")
+                // Temporarily set ignore flag to prevent missed day screen from showing for the destination
+                viewModel.ignoreMissedDayForCurrentSession = true
                 viewModel.selectDate(currentDate)
                 return
             }
@@ -380,14 +382,8 @@ struct DailyChecklistView: View {
                 
                 Button("Continue Anyway") {
                     print("🔍 Continue Anyway button tapped")
-                    // First set the ignore flag to prevent the missed day screen from showing
-                    viewModel.ignoreMissedDayForCurrentSession = true
-                    // Then navigate to the first missed day from the start of the program
+                    // Navigate to the first missed day from the start of the program
                     navigateToFirstMissedDay()
-                    // Force a UI update to reflect the changes
-                    DispatchQueue.main.async {
-                        self.viewModel.objectWillChange.send()
-                    }
                 }
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
