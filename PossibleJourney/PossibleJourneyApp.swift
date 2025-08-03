@@ -483,11 +483,10 @@ struct PossibleJourneyApp: App {
                     .id(navigationKey)
                     
                     // Global Birthday Cake Popup
-                    if themeManager.shouldShowBirthdayCake {
+                    .sheet(isPresented: $themeManager.shouldShowBirthdayCake, onDismiss: {
+                        themeManager.resetBirthdayCakeFlag()
+                    }) {
                         BirthdayCakePopup()
-                            .onDisappear {
-                                themeManager.resetBirthdayCakeFlag()
-                            }
                     }
                 // Global DebugWindow always visible at top
                 GlobalDebugWindow(checklistDebugContent: {

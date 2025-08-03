@@ -93,7 +93,9 @@ class ThemeManager: ObservableObject {
     }
     
     func resetBirthdayCakeFlag() {
-        shouldShowBirthdayCake = false
+        DispatchQueue.main.async {
+            self.shouldShowBirthdayCake = false
+        }
     }
     
     var colorScheme: ColorScheme? {
