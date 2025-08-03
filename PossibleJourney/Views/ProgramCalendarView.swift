@@ -13,6 +13,7 @@ struct ProgramCalendarView: View {
     // Check for August 4th birthday theme activation
     private func checkAugust4thBirthdayActivation() {
         print("🔍 Calendar Birthday Check - Selected Date: \(selectedDate)")
+        print("🔍 Calendar Birthday Check - Current Theme: \(themeManager.currentTheme)")
         themeManager.checkBirthdayActivationForDate(selectedDate)
     }
     private var calendar: Calendar { Calendar.current }
@@ -122,11 +123,13 @@ struct ProgramCalendarView: View {
         .background(Color(.systemBackground))
 
         .onAppear {
+            print("📅 Calendar onAppear - START")
             selectedMonthIndex = currentMonthIndex // Start on current month
             
             // Check for August 4th birthday theme activation
             print("📅 Calendar onAppear - Current theme: \(themeManager.currentTheme)")
             checkAugust4thBirthdayActivation()
+            print("📅 Calendar onAppear - END")
         }
         .onChange(of: selectedDate) { oldValue, newValue in
             // Check for August 4th birthday theme activation when date changes

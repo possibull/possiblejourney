@@ -110,6 +110,7 @@ class ThemeManager: ObservableObject {
     
     // Public method for calendar view to check birthday activation with selected date
     func checkBirthdayActivationForDate(_ date: Date) {
+        print("🎂 ThemeManager.checkBirthdayActivationForDate called with date: \(date)")
         checkAndActivateBirthdayTheme(for: date)
     }
     
