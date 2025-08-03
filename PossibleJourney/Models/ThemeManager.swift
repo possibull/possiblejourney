@@ -70,12 +70,18 @@ class ThemeManager: ObservableObject {
     }
     
     private func checkAndActivateBirthdayTheme() {
+        checkAndActivateBirthdayTheme(for: Date())
+    }
+    
+    private func checkAndActivateBirthdayTheme(for date: Date) {
         let calendar = Calendar.current
-        let now = Date()
-        let components = calendar.dateComponents([.year, .month, .day], from: now)
+        let components = calendar.dateComponents([.year, .month, .day], from: date)
+        
+        print("🔍 ThemeManager Birthday Check - Date: \(date), Components: \(components)")
         
         // Check if it's August 4th, 2025
         if components.year == 2025 && components.month == 8 && components.day == 4 {
+            print("🎂 August 4th, 2025 detected in ThemeManager! Current theme: \(self.currentTheme)")
             // If user is currently on Bea theme, activate birthday theme
             if self.currentTheme == .bea {
                 print("🎂 August 4th, 2025 detected! Activating Birthday theme for Bea user!")
@@ -88,7 +94,11 @@ class ThemeManager: ObservableObject {
                         self.shouldShowBirthdayCake = true
                     }
                 }
+            } else {
+                print("🎂 August 4th detected but current theme is \(self.currentTheme), not .bea")
             }
+        } else {
+            print("🔍 Not August 4th, 2025 - Year: \(components.year ?? 0), Month: \(components.month ?? 0), Day: \(components.day ?? 0)")
         }
     }
     
@@ -96,6 +106,11 @@ class ThemeManager: ObservableObject {
         DispatchQueue.main.async {
             self.shouldShowBirthdayCake = false
         }
+    }
+    
+    // Public method for calendar view to check birthday activation with selected date
+    func checkBirthdayActivationForDate(_ date: Date) {
+        checkAndActivateBirthdayTheme(for: date)
     }
     
     var colorScheme: ColorScheme? {
