@@ -280,7 +280,7 @@ struct ThemeAwareCard: ViewModifier {
                 color: themeManager.currentTheme == .birthday ? 
                     Color.black.opacity(0.15) :
                     (themeManager.currentTheme == .bea ? 
-                        Color.black.opacity(0.1) : 
+                    Color.black.opacity(0.1) : 
                         (colorScheme == .dark ? Color.black.opacity(0.4) : Color.black.opacity(0.05))),
                 radius: themeManager.currentTheme == .birthday ? 8 : 
                     (themeManager.currentTheme == .bea ? 6 : (colorScheme == .dark ? 12 : 8)),
@@ -353,8 +353,8 @@ struct ThemeAwareDivider: ViewModifier {
                 themeManager.currentTheme == .birthday ? 
                     Color(red: 1.0, green: 0.8, blue: 0.9).opacity(0.7) : // Pink
                     (themeManager.currentTheme == .bea ? 
-                        Color(red: 0.8, green: 0.9, blue: 1.0).opacity(0.6) : // Pastel blue
-                        (colorScheme == .dark ? 
+                    Color(red: 0.8, green: 0.9, blue: 1.0).opacity(0.6) : // Pastel blue
+                    (colorScheme == .dark ? 
                             Color.white.opacity(0.15) : Color.gray.opacity(0.3)))
             )
     }
@@ -621,6 +621,11 @@ struct BirthdayCakePopup: View {
     @State private var crackScale: CGFloat = 1.0
     @State private var crackRotation: Double = 0
     @State private var reveal46: Bool = false
+    @State private var splitOffset5: CGFloat = 0
+    @State private var splitOffset0: CGFloat = 0
+    @State private var splitScale5: CGFloat = 1.0
+    @State private var splitScale0: CGFloat = 1.0
+    @State private var showSplitAnimation: Bool = false
     
     var body: some View {
         ZStack {
@@ -712,7 +717,7 @@ struct BirthdayCakePopup: View {
                                 .fill(Color.black.opacity(0.6))
                                 .frame(width: 120, height: 60)
                             
-                            // Show "50" initially, then "46" after cracking
+                            // Show "46" after splitting animation
                             if reveal46 {
                                 Text("46")
                                     .font(.system(size: 48, weight: .bold, design: .rounded))
@@ -720,14 +725,30 @@ struct BirthdayCakePopup: View {
                                     .shadow(color: .black.opacity(0.8), radius: 3, x: 0, y: 2)
                                     .transition(.scale.combined(with: .opacity))
                             } else {
-                                Text("50")
-                                    .font(.system(size: 48, weight: .bold, design: .rounded))
-                                    .foregroundColor(.white)
-                                    .shadow(color: .black.opacity(0.8), radius: 3, x: 0, y: 2)
-                                    .scaleEffect(crackScale)
-                                    .rotationEffect(.degrees(crackRotation))
-                                    .animation(.easeInOut(duration: 0.3), value: crackScale)
-                                    .animation(.easeInOut(duration: 0.3), value: crackRotation)
+                                // Split "50" into individual digits that move apart
+                                HStack(spacing: 0) {
+                                    // "5" - splits to the left
+                                    Text("5")
+                                        .font(.system(size: 48, weight: .bold, design: .rounded))
+                                        .foregroundColor(.white)
+                                        .shadow(color: .black.opacity(0.8), radius: 3, x: 0, y: 2)
+                                        .offset(x: splitOffset5)
+                                        .scaleEffect(splitScale5)
+                                        .clipped()
+                                    
+                                    // "0" - splits to the right
+                                    Text("0")
+                                        .font(.system(size: 48, weight: .bold, design: .rounded))
+                                        .foregroundColor(.white)
+                                        .shadow(color: .black.opacity(0.8), radius: 3, x: 0, y: 2)
+                                        .offset(x: splitOffset0)
+                                        .scaleEffect(splitScale0)
+                                        .clipped()
+                                }
+                                .animation(.easeInOut(duration: 0.8), value: splitOffset5)
+                                .animation(.easeInOut(duration: 0.8), value: splitOffset0)
+                                .animation(.easeInOut(duration: 0.8), value: splitScale5)
+                                .animation(.easeInOut(duration: 0.8), value: splitScale0)
                             }
                         }
                         .padding(.horizontal, 20)
@@ -804,16 +825,28 @@ struct BirthdayCakePopup: View {
                 createConfetti()
             }
             
-            // Start the cracking animation sequence
+            // Start the splitting animation sequence
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                // First, make the "50" shake and crack
-                withAnimation(.easeInOut(duration: 0.2).repeatCount(3, autoreverses: true)) {
-                    crackScale = 1.1
-                    crackRotation = 5
+                // First, make the "50" shake slightly
+                withAnimation(.easeInOut(duration: 0.2).repeatCount(2, autoreverses: true)) {
+                    crackScale = 1.05
+                    crackRotation = 2
+                }
+                
+                // Then split the numbers apart
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    withAnimation(.easeInOut(duration: 0.8)) {
+                        // "5" moves left and shrinks
+                        splitOffset5 = -30
+                        splitScale5 = 0.8
+                        // "0" moves right and shrinks
+                        splitOffset0 = 30
+                        splitScale0 = 0.8
+                    }
                 }
                 
                 // Then reveal "46"
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
                     withAnimation(.easeInOut(duration: 0.5)) {
                         reveal46 = true
                     }
