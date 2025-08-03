@@ -1672,18 +1672,20 @@ struct SlotMachineIcon: View {
     var body: some View {
         ZStack {
             if isSpinning && isAnimating {
-                // Spinning slot machine effect
+                // Spinning slot machine effect - make it more visible
                 VStack(spacing: 0) {
                     ForEach(0..<slotSymbols.count, id: \.self) { index in
                         Text(slotSymbols[index])
-                            .font(.system(size: 20, weight: .bold))
-                            .frame(height: 24)
-                            .opacity(index == currentIconIndex ? 1.0 : 0.6)
+                            .font(.system(size: 24, weight: .bold))
+                            .frame(height: 30)
+                            .opacity(index == currentIconIndex ? 1.0 : 0.8)
+                            .scaleEffect(index == currentIconIndex ? 1.2 : 1.0)
                     }
                 }
                 .offset(y: spinOffset)
                 .clipped()
-                .frame(height: 24)
+                .frame(height: 30)
+                .background(Color.red.opacity(0.1)) // Debug background
                 .onAppear {
                     startSpinAnimation()
                 }
@@ -1741,6 +1743,10 @@ struct SlotMachineCardIcon: View {
             Circle()
                 .fill(themeSecondaryColor.opacity(0.2))
                 .frame(width: 40, height: 40)
+                .overlay(
+                    Circle()
+                        .stroke(isSpinning ? Color.red : Color.clear, lineWidth: 3)
+                )
             
             SlotMachineIcon(
                 iconName: iconName,
