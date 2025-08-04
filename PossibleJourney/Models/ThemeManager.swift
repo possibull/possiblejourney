@@ -541,12 +541,12 @@ struct ThemeAwareDivider: ViewModifier {
 
 // MARK: - Birthday Theme Decorations
 struct BirthdayBalloons: View {
-    @State private var balloon1Offset: CGFloat = 800
-    @State private var balloon2Offset: CGFloat = 900
-    @State private var balloon3Offset: CGFloat = 1000
-    @State private var balloon4Offset: CGFloat = 1100
-    @State private var balloon5Offset: CGFloat = 1200
-    @State private var balloon6Offset: CGFloat = 1300
+    @State private var balloon1Offset: CGFloat = 200
+    @State private var balloon2Offset: CGFloat = 250
+    @State private var balloon3Offset: CGFloat = 300
+    @State private var balloon4Offset: CGFloat = 350
+    @State private var balloon5Offset: CGFloat = 400
+    @State private var balloon6Offset: CGFloat = 450
     @State private var rotationAngle: Double = 0
     @State private var scaleEffect: CGFloat = 1.0
     @State private var sparkleOpacity: Double = 0.3
@@ -593,7 +593,7 @@ struct BirthdayBalloons: View {
                                     )
                             }
                         )
-                        .offset(x: -100, y: balloon1Offset)
+                        .offset(x: -80, y: balloon1Offset)
                         .scaleEffect(scaleEffect)
                         .rotationEffect(.degrees(rotationAngle * 0.5))
                         .opacity(balloon1Opacity)
@@ -635,7 +635,7 @@ struct BirthdayBalloons: View {
                                 .offset(x: -8, y: -15)
                                 .rotationEffect(.degrees(45))
                         )
-                        .offset(x: 100, y: balloon2Offset)
+                        .offset(x: 80, y: balloon2Offset)
                         .scaleEffect(scaleEffect * 0.9)
                         .rotationEffect(.degrees(-rotationAngle * 0.3))
                         .opacity(balloon2Opacity)
@@ -711,7 +711,7 @@ struct BirthdayBalloons: View {
                             .frame(width: 2, height: 75)
                             .offset(y: 35)
                     )
-                    .offset(x: -150, y: balloon4Offset)
+                                            .offset(x: -120, y: balloon4Offset)
                     .scaleEffect(scaleEffect * 0.95)
                     .rotationEffect(.degrees(-rotationAngle * 0.4))
                     .opacity(balloon4Opacity)
@@ -749,7 +749,7 @@ struct BirthdayBalloons: View {
                             .frame(width: 2, height: 85)
                             .offset(y: 40)
                     )
-                    .offset(x: 150, y: balloon5Offset)
+                                            .offset(x: 120, y: balloon5Offset)
                     .scaleEffect(scaleEffect * 1.05)
                     .rotationEffect(.degrees(rotationAngle * 0.6))
                     .opacity(balloon5Opacity)
@@ -788,7 +788,7 @@ struct BirthdayBalloons: View {
                             .frame(width: 2, height: 70)
                             .offset(y: 30)
                     )
-                    .offset(x: -50, y: balloon6Offset)
+                                            .offset(x: -40, y: balloon6Offset)
                     .scaleEffect(scaleEffect * 0.88)
                     .rotationEffect(.degrees(-rotationAngle * 0.2))
                     .opacity(balloon6Opacity)
@@ -827,7 +827,7 @@ struct BirthdayBalloons: View {
                 Animation.linear(duration: 6)
                     .repeatForever(autoreverses: false)
             ) {
-                balloon1Offset = -600
+                balloon1Offset = -150
                 balloon1Opacity = 0.0
             }
             
@@ -836,7 +836,7 @@ struct BirthdayBalloons: View {
                 Animation.linear(duration: 7)
                     .repeatForever(autoreverses: false)
             ) {
-                balloon2Offset = -700
+                balloon2Offset = -200
                 balloon2Opacity = 0.0
             }
             
@@ -845,7 +845,7 @@ struct BirthdayBalloons: View {
                 Animation.linear(duration: 8)
                     .repeatForever(autoreverses: false)
             ) {
-                balloon3Offset = -800
+                balloon3Offset = -250
                 balloon3Opacity = 0.0
             }
             
@@ -854,7 +854,7 @@ struct BirthdayBalloons: View {
                 Animation.linear(duration: 5.5)
                     .repeatForever(autoreverses: false)
             ) {
-                balloon4Offset = -900
+                balloon4Offset = -300
                 balloon4Opacity = 0.0
             }
             
@@ -863,7 +863,7 @@ struct BirthdayBalloons: View {
                 Animation.linear(duration: 7.5)
                     .repeatForever(autoreverses: false)
             ) {
-                balloon5Offset = -1000
+                balloon5Offset = -350
                 balloon5Opacity = 0.0
             }
             
@@ -872,38 +872,38 @@ struct BirthdayBalloons: View {
                 Animation.linear(duration: 6.5)
                     .repeatForever(autoreverses: false)
             ) {
-                balloon6Offset = -1100
+                balloon6Offset = -400
                 balloon6Opacity = 0.0
             }
             
             // Reset balloons after they disappear to create continuous flow
             DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
-                balloon1Offset = 800
+                balloon1Offset = 200
                 balloon1Opacity = 1.0
             }
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
-                balloon2Offset = 900
+                balloon2Offset = 250
                 balloon2Opacity = 1.0
             }
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 8) {
-                balloon3Offset = 1000
+                balloon3Offset = 300
                 balloon3Opacity = 1.0
             }
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 5.5) {
-                balloon4Offset = 1100
+                balloon4Offset = 350
                 balloon4Opacity = 1.0
             }
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 7.5) {
-                balloon5Offset = 1200
+                balloon5Offset = 400
                 balloon5Opacity = 1.0
             }
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 6.5) {
-                balloon6Offset = 1300
+                balloon6Offset = 450
                 balloon6Opacity = 1.0
             }
         }
