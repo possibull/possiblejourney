@@ -20,6 +20,13 @@ struct DailyChecklistView: View {
     @State private var autoAdvanceTimer: Timer?
     @State private var showingReleaseNotes = false
     
+    // Computed property to check if current date is August 4th, 2025
+    private var isAugust4th2025: Bool {
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.year, .month, .day], from: viewModel.selectedDate)
+        return components.year == 2025 && components.month == 8 && components.day == 4
+    }
+    
     // Check for August 4th birthday theme activation
     private func checkAugust4thBirthdayActivation() {
         let calendar = Calendar.current
@@ -421,9 +428,16 @@ struct DailyChecklistView: View {
                         .fontWeight(.bold)
                         .foregroundColor(.primary)
                     
-                    Text(viewModel.selectedDate, style: .date)
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+                    // Show "My Happy Birthday" on August 4th, 2025 when birthday theme is active
+                    if isAugust4th2025 && themeManager.currentTheme == .birthday {
+                        Text("My Happy Birthday")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    } else {
+                        Text(viewModel.selectedDate, style: .date)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
                 }
                 
                 Spacer()
