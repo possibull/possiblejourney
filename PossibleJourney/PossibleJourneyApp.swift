@@ -318,8 +318,8 @@ struct GlobalThemeSelector: View {
     
     var body: some View {
         HStack(spacing: 8) {
-            // Hidden Easter egg button (only visible when Bea theme is active) - moved to left
-            if themeManager.currentTheme == .bea {
+            // Hidden Easter egg button (only visible when Bea theme or Birthday theme is active) - moved to left
+            if themeManager.currentTheme == .bea || themeManager.currentTheme == .birthday {
                 Button(action: {
                     print("🎨 Easter egg button tapped! Count: \(beaTapCount + 1)")
                     let now = Date()
