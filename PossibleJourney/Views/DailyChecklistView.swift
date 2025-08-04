@@ -233,12 +233,7 @@ struct DailyChecklistView: View {
                 isCompleted: false
             )
             
-            // Check if all tasks for this day are completed
-            let allTasksCompleted = viewModel.program.tasks().allSatisfy { task in
-                dayProgress.completedTaskIDs.contains(task.id)
-            }
-            
-            if !allTasksCompleted {
+            if !dayProgress.isCompleted {
                 // Found the first missed day, navigate to it
                 viewModel.selectDate(currentDate)
                 return
