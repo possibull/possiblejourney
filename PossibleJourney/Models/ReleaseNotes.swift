@@ -345,6 +345,22 @@ struct ReleaseNotes {
                 "🚀 Ready for TestFlight distribution with enhanced features"
             ],
             date: Date()
+        ),
+        ReleaseNotes(
+            version: "1.8",
+            buildNumber: 2,
+            title: "Visual Enhancements & Performance Improvements",
+            notes: [
+                "🎯 Enhanced theme functionality and visual effects",
+                "📱 Improved splash screen with additional visual elements",
+                "⚡ Better app performance and animation smoothness",
+                "🔧 Enhanced theme system with expanded visual effects",
+                "🎨 Optimized UI animations and visual transitions",
+                "✨ Added new animated elements and visual enhancements",
+                "🐛 Fixed various UI glitches and interaction issues",
+                "🚀 Ready for TestFlight distribution with enhanced features"
+            ],
+            date: Date()
         )
     ]
     
