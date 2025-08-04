@@ -541,21 +541,15 @@ struct ThemeAwareDivider: ViewModifier {
 
 // MARK: - Birthday Theme Decorations
 struct BirthdayBalloons: View {
-    @State private var balloon1Offset: CGFloat = 200
-    @State private var balloon2Offset: CGFloat = 250
-    @State private var balloon3Offset: CGFloat = 300
-    @State private var balloon4Offset: CGFloat = 350
-    @State private var balloon5Offset: CGFloat = 400
-    @State private var balloon6Offset: CGFloat = 450
+    @State private var balloon1Offset: CGFloat = 1200
+    @State private var balloon2Offset: CGFloat = 1300
+    @State private var balloon3Offset: CGFloat = 1400
     @State private var rotationAngle: Double = 0
     @State private var scaleEffect: CGFloat = 1.0
     @State private var sparkleOpacity: Double = 0.3
     @State private var balloon1Opacity: Double = 1.0
     @State private var balloon2Opacity: Double = 1.0
     @State private var balloon3Opacity: Double = 1.0
-    @State private var balloon4Opacity: Double = 1.0
-    @State private var balloon5Opacity: Double = 1.0
-    @State private var balloon6Opacity: Double = 1.0
     
     var body: some View {
         GeometryReader { geometry in
@@ -575,7 +569,7 @@ struct BirthdayBalloons: View {
                         )
                         .frame(width: 60, height: 75)
                         .overlay(
-                            // Balloon string
+                            // Balloon string - pointing down
                             Rectangle()
                                 .fill(Color.gray.opacity(0.3))
                                 .frame(width: 2, height: 80)
@@ -612,7 +606,7 @@ struct BirthdayBalloons: View {
                         )
                         .frame(width: 50, height: 65)
                         .overlay(
-                            // Balloon string
+                            // Balloon string - pointing down
                             Rectangle()
                                 .fill(Color.gray.opacity(0.3))
                                 .frame(width: 2, height: 70)
@@ -667,7 +661,7 @@ struct BirthdayBalloons: View {
                         }
                     }
                     .overlay(
-                        // Balloon string
+                        // Balloon string - pointing down
                         Rectangle()
                             .fill(Color.gray.opacity(0.3))
                             .frame(width: 2, height: 90)
@@ -677,121 +671,6 @@ struct BirthdayBalloons: View {
                     .scaleEffect(scaleEffect * 1.1)
                     .rotationEffect(.degrees(rotationAngle * 0.7))
                     .opacity(balloon3Opacity)
-                    
-                    // Balloon 4 - Purple with stars
-                    ZStack {
-                        Circle()
-                            .fill(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        Color(red: 0.9, green: 0.8, blue: 1.0), // Light purple
-                                        Color(red: 0.7, green: 0.6, blue: 0.9)  // Darker purple
-                                    ]),
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
-                            )
-                            .frame(width: 55, height: 70)
-                        
-                        // Stars
-                        ForEach(0..<3) { i in
-                            Image(systemName: "star.fill")
-                                .foregroundColor(.white.opacity(0.9))
-                                .font(.system(size: 8))
-                                .offset(
-                                    x: CGFloat.random(in: -15...15),
-                                    y: CGFloat.random(in: -20...20)
-                                )
-                        }
-                    }
-                    .overlay(
-                        // Balloon string
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.3))
-                            .frame(width: 2, height: 75)
-                            .offset(y: 35)
-                    )
-                                            .offset(x: -120, y: balloon4Offset)
-                    .scaleEffect(scaleEffect * 0.95)
-                    .rotationEffect(.degrees(-rotationAngle * 0.4))
-                    .opacity(balloon4Opacity)
-                    
-                    // Balloon 5 - Green with stripes
-                    ZStack {
-                        Circle()
-                            .fill(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        Color(red: 0.8, green: 1.0, blue: 0.8), // Light green
-                                        Color(red: 0.6, green: 0.9, blue: 0.6)  // Darker green
-                                    ]),
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
-                            )
-                            .frame(width: 65, height: 80)
-                        
-                        // Stripes
-                        ForEach(0..<3) { i in
-                            Rectangle()
-                                .fill(Color.white.opacity(0.7))
-                                .frame(width: 4, height: 25)
-                                .offset(
-                                    x: CGFloat.random(in: -15...15),
-                                    y: CGFloat.random(in: -20...20)
-                                )
-                        }
-                    }
-                    .overlay(
-                        // Balloon string
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.3))
-                            .frame(width: 2, height: 85)
-                            .offset(y: 40)
-                    )
-                                            .offset(x: 120, y: balloon5Offset)
-                    .scaleEffect(scaleEffect * 1.05)
-                    .rotationEffect(.degrees(rotationAngle * 0.6))
-                    .opacity(balloon5Opacity)
-                    
-                    // Balloon 6 - Orange with confetti
-                    ZStack {
-                        Circle()
-                            .fill(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        Color(red: 1.0, green: 0.9, blue: 0.7), // Light orange
-                                        Color(red: 0.9, green: 0.7, blue: 0.5)  // Darker orange
-                                    ]),
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
-                            )
-                            .frame(width: 45, height: 60)
-                        
-                        // Confetti pieces
-                        ForEach(0..<5) { i in
-                            Rectangle()
-                                .fill(Color.white.opacity(0.8))
-                                .frame(width: 3, height: 6)
-                                .rotationEffect(.degrees(Double.random(in: 0...360)))
-                                .offset(
-                                    x: CGFloat.random(in: -15...15),
-                                    y: CGFloat.random(in: -20...20)
-                                )
-                        }
-                    }
-                    .overlay(
-                        // Balloon string
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.3))
-                            .frame(width: 2, height: 70)
-                            .offset(y: 30)
-                    )
-                                            .offset(x: -40, y: balloon6Offset)
-                    .scaleEffect(scaleEffect * 0.88)
-                    .rotationEffect(.degrees(-rotationAngle * 0.2))
-                    .opacity(balloon6Opacity)
                 }
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
@@ -822,89 +701,47 @@ struct BirthdayBalloons: View {
                 sparkleOpacity = 0.8
             }
             
-            // Balloon 1 floating rapidly up and disappearing
-            withAnimation(
-                Animation.linear(duration: 6)
-                    .repeatForever(autoreverses: false)
-            ) {
-                balloon1Offset = -150
-                balloon1Opacity = 0.0
-            }
-            
-            // Balloon 2 floating rapidly up and disappearing
-            withAnimation(
-                Animation.linear(duration: 7)
-                    .repeatForever(autoreverses: false)
-            ) {
-                balloon2Offset = -200
-                balloon2Opacity = 0.0
-            }
-            
-            // Balloon 3 floating rapidly up and disappearing
+            // Balloon 1 floating from bottom to top
             withAnimation(
                 Animation.linear(duration: 8)
                     .repeatForever(autoreverses: false)
             ) {
-                balloon3Offset = -250
+                balloon1Offset = -800
+                balloon1Opacity = 0.0
+            }
+            
+            // Balloon 2 floating from bottom to top
+            withAnimation(
+                Animation.linear(duration: 10)
+                    .repeatForever(autoreverses: false)
+            ) {
+                balloon2Offset = -900
+                balloon2Opacity = 0.0
+            }
+            
+            // Balloon 3 floating from bottom to top
+            withAnimation(
+                Animation.linear(duration: 12)
+                    .repeatForever(autoreverses: false)
+            ) {
+                balloon3Offset = -1000
                 balloon3Opacity = 0.0
             }
             
-            // Balloon 4 floating rapidly up and disappearing
-            withAnimation(
-                Animation.linear(duration: 5.5)
-                    .repeatForever(autoreverses: false)
-            ) {
-                balloon4Offset = -300
-                balloon4Opacity = 0.0
-            }
-            
-            // Balloon 5 floating rapidly up and disappearing
-            withAnimation(
-                Animation.linear(duration: 7.5)
-                    .repeatForever(autoreverses: false)
-            ) {
-                balloon5Offset = -350
-                balloon5Opacity = 0.0
-            }
-            
-            // Balloon 6 floating rapidly up and disappearing
-            withAnimation(
-                Animation.linear(duration: 6.5)
-                    .repeatForever(autoreverses: false)
-            ) {
-                balloon6Offset = -400
-                balloon6Opacity = 0.0
-            }
-            
             // Reset balloons after they disappear to create continuous flow
-            DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
-                balloon1Offset = 200
+            DispatchQueue.main.asyncAfter(deadline: .now() + 8) {
+                balloon1Offset = 1200
                 balloon1Opacity = 1.0
             }
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
-                balloon2Offset = 250
+            DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+                balloon2Offset = 1300
                 balloon2Opacity = 1.0
             }
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 8) {
-                balloon3Offset = 300
+            DispatchQueue.main.asyncAfter(deadline: .now() + 12) {
+                balloon3Offset = 1400
                 balloon3Opacity = 1.0
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 5.5) {
-                balloon4Offset = 350
-                balloon4Opacity = 1.0
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 7.5) {
-                balloon5Offset = 400
-                balloon5Opacity = 1.0
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 6.5) {
-                balloon6Offset = 450
-                balloon6Opacity = 1.0
             }
         }
     }

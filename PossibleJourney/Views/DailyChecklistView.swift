@@ -398,17 +398,17 @@ struct DailyChecklistView: View {
     
     private var checklistContent: some View {
         VStack(spacing: 0) {
+            headerView
+            
             ZStack {
-                headerView
+                taskListView
                 
-                // Add balloons on top of the header card when birthday theme is active
+                // Add balloons floating from bottom to top when birthday theme is active
                 if themeManager.currentTheme == .birthday {
                     BirthdayBalloons()
-                        .allowsHitTesting(false) // Allow taps to pass through to the header
+                        .allowsHitTesting(false) // Allow taps to pass through to the tasks
                 }
             }
-            
-            taskListView
         }
     }
     
@@ -446,7 +446,8 @@ struct DailyChecklistView: View {
                 .scaleEffect(x: 1, y: 2, anchor: .center)
         }
         .padding()
-        .themeAwareHeader()
+        .background(Color(.systemGray6).opacity(0.3))
+        .cornerRadius(12)
     }
     
     private var taskListView: some View {
