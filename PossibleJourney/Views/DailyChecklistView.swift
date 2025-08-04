@@ -891,6 +891,9 @@ struct TaskRowView: View {
         }
         .sheet(isPresented: $showingImagePicker) {
             ImagePicker(selectedImage: $selectedImage, sourceType: imageSource)
+                .ignoresSafeArea()
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showingFullPhoto) {
             FullPhotoViewer(image: fullImage, taskTitle: task.title)
