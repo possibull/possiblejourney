@@ -88,6 +88,12 @@ struct SplashView: View {
             .rotationEffect(.degrees(backgroundRotation))
             .animation(.linear(duration: 20).repeatForever(autoreverses: false), value: backgroundRotation)
             
+            // Birthday decorations (only for birthday theme)
+            if themeManager.currentTheme == .birthday {
+                BirthdayBalloons()
+                BirthdayStreamers()
+            }
+            
             // Subtle animated circles
             Circle()
                 .fill(Color.white.opacity(0.1))
