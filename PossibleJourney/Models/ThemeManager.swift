@@ -1185,30 +1185,30 @@ struct BirthdayBalloons: View {
     }
     
     private func startBalloonAnimations() {
-        // Rotation animation
-        withAnimation(
-            Animation.linear(duration: 6)
-                .repeatForever(autoreverses: false)
-        ) {
-            rotationAngle = 360
-        }
-        
-        // Scale animation
-        withAnimation(
-            Animation.easeInOut(duration: 2.0)
-                .repeatForever(autoreverses: true)
-        ) {
-            scaleEffect = 1.1
-        }
-        
-        // Sparkle animation
-        withAnimation(
-            Animation.easeInOut(duration: 1.0)
-                .repeatForever(autoreverses: true)
-        ) {
-            sparkleOpacity = 0.8
-        }
-        
+            // Rotation animation
+            withAnimation(
+                Animation.linear(duration: 6)
+                    .repeatForever(autoreverses: false)
+            ) {
+                rotationAngle = 360
+            }
+            
+            // Scale animation
+            withAnimation(
+                Animation.easeInOut(duration: 2.0)
+                    .repeatForever(autoreverses: true)
+            ) {
+                scaleEffect = 1.1
+            }
+            
+            // Sparkle animation
+            withAnimation(
+                Animation.easeInOut(duration: 1.0)
+                    .repeatForever(autoreverses: true)
+            ) {
+                sparkleOpacity = 0.8
+            }
+            
         // Start continuous balloon animations (slower speeds)
         animateBalloon(1, duration: 12.0, delay: 0.0)
         animateBalloon(2, duration: 15.0, delay: 1.0)
@@ -1235,7 +1235,7 @@ struct BirthdayBalloons: View {
     
     private func animateSingleBalloon(_ balloonNumber: Int, duration: Double) {
         // Animate balloon floating up
-        withAnimation(
+            withAnimation(
             Animation.linear(duration: duration)
         ) {
             switch balloonNumber {
