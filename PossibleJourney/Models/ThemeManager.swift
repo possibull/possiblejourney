@@ -2367,6 +2367,318 @@ struct USAStripes: View {
     }
 } 
 
+// MARK: - Additional Girly Birthday Decorations
+
+struct BirthdayGlitter: View {
+    @State private var glitterOffset: CGFloat = 0
+    @State private var glitterRotation: Double = 0
+    @State private var glitterOpacity: Double = 0.7
+    
+    var body: some View {
+        ZStack {
+            // Sparkling glitter pieces
+            ForEach(0..<20, id: \.self) { index in
+                Image(systemName: "sparkle")
+                    .foregroundColor([
+                        Color(red: 1.0, green: 0.8, blue: 0.9), // Pink
+                        Color(red: 0.8, green: 0.9, blue: 1.0), // Blue
+                        Color(red: 1.0, green: 0.95, blue: 0.7), // Yellow
+                        Color(red: 1.0, green: 0.9, blue: 0.95), // Light pink
+                        Color.white
+                    ][index % 5])
+                    .font(.system(size: CGFloat.random(in: 8...16)))
+                    .offset(
+                        x: CGFloat.random(in: -200...200),
+                        y: CGFloat.random(in: -400...400)
+                    )
+                    .rotationEffect(.degrees(glitterRotation + Double(index * 18)))
+                    .opacity(glitterOpacity)
+                    .animation(
+                        .easeInOut(duration: Double.random(in: 1.5...3.0))
+                        .repeatForever(autoreverses: true)
+                        .delay(Double(index) * 0.1),
+                        value: glitterRotation
+                    )
+            }
+        }
+        .onAppear {
+            withAnimation(
+                Animation.linear(duration: 8)
+                    .repeatForever(autoreverses: false)
+            ) {
+                glitterRotation = 360
+            }
+            
+            withAnimation(
+                Animation.easeInOut(duration: 2)
+                    .repeatForever(autoreverses: true)
+            ) {
+                glitterOpacity = 1.0
+            }
+        }
+    }
+}
+
+struct BirthdayHearts: View {
+    @State private var heartOffset: CGFloat = 0
+    @State private var heartScale: CGFloat = 1.0
+    @State private var heartRotation: Double = 0
+    
+    var body: some View {
+        ZStack {
+            // Floating hearts
+            ForEach(0..<12, id: \.self) { index in
+                Image(systemName: "heart.fill")
+                    .foregroundColor([
+                        Color(red: 1.0, green: 0.6, blue: 0.8), // Pink
+                        Color(red: 1.0, green: 0.8, blue: 0.9), // Light pink
+                        Color(red: 0.9, green: 0.7, blue: 0.9), // Purple
+                        Color(red: 1.0, green: 0.9, blue: 0.95) // Very light pink
+                    ][index % 4])
+                    .font(.system(size: CGFloat.random(in: 12...24)))
+                    .offset(
+                        x: CGFloat.random(in: -180...180),
+                        y: CGFloat.random(in: -350...350) + heartOffset
+                    )
+                    .scaleEffect(heartScale)
+                    .rotationEffect(.degrees(heartRotation + Double(index * 30)))
+                    .animation(
+                        .easeInOut(duration: Double.random(in: 2.0...4.0))
+                        .repeatForever(autoreverses: true)
+                        .delay(Double(index) * 0.2),
+                        value: heartScale
+                    )
+            }
+        }
+        .onAppear {
+            withAnimation(
+                Animation.easeInOut(duration: 4)
+                    .repeatForever(autoreverses: true)
+            ) {
+                heartOffset = 20
+                heartScale = 1.2
+                heartRotation = 360
+            }
+        }
+    }
+}
+
+struct BirthdayStars: View {
+    @State private var starOffset: CGFloat = 0
+    @State private var starScale: CGFloat = 1.0
+    @State private var starRotation: Double = 0
+    
+    var body: some View {
+        ZStack {
+            // Twinkling stars
+            ForEach(0..<15, id: \.self) { index in
+                Image(systemName: "star.fill")
+                    .foregroundColor([
+                        Color(red: 1.0, green: 0.95, blue: 0.7), // Yellow
+                        Color(red: 1.0, green: 1.0, blue: 0.8), // Light yellow
+                        Color.white,
+                        Color(red: 1.0, green: 0.9, blue: 0.6) // Gold
+                    ][index % 4])
+                    .font(.system(size: CGFloat.random(in: 10...20)))
+                    .offset(
+                        x: CGFloat.random(in: -200...200),
+                        y: CGFloat.random(in: -400...400) + starOffset
+                    )
+                    .scaleEffect(starScale)
+                    .rotationEffect(.degrees(starRotation + Double(index * 24)))
+                    .animation(
+                        .easeInOut(duration: Double.random(in: 1.5...3.5))
+                        .repeatForever(autoreverses: true)
+                        .delay(Double(index) * 0.15),
+                        value: starScale
+                    )
+            }
+        }
+        .onAppear {
+            withAnimation(
+                Animation.easeInOut(duration: 3)
+                    .repeatForever(autoreverses: true)
+            ) {
+                starOffset = 15
+                starScale = 1.3
+                starRotation = 360
+            }
+        }
+    }
+}
+
+struct BirthdayCupcakes: View {
+    @State private var cupcakeOffset: CGFloat = 0
+    @State private var cupcakeScale: CGFloat = 1.0
+    @State private var cupcakeRotation: Double = 0
+    
+    var body: some View {
+        ZStack {
+            // Decorative cupcakes
+            ForEach(0..<6, id: \.self) { index in
+                ZStack {
+                    // Cupcake base
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color(red: 0.9, green: 0.7, blue: 0.5), // Brown
+                                    Color(red: 0.8, green: 0.6, blue: 0.4)
+                                ]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                        .frame(width: 30, height: 25)
+                    
+                    // Cupcake frosting
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color(red: 1.0, green: 0.8, blue: 0.9), // Pink
+                                    Color(red: 0.9, green: 0.6, blue: 0.8)
+                                ]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                        .frame(width: 35, height: 20)
+                        .offset(y: -12)
+                    
+                    // Sprinkles
+                    ForEach(0..<5, id: \.self) { sprinkleIndex in
+                        Circle()
+                            .fill([
+                                Color(red: 1.0, green: 0.9, blue: 0.7), // Yellow
+                                Color(red: 0.8, green: 0.9, blue: 1.0), // Blue
+                                Color(red: 1.0, green: 0.8, blue: 0.9) // Pink
+                            ][sprinkleIndex % 3])
+                            .frame(width: 3, height: 3)
+                            .offset(
+                                x: CGFloat.random(in: -10...10),
+                                y: CGFloat.random(in: -15...(-5))
+                            )
+                    }
+                }
+                .offset(
+                    x: CGFloat(index * 60 - 150),
+                    y: 300 + cupcakeOffset
+                )
+                .scaleEffect(cupcakeScale)
+                .rotationEffect(.degrees(cupcakeRotation + Double(index * 60)))
+                .animation(
+                    .easeInOut(duration: Double.random(in: 2.0...4.0))
+                    .repeatForever(autoreverses: true)
+                    .delay(Double(index) * 0.3),
+                    value: cupcakeScale
+                )
+            }
+        }
+        .onAppear {
+            withAnimation(
+                Animation.easeInOut(duration: 4)
+                    .repeatForever(autoreverses: true)
+            ) {
+                cupcakeOffset = 10
+                cupcakeScale = 1.1
+                cupcakeRotation = 360
+            }
+        }
+    }
+}
+
+struct BirthdayGifts: View {
+    @State private var giftOffset: CGFloat = 0
+    @State private var giftScale: CGFloat = 1.0
+    @State private var giftRotation: Double = 0
+    
+    var body: some View {
+        ZStack {
+            // Decorative gift boxes
+            ForEach(0..<4, id: \.self) { index in
+                ZStack {
+                    // Gift box base
+                    Rectangle()
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color(red: 1.0, green: 0.8, blue: 0.9), // Pink
+                                    Color(red: 0.9, green: 0.6, blue: 0.8)
+                                ]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                        .frame(width: 40, height: 35)
+                        .cornerRadius(5)
+                    
+                    // Gift box lid
+                    Rectangle()
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color(red: 0.8, green: 0.9, blue: 1.0), // Blue
+                                    Color(red: 0.6, green: 0.8, blue: 0.9)
+                                ]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                        .frame(width: 45, height: 8)
+                        .cornerRadius(3)
+                        .offset(y: -21)
+                    
+                    // Ribbon
+                    Rectangle()
+                        .fill(Color(red: 1.0, green: 0.95, blue: 0.7)) // Yellow
+                        .frame(width: 4, height: 35)
+                    
+                    Rectangle()
+                        .fill(Color(red: 1.0, green: 0.95, blue: 0.7)) // Yellow
+                        .frame(width: 40, height: 4)
+                        .offset(y: 5)
+                    
+                    // Bow
+                    ZStack {
+                        Circle()
+                            .fill(Color(red: 1.0, green: 0.6, blue: 0.8)) // Pink
+                            .frame(width: 12, height: 8)
+                        
+                        Circle()
+                            .fill(Color(red: 1.0, green: 0.6, blue: 0.8)) // Pink
+                            .frame(width: 8, height: 12)
+                    }
+                    .offset(y: -21)
+                }
+                .offset(
+                    x: CGFloat(index * 80 - 120),
+                    y: 350 + giftOffset
+                )
+                .scaleEffect(giftScale)
+                .rotationEffect(.degrees(giftRotation + Double(index * 90)))
+                .animation(
+                    .easeInOut(duration: Double.random(in: 2.5...4.5))
+                    .repeatForever(autoreverses: true)
+                    .delay(Double(index) * 0.4),
+                    value: giftScale
+                )
+            }
+        }
+        .onAppear {
+            withAnimation(
+                Animation.easeInOut(duration: 5)
+                    .repeatForever(autoreverses: true)
+            ) {
+                giftOffset = 15
+                giftScale = 1.15
+                giftRotation = 360
+            }
+        }
+    }
+}
+
+
 
 
  

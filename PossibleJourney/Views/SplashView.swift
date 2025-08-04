@@ -92,6 +92,11 @@ struct SplashView: View {
             if themeManager.currentTheme == .birthday {
                 BirthdayBalloons()
                 BirthdayStreamers()
+                BirthdayGlitter()
+                BirthdayHearts()
+                BirthdayStars()
+                BirthdayCupcakes()
+                BirthdayGifts()
             }
             
             // Subtle animated circles
