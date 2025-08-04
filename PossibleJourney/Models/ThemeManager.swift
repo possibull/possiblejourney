@@ -577,25 +577,25 @@ struct BirthdayBalloons: View {
     
     var body: some View {
         GeometryReader { geometry in
-            ZStack {
+        ZStack {
                 // Balloon 1 - Pink with sparkles
                 ZStack {
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    Color(red: 1.0, green: 0.8, blue: 0.9), // Light pink
-                                    Color(red: 0.9, green: 0.6, blue: 0.8)  // Darker pink
-                                ]),
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
+            Circle()
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color(red: 1.0, green: 0.8, blue: 0.9), // Light pink
+                            Color(red: 0.9, green: 0.6, blue: 0.8)  // Darker pink
+                        ]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
                         .frame(width: 60, height: 75)
-                        .overlay(
+                .overlay(
                             // Balloon string - pointing down
-                            Rectangle()
-                                .fill(Color.gray.opacity(0.3))
+                    Rectangle()
+                        .fill(Color.gray.opacity(0.3))
                                 .frame(width: 2, height: 80)
                                 .offset(y: 37)
                         )
@@ -617,22 +617,22 @@ struct BirthdayBalloons: View {
                         .opacity(balloon1Opacity)
                     
                     // Balloon 2 - Blue with shimmer
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    Color(red: 0.8, green: 0.9, blue: 1.0), // Light blue
-                                    Color(red: 0.6, green: 0.8, blue: 0.9)  // Darker blue
-                                ]),
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
+            Circle()
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color(red: 0.8, green: 0.9, blue: 1.0), // Light blue
+                            Color(red: 0.6, green: 0.8, blue: 0.9)  // Darker blue
+                        ]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
                         .frame(width: 50, height: 65)
-                        .overlay(
+                .overlay(
                             // Balloon string - pointing down
-                            Rectangle()
-                                .fill(Color.gray.opacity(0.3))
+                    Rectangle()
+                        .fill(Color.gray.opacity(0.3))
                                 .frame(width: 2, height: 70)
                                 .offset(y: 32)
                         )
@@ -660,17 +660,17 @@ struct BirthdayBalloons: View {
                     
                     // Balloon 3 - Yellow with polka dots
                     ZStack {
-                        Circle()
-                            .fill(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        Color(red: 1.0, green: 0.95, blue: 0.7), // Light yellow
-                                        Color(red: 0.9, green: 0.85, blue: 0.6)  // Darker yellow
-                                    ]),
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
-                            )
+            Circle()
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            Color(red: 1.0, green: 0.95, blue: 0.7), // Light yellow
+                            Color(red: 0.9, green: 0.85, blue: 0.6)  // Darker yellow
+                        ]),
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
                             .frame(width: 70, height: 85)
                         
                         // Polka dots
@@ -684,7 +684,7 @@ struct BirthdayBalloons: View {
                                 )
                         }
                     }
-                    .overlay(
+                .overlay(
                         // Balloon string - pointing down
                         Rectangle()
                             .fill(Color.gray.opacity(0.3))
@@ -801,9 +801,9 @@ struct BirthdayBalloons: View {
                     }
                     .overlay(
                         // Balloon string - pointing down
-                        Rectangle()
-                            .fill(Color.gray.opacity(0.3))
-                            .frame(width: 2, height: 70)
+                    Rectangle()
+                        .fill(Color.gray.opacity(0.3))
+                        .frame(width: 2, height: 70)
                             .offset(y: 30)
                     )
                     .offset(x: -40, y: balloon6Offset)
@@ -1180,240 +1180,169 @@ struct BirthdayBalloons: View {
             .clipped(antialiased: false)
         }
         .onAppear {
-            // Rotation animation
-            withAnimation(
-                Animation.linear(duration: 6)
-                    .repeatForever(autoreverses: false)
-            ) {
-                rotationAngle = 360
-            }
-            
-            // Scale animation
-            withAnimation(
-                Animation.easeInOut(duration: 2.0)
-                    .repeatForever(autoreverses: true)
-            ) {
-                scaleEffect = 1.1
-            }
-            
-            // Sparkle animation
-            withAnimation(
-                Animation.easeInOut(duration: 1.0)
-                    .repeatForever(autoreverses: true)
-            ) {
-                sparkleOpacity = 0.8
-            }
-            
-            // Balloon 1 floating from bottom to top
-            withAnimation(
-                Animation.linear(duration: 8)
-                    .repeatForever(autoreverses: false)
-            ) {
+            startBalloonAnimations()
+        }
+    }
+    
+    private func startBalloonAnimations() {
+        // Rotation animation
+        withAnimation(
+            Animation.linear(duration: 6)
+                .repeatForever(autoreverses: false)
+        ) {
+            rotationAngle = 360
+        }
+        
+        // Scale animation
+        withAnimation(
+            Animation.easeInOut(duration: 2.0)
+                .repeatForever(autoreverses: true)
+        ) {
+            scaleEffect = 1.1
+        }
+        
+        // Sparkle animation
+        withAnimation(
+            Animation.easeInOut(duration: 1.0)
+                .repeatForever(autoreverses: true)
+        ) {
+            sparkleOpacity = 0.8
+        }
+        
+        // Start continuous balloon animations
+        animateBalloon(1, duration: 8.0, delay: 0.0)
+        animateBalloon(2, duration: 10.0, delay: 1.0)
+        animateBalloon(3, duration: 12.0, delay: 2.0)
+        animateBalloon(4, duration: 9.0, delay: 0.5)
+        animateBalloon(5, duration: 11.0, delay: 1.5)
+        animateBalloon(6, duration: 8.0, delay: 3.0)
+        animateBalloon(7, duration: 13.0, delay: 0.8)
+        animateBalloon(8, duration: 10.0, delay: 2.5)
+        animateBalloon(9, duration: 14.0, delay: 1.2)
+        animateBalloon(10, duration: 7.0, delay: 3.5)
+        animateBalloon(11, duration: 15.0, delay: 0.3)
+        animateBalloon(12, duration: 9.5, delay: 2.8)
+        animateBalloon(13, duration: 11.5, delay: 1.8)
+        animateBalloon(14, duration: 8.5, delay: 3.2)
+        animateBalloon(15, duration: 12.5, delay: 0.7)
+    }
+    
+    private func animateBalloon(_ balloonNumber: Int, duration: Double, delay: Double) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            animateSingleBalloon(balloonNumber, duration: duration)
+        }
+    }
+    
+    private func animateSingleBalloon(_ balloonNumber: Int, duration: Double) {
+        // Animate balloon floating up
+        withAnimation(
+            Animation.linear(duration: duration)
+        ) {
+            switch balloonNumber {
+            case 1:
                 balloon1Offset = -800
                 balloon1Opacity = 0.0
-            }
-            
-            // Balloon 2 floating from bottom to top
-            withAnimation(
-                Animation.linear(duration: 10)
-                    .repeatForever(autoreverses: false)
-            ) {
+            case 2:
                 balloon2Offset = -900
                 balloon2Opacity = 0.0
-            }
-            
-            // Balloon 3 floating from bottom to top
-            withAnimation(
-                Animation.linear(duration: 12)
-                    .repeatForever(autoreverses: false)
-            ) {
+            case 3:
                 balloon3Offset = -1000
                 balloon3Opacity = 0.0
-            }
-            
-            // Balloon 4 floating from bottom to top
-            withAnimation(
-                Animation.linear(duration: 9)
-                    .repeatForever(autoreverses: false)
-            ) {
+            case 4:
                 balloon4Offset = -1100
                 balloon4Opacity = 0.0
-            }
-            
-            // Balloon 5 floating from bottom to top
-            withAnimation(
-                Animation.linear(duration: 11)
-                    .repeatForever(autoreverses: false)
-            ) {
+            case 5:
                 balloon5Offset = -1200
                 balloon5Opacity = 0.0
-            }
-            
-            // Balloon 6 floating from bottom to top
-            withAnimation(
-                Animation.linear(duration: 8)
-                    .repeatForever(autoreverses: false)
-            ) {
+            case 6:
                 balloon6Offset = -1300
                 balloon6Opacity = 0.0
-            }
-            
-            // Balloon 7 floating from bottom to top
-            withAnimation(
-                Animation.linear(duration: 13)
-                    .repeatForever(autoreverses: false)
-            ) {
+            case 7:
                 balloon7Offset = -1400
                 balloon7Opacity = 0.0
-            }
-            
-            // Balloon 8 floating from bottom to top
-            withAnimation(
-                Animation.linear(duration: 10)
-                    .repeatForever(autoreverses: false)
-            ) {
+            case 8:
                 balloon8Offset = -1500
                 balloon8Opacity = 0.0
-            }
-            
-            // Balloon 9 floating from bottom to top
-            withAnimation(
-                Animation.linear(duration: 14)
-                    .repeatForever(autoreverses: false)
-            ) {
+            case 9:
                 balloon9Offset = -1600
                 balloon9Opacity = 0.0
-            }
-            
-            // Balloon 10 floating from bottom to top
-            withAnimation(
-                Animation.linear(duration: 7)
-                    .repeatForever(autoreverses: false)
-            ) {
+            case 10:
                 balloon10Offset = -1700
                 balloon10Opacity = 0.0
-            }
-            
-            // Balloon 11 floating from bottom to top
-            withAnimation(
-                Animation.linear(duration: 15)
-                    .repeatForever(autoreverses: false)
-            ) {
+            case 11:
                 balloon11Offset = -1800
                 balloon11Opacity = 0.0
-            }
-            
-            // Balloon 12 floating from bottom to top
-            withAnimation(
-                Animation.linear(duration: 9.5)
-                    .repeatForever(autoreverses: false)
-            ) {
+            case 12:
                 balloon12Offset = -1900
                 balloon12Opacity = 0.0
-            }
-            
-            // Balloon 13 floating from bottom to top
-            withAnimation(
-                Animation.linear(duration: 11.5)
-                    .repeatForever(autoreverses: false)
-            ) {
+            case 13:
                 balloon13Offset = -2000
                 balloon13Opacity = 0.0
-            }
-            
-            // Balloon 14 floating from bottom to top
-            withAnimation(
-                Animation.linear(duration: 8.5)
-                    .repeatForever(autoreverses: false)
-            ) {
+            case 14:
                 balloon14Offset = -2100
                 balloon14Opacity = 0.0
-            }
-            
-            // Balloon 15 floating from bottom to top
-            withAnimation(
-                Animation.linear(duration: 12.5)
-                    .repeatForever(autoreverses: false)
-            ) {
+            case 15:
                 balloon15Offset = -2200
                 balloon15Opacity = 0.0
+            default:
+                break
             }
-            
-            // Reset balloons after they disappear to create continuous flow
-            DispatchQueue.main.asyncAfter(deadline: .now() + 8) {
+        }
+        
+        // Reset balloon after animation completes and restart
+        DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
+            switch balloonNumber {
+            case 1:
                 balloon1Offset = 1200
                 balloon1Opacity = 1.0
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+            case 2:
                 balloon2Offset = 1300
                 balloon2Opacity = 1.0
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 12) {
+            case 3:
                 balloon3Offset = 1400
                 balloon3Opacity = 1.0
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 9) {
+            case 4:
                 balloon4Offset = 1500
                 balloon4Opacity = 1.0
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 11) {
+            case 5:
                 balloon5Offset = 1600
                 balloon5Opacity = 1.0
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 8) {
+            case 6:
                 balloon6Offset = 1700
                 balloon6Opacity = 1.0
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 13) {
+            case 7:
                 balloon7Offset = 1800
                 balloon7Opacity = 1.0
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+            case 8:
                 balloon8Offset = 1900
                 balloon8Opacity = 1.0
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 14) {
+            case 9:
                 balloon9Offset = 2000
                 balloon9Opacity = 1.0
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
+            case 10:
                 balloon10Offset = 2100
                 balloon10Opacity = 1.0
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
+            case 11:
                 balloon11Offset = 2200
                 balloon11Opacity = 1.0
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 9.5) {
+            case 12:
                 balloon12Offset = 2300
                 balloon12Opacity = 1.0
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 11.5) {
+            case 13:
                 balloon13Offset = 2400
                 balloon13Opacity = 1.0
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 8.5) {
+            case 14:
                 balloon14Offset = 2500
                 balloon14Opacity = 1.0
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 12.5) {
+            case 15:
                 balloon15Offset = 2600
                 balloon15Opacity = 1.0
+            default:
+                break
             }
+            
+            // Restart the animation for this balloon
+            animateSingleBalloon(balloonNumber, duration: duration)
         }
     }
 }
@@ -2341,7 +2270,7 @@ struct LasVegasCardElements: View {
             }
         }
     }
-}
+} 
 
 // MARK: - USA Theme Components
 struct USAPattern: View {
