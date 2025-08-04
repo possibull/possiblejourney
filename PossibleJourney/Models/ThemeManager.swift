@@ -558,245 +558,249 @@ struct BirthdayBalloons: View {
     @State private var balloon6Opacity: Double = 1.0
     
     var body: some View {
-        ZStack {
-            // Balloon 1 - Pink with sparkles
+        GeometryReader { geometry in
             ZStack {
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color(red: 1.0, green: 0.8, blue: 0.9), // Light pink
-                                Color(red: 0.9, green: 0.6, blue: 0.8)  // Darker pink
-                            ]),
-                            startPoint: .top,
-                            endPoint: .bottom
+                // Balloon 1 - Pink with sparkles
+                ZStack {
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color(red: 1.0, green: 0.8, blue: 0.9), // Light pink
+                                    Color(red: 0.9, green: 0.6, blue: 0.8)  // Darker pink
+                                ]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
                         )
-                    )
-                    .frame(width: 40, height: 50)
+                        .frame(width: 60, height: 75)
+                        .overlay(
+                            // Balloon string
+                            Rectangle()
+                                .fill(Color.gray.opacity(0.3))
+                                .frame(width: 2, height: 80)
+                                .offset(y: 37)
+                        )
+                        .overlay(
+                            // Sparkles
+                            ForEach(0..<3) { i in
+                                Image(systemName: "sparkle")
+                                    .foregroundColor(.white.opacity(sparkleOpacity))
+                                    .font(.system(size: 12))
+                                    .offset(
+                                        x: CGFloat.random(in: -20...20),
+                                        y: CGFloat.random(in: -25...25)
+                                    )
+                            }
+                        )
+                        .offset(x: -100, y: balloon1Offset)
+                        .scaleEffect(scaleEffect)
+                        .rotationEffect(.degrees(rotationAngle * 0.5))
+                        .opacity(balloon1Opacity)
+                    
+                    // Balloon 2 - Blue with shimmer
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color(red: 0.8, green: 0.9, blue: 1.0), // Light blue
+                                    Color(red: 0.6, green: 0.8, blue: 0.9)  // Darker blue
+                                ]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                        .frame(width: 50, height: 65)
+                        .overlay(
+                            // Balloon string
+                            Rectangle()
+                                .fill(Color.gray.opacity(0.3))
+                                .frame(width: 2, height: 70)
+                                .offset(y: 32)
+                        )
+                        .overlay(
+                            // Shimmer effect
+                            Rectangle()
+                                .fill(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            Color.white.opacity(0.6),
+                                            Color.clear
+                                        ]),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    )
+                                )
+                                .frame(width: 25, height: 30)
+                                .offset(x: -8, y: -15)
+                                .rotationEffect(.degrees(45))
+                        )
+                        .offset(x: 100, y: balloon2Offset)
+                        .scaleEffect(scaleEffect * 0.9)
+                        .rotationEffect(.degrees(-rotationAngle * 0.3))
+                        .opacity(balloon2Opacity)
+                    
+                    // Balloon 3 - Yellow with polka dots
+                    ZStack {
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color(red: 1.0, green: 0.95, blue: 0.7), // Light yellow
+                                        Color(red: 0.9, green: 0.85, blue: 0.6)  // Darker yellow
+                                    ]),
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
+                            .frame(width: 70, height: 85)
+                        
+                        // Polka dots
+                        ForEach(0..<4) { i in
+                            Circle()
+                                .fill(Color.white.opacity(0.8))
+                                .frame(width: 8, height: 8)
+                                .offset(
+                                    x: CGFloat.random(in: -20...20),
+                                    y: CGFloat.random(in: -25...25)
+                                )
+                        }
+                    }
                     .overlay(
                         // Balloon string
                         Rectangle()
                             .fill(Color.gray.opacity(0.3))
-                            .frame(width: 2, height: 60)
-                            .offset(y: 25)
+                            .frame(width: 2, height: 90)
+                            .offset(y: 42)
                     )
-                    .overlay(
-                        // Sparkles
+                    .offset(x: 0, y: balloon3Offset)
+                    .scaleEffect(scaleEffect * 1.1)
+                    .rotationEffect(.degrees(rotationAngle * 0.7))
+                    .opacity(balloon3Opacity)
+                    
+                    // Balloon 4 - Purple with stars
+                    ZStack {
+                        Circle()
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color(red: 0.9, green: 0.8, blue: 1.0), // Light purple
+                                        Color(red: 0.7, green: 0.6, blue: 0.9)  // Darker purple
+                                    ]),
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
+                            .frame(width: 55, height: 70)
+                        
+                        // Stars
                         ForEach(0..<3) { i in
-                            Image(systemName: "sparkle")
-                                .foregroundColor(.white.opacity(sparkleOpacity))
+                            Image(systemName: "star.fill")
+                                .foregroundColor(.white.opacity(0.9))
                                 .font(.system(size: 8))
                                 .offset(
                                     x: CGFloat.random(in: -15...15),
                                     y: CGFloat.random(in: -20...20)
                                 )
                         }
-                    )
-                    .offset(x: -150, y: balloon1Offset)
-                    .scaleEffect(scaleEffect)
-                    .rotationEffect(.degrees(rotationAngle * 0.5))
-                    .opacity(balloon1Opacity)
-                
-                // Balloon 2 - Blue with shimmer
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color(red: 0.8, green: 0.9, blue: 1.0), // Light blue
-                                Color(red: 0.6, green: 0.8, blue: 0.9)  // Darker blue
-                            ]),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .frame(width: 35, height: 45)
+                    }
                     .overlay(
                         // Balloon string
                         Rectangle()
                             .fill(Color.gray.opacity(0.3))
-                            .frame(width: 2, height: 50)
-                            .offset(y: 22)
+                            .frame(width: 2, height: 75)
+                            .offset(y: 35)
                     )
-                    .overlay(
-                        // Shimmer effect
-                        Rectangle()
+                    .offset(x: -150, y: balloon4Offset)
+                    .scaleEffect(scaleEffect * 0.95)
+                    .rotationEffect(.degrees(-rotationAngle * 0.4))
+                    .opacity(balloon4Opacity)
+                    
+                    // Balloon 5 - Green with stripes
+                    ZStack {
+                        Circle()
                             .fill(
                                 LinearGradient(
                                     gradient: Gradient(colors: [
-                                        Color.white.opacity(0.6),
-                                        Color.clear
+                                        Color(red: 0.8, green: 1.0, blue: 0.8), // Light green
+                                        Color(red: 0.6, green: 0.9, blue: 0.6)  // Darker green
                                     ]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
+                                    startPoint: .top,
+                                    endPoint: .bottom
                                 )
                             )
-                            .frame(width: 20, height: 25)
-                            .offset(x: -5, y: -10)
-                            .rotationEffect(.degrees(45))
+                            .frame(width: 65, height: 80)
+                        
+                        // Stripes
+                        ForEach(0..<3) { i in
+                            Rectangle()
+                                .fill(Color.white.opacity(0.7))
+                                .frame(width: 4, height: 25)
+                                .offset(
+                                    x: CGFloat.random(in: -15...15),
+                                    y: CGFloat.random(in: -20...20)
+                                )
+                        }
+                    }
+                    .overlay(
+                        // Balloon string
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.3))
+                            .frame(width: 2, height: 85)
+                            .offset(y: 40)
                     )
-                    .offset(x: 120, y: balloon2Offset)
-                    .scaleEffect(scaleEffect * 0.9)
-                    .rotationEffect(.degrees(-rotationAngle * 0.3))
-                    .opacity(balloon2Opacity)
-                
-                // Balloon 3 - Yellow with polka dots
-                ZStack {
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    Color(red: 1.0, green: 0.95, blue: 0.7), // Light yellow
-                                    Color(red: 0.9, green: 0.85, blue: 0.6)  // Darker yellow
-                                ]),
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
-                        .frame(width: 45, height: 55)
+                    .offset(x: 150, y: balloon5Offset)
+                    .scaleEffect(scaleEffect * 1.05)
+                    .rotationEffect(.degrees(rotationAngle * 0.6))
+                    .opacity(balloon5Opacity)
                     
-                    // Polka dots
-                    ForEach(0..<4) { i in
+                    // Balloon 6 - Orange with confetti
+                    ZStack {
                         Circle()
-                            .fill(Color.white.opacity(0.8))
-                            .frame(width: 6, height: 6)
-                            .offset(
-                                x: CGFloat.random(in: -15...15),
-                                y: CGFloat.random(in: -20...20)
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color(red: 1.0, green: 0.9, blue: 0.7), // Light orange
+                                        Color(red: 0.9, green: 0.7, blue: 0.5)  // Darker orange
+                                    ]),
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
                             )
+                            .frame(width: 45, height: 60)
+                        
+                        // Confetti pieces
+                        ForEach(0..<5) { i in
+                            Rectangle()
+                                .fill(Color.white.opacity(0.8))
+                                .frame(width: 3, height: 6)
+                                .rotationEffect(.degrees(Double.random(in: 0...360)))
+                                .offset(
+                                    x: CGFloat.random(in: -15...15),
+                                    y: CGFloat.random(in: -20...20)
+                                )
+                        }
                     }
-                }
-                .overlay(
-                    // Balloon string
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.3))
-                        .frame(width: 2, height: 70)
-                        .offset(y: 27)
-                )
-                .offset(x: 180, y: balloon3Offset)
-                .scaleEffect(scaleEffect * 1.1)
-                .rotationEffect(.degrees(rotationAngle * 0.7))
-                .opacity(balloon3Opacity)
-                
-                // Balloon 4 - Purple with stars
-                ZStack {
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    Color(red: 0.9, green: 0.8, blue: 1.0), // Light purple
-                                    Color(red: 0.7, green: 0.6, blue: 0.9)  // Darker purple
-                                ]),
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
-                        .frame(width: 38, height: 48)
-                    
-                    // Stars
-                    ForEach(0..<3) { i in
-                        Image(systemName: "star.fill")
-                            .foregroundColor(.white.opacity(0.9))
-                            .font(.system(size: 6))
-                            .offset(
-                                x: CGFloat.random(in: -12...12),
-                                y: CGFloat.random(in: -15...15)
-                            )
-                    }
-                }
-                .overlay(
-                    // Balloon string
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.3))
-                        .frame(width: 2, height: 55)
-                        .offset(y: 24)
-                )
-                .offset(x: -80, y: balloon4Offset)
-                .scaleEffect(scaleEffect * 0.95)
-                .rotationEffect(.degrees(-rotationAngle * 0.4))
-                .opacity(balloon4Opacity)
-                
-                // Balloon 5 - Green with stripes
-                ZStack {
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    Color(red: 0.8, green: 1.0, blue: 0.8), // Light green
-                                    Color(red: 0.6, green: 0.9, blue: 0.6)  // Darker green
-                                ]),
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
-                        .frame(width: 42, height: 52)
-                    
-                    // Stripes
-                    ForEach(0..<3) { i in
+                    .overlay(
+                        // Balloon string
                         Rectangle()
-                            .fill(Color.white.opacity(0.7))
-                            .frame(width: 3, height: 20)
-                            .offset(
-                                x: CGFloat.random(in: -10...10),
-                                y: CGFloat.random(in: -15...15)
-                            )
-                    }
+                            .fill(Color.gray.opacity(0.3))
+                            .frame(width: 2, height: 70)
+                            .offset(y: 30)
+                    )
+                    .offset(x: -50, y: balloon6Offset)
+                    .scaleEffect(scaleEffect * 0.88)
+                    .rotationEffect(.degrees(-rotationAngle * 0.2))
+                    .opacity(balloon6Opacity)
                 }
-                .overlay(
-                    // Balloon string
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.3))
-                        .frame(width: 2, height: 65)
-                        .offset(y: 26)
-                )
-                .offset(x: 60, y: balloon5Offset)
-                .scaleEffect(scaleEffect * 1.05)
-                .rotationEffect(.degrees(rotationAngle * 0.6))
-                .opacity(balloon5Opacity)
-                
-                // Balloon 6 - Orange with confetti
-                ZStack {
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    Color(red: 1.0, green: 0.9, blue: 0.7), // Light orange
-                                    Color(red: 0.9, green: 0.7, blue: 0.5)  // Darker orange
-                                ]),
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
-                        .frame(width: 36, height: 46)
-                    
-                    // Confetti pieces
-                    ForEach(0..<5) { i in
-                        Rectangle()
-                            .fill(Color.white.opacity(0.8))
-                            .frame(width: 2, height: 4)
-                            .rotationEffect(.degrees(Double.random(in: 0...360)))
-                            .offset(
-                                x: CGFloat.random(in: -12...12),
-                                y: CGFloat.random(in: -18...18)
-                            )
-                    }
-                }
-                .overlay(
-                    // Balloon string
-                    Rectangle()
-                        .fill(Color.gray.opacity(0.3))
-                        .frame(width: 2, height: 58)
-                        .offset(y: 23)
-                )
-                .offset(x: -200, y: balloon6Offset)
-                .scaleEffect(scaleEffect * 0.88)
-                .rotationEffect(.degrees(-rotationAngle * 0.2))
-                .opacity(balloon6Opacity)
             }
+            .frame(width: geometry.size.width, height: geometry.size.height)
+            .clipped(antialiased: false)
         }
         .onAppear {
             // Rotation animation
             withAnimation(
-                Animation.linear(duration: 8)
+                Animation.linear(duration: 6)
                     .repeatForever(autoreverses: false)
             ) {
                 rotationAngle = 360
@@ -804,7 +808,7 @@ struct BirthdayBalloons: View {
             
             // Scale animation
             withAnimation(
-                Animation.easeInOut(duration: 2.5)
+                Animation.easeInOut(duration: 2.0)
                     .repeatForever(autoreverses: true)
             ) {
                 scaleEffect = 1.1
@@ -812,93 +816,93 @@ struct BirthdayBalloons: View {
             
             // Sparkle animation
             withAnimation(
-                Animation.easeInOut(duration: 1.5)
+                Animation.easeInOut(duration: 1.0)
                     .repeatForever(autoreverses: true)
             ) {
                 sparkleOpacity = 0.8
             }
             
-            // Balloon 1 floating up and disappearing
+            // Balloon 1 floating rapidly up and disappearing
             withAnimation(
-                Animation.linear(duration: 12)
+                Animation.linear(duration: 6)
                     .repeatForever(autoreverses: false)
             ) {
-                balloon1Offset = -800
+                balloon1Offset = -600
                 balloon1Opacity = 0.0
             }
             
-            // Balloon 2 floating up and disappearing
+            // Balloon 2 floating rapidly up and disappearing
             withAnimation(
-                Animation.linear(duration: 14)
+                Animation.linear(duration: 7)
                     .repeatForever(autoreverses: false)
             ) {
-                balloon2Offset = -900
+                balloon2Offset = -700
                 balloon2Opacity = 0.0
             }
             
-            // Balloon 3 floating up and disappearing
+            // Balloon 3 floating rapidly up and disappearing
             withAnimation(
-                Animation.linear(duration: 16)
+                Animation.linear(duration: 8)
                     .repeatForever(autoreverses: false)
             ) {
-                balloon3Offset = -1000
+                balloon3Offset = -800
                 balloon3Opacity = 0.0
             }
             
-            // Balloon 4 floating up and disappearing
+            // Balloon 4 floating rapidly up and disappearing
             withAnimation(
-                Animation.linear(duration: 13)
+                Animation.linear(duration: 5.5)
                     .repeatForever(autoreverses: false)
             ) {
-                balloon4Offset = -1100
+                balloon4Offset = -900
                 balloon4Opacity = 0.0
             }
             
-            // Balloon 5 floating up and disappearing
+            // Balloon 5 floating rapidly up and disappearing
             withAnimation(
-                Animation.linear(duration: 15)
+                Animation.linear(duration: 7.5)
                     .repeatForever(autoreverses: false)
             ) {
-                balloon5Offset = -1200
+                balloon5Offset = -1000
                 balloon5Opacity = 0.0
             }
             
-            // Balloon 6 floating up and disappearing
+            // Balloon 6 floating rapidly up and disappearing
             withAnimation(
-                Animation.linear(duration: 17)
+                Animation.linear(duration: 6.5)
                     .repeatForever(autoreverses: false)
             ) {
-                balloon6Offset = -1300
+                balloon6Offset = -1100
                 balloon6Opacity = 0.0
             }
             
             // Reset balloons after they disappear to create continuous flow
-            DispatchQueue.main.asyncAfter(deadline: .now() + 12) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
                 balloon1Offset = 800
                 balloon1Opacity = 1.0
             }
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 14) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
                 balloon2Offset = 900
                 balloon2Opacity = 1.0
             }
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 16) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 8) {
                 balloon3Offset = 1000
                 balloon3Opacity = 1.0
             }
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 13) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5.5) {
                 balloon4Offset = 1100
                 balloon4Opacity = 1.0
             }
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 7.5) {
                 balloon5Offset = 1200
                 balloon5Opacity = 1.0
             }
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 17) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 6.5) {
                 balloon6Offset = 1300
                 balloon6Opacity = 1.0
             }
