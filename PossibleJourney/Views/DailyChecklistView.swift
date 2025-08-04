@@ -211,10 +211,15 @@ struct DailyChecklistView: View {
     
     // Check for missed days and navigate to the first missed day
     private func checkForMissedDaysAndNavigate() {
+        print("🔍 checkForMissedDaysAndNavigate() called")
         let calendar = Calendar.current
         let startDate = calendar.startOfDay(for: viewModel.program.startDate)
         let today = calendar.startOfDay(for: Date())
         let dailyProgressStorage = DailyProgressStorage()
+        
+        print("🔍 Start date: \(startDate)")
+        print("🔍 Today: \(today)")
+        print("🔍 Program duration: \(viewModel.program.numberOfDays()) days")
         
         // Check all days from start date up to today
         var currentDate = startDate
@@ -222,6 +227,7 @@ struct DailyChecklistView: View {
             // Skip if we're past the program duration
             let dayNumber = calendar.dateComponents([.day], from: startDate, to: currentDate).day ?? 0
             if dayNumber >= viewModel.program.numberOfDays() {
+                print("🔍 Past program duration, stopping at day \(dayNumber)")
                 break
             }
             
@@ -233,8 +239,11 @@ struct DailyChecklistView: View {
                 isCompleted: false
             )
             
+            print("🔍 Checking day \(dayNumber + 1): \(currentDate) - completed: \(dayProgress.isCompleted)")
+            
             if !dayProgress.isCompleted {
                 // Found the first missed day, navigate to it
+                print("🔍 Found first missed day: \(currentDate) (day \(dayNumber + 1))")
                 viewModel.selectDate(currentDate)
                 return
             }
@@ -244,6 +253,7 @@ struct DailyChecklistView: View {
         }
         
         // No missed days found, stay on today
+        print("🔍 No missed days found, staying on today: \(today)")
         viewModel.selectDate(today)
     }
     
