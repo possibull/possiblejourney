@@ -21,7 +21,9 @@ struct ReleaseNotes {
                     "📸 Improved photo workflow with logical task completion status",
                     "⚡ Enhanced UI responsiveness and visual consistency",
                     "🎨 Better presentation of photo selection and camera interfaces",
-                    "🚀 Ready for TestFlight distribution with improved photo management"
+                    "🐛 Fixed missed day detection bug - now properly shows missed day screen when first day tasks are incomplete",
+                    "📅 Improved missed day logic to correctly identify and navigate to first uncompleted day on app startup",
+                    "🚀 Ready for TestFlight distribution with improved photo management and bug fixes"
                 ],
                 date: Date()
             ),
