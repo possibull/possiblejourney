@@ -1209,22 +1209,22 @@ struct BirthdayBalloons: View {
             sparkleOpacity = 0.8
         }
         
-        // Start continuous balloon animations
-        animateBalloon(1, duration: 8.0, delay: 0.0)
-        animateBalloon(2, duration: 10.0, delay: 1.0)
-        animateBalloon(3, duration: 12.0, delay: 2.0)
-        animateBalloon(4, duration: 9.0, delay: 0.5)
-        animateBalloon(5, duration: 11.0, delay: 1.5)
-        animateBalloon(6, duration: 8.0, delay: 3.0)
-        animateBalloon(7, duration: 13.0, delay: 0.8)
-        animateBalloon(8, duration: 10.0, delay: 2.5)
-        animateBalloon(9, duration: 14.0, delay: 1.2)
-        animateBalloon(10, duration: 7.0, delay: 3.5)
-        animateBalloon(11, duration: 15.0, delay: 0.3)
-        animateBalloon(12, duration: 9.5, delay: 2.8)
-        animateBalloon(13, duration: 11.5, delay: 1.8)
-        animateBalloon(14, duration: 8.5, delay: 3.2)
-        animateBalloon(15, duration: 12.5, delay: 0.7)
+        // Start continuous balloon animations (slower speeds)
+        animateBalloon(1, duration: 12.0, delay: 0.0)
+        animateBalloon(2, duration: 15.0, delay: 1.0)
+        animateBalloon(3, duration: 18.0, delay: 2.0)
+        animateBalloon(4, duration: 13.5, delay: 0.5)
+        animateBalloon(5, duration: 16.5, delay: 1.5)
+        animateBalloon(6, duration: 12.0, delay: 3.0)
+        animateBalloon(7, duration: 19.5, delay: 0.8)
+        animateBalloon(8, duration: 15.0, delay: 2.5)
+        animateBalloon(9, duration: 21.0, delay: 1.2)
+        animateBalloon(10, duration: 10.5, delay: 3.5)
+        animateBalloon(11, duration: 22.5, delay: 0.3)
+        animateBalloon(12, duration: 14.25, delay: 2.8)
+        animateBalloon(13, duration: 17.25, delay: 1.8)
+        animateBalloon(14, duration: 12.75, delay: 3.2)
+        animateBalloon(15, duration: 18.75, delay: 0.7)
     }
     
     private func animateBalloon(_ balloonNumber: Int, duration: Double, delay: Double) {
