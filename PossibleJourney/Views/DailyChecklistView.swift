@@ -669,18 +669,8 @@ struct TaskRowView: View {
         VStack(spacing: 0) {
             // Modern card design
             HStack(spacing: 16) {
-                // Modern checkbox with animation
-                Button(action: {
-                    withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-                        checkboxScale = 0.8
-                    }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-                            checkboxScale = 1.0
-                        }
-                        handleCheckboxTap()
-                    }
-                }) {
+                // Modern checkbox with animation (no longer clickable - entire card handles taps)
+                ZStack {
                     ZStack {
                         Circle()
                             .fill(checkboxFillColor)
@@ -703,7 +693,6 @@ struct TaskRowView: View {
                         }
                     }
                 }
-                .buttonStyle(PlainButtonStyle())
                 .scaleEffect(checkboxScale)
                 
                 // Task content
@@ -826,6 +815,8 @@ struct TaskRowView: View {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
                         cardScale = 1.0
                     }
+                    // Handle checkbox tap when entire card is tapped
+                    handleCheckboxTap()
                 }
             }
         }
