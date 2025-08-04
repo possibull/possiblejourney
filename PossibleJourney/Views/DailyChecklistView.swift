@@ -949,6 +949,7 @@ struct TaskRowView: View {
     // Function to remove photo without toggling task completion
     private func removePhotoOnly() {
         var photoURLs = currentDailyProgress.photoURLs
+        var completedTaskIDs = currentDailyProgress.completedTaskIDs
         
         if let photoURL = photoURLs[task.id] {
             // Delete the photo file from storage
@@ -962,11 +963,17 @@ struct TaskRowView: View {
             photoURLs.removeValue(forKey: task.id)
             print("DEBUG: Removed photo URL for task: \(task.title)")
             
+            // If this task requires a photo and was completed, uncheck it
+            if task.requiresPhoto && completedTaskIDs.contains(task.id) {
+                completedTaskIDs.remove(task.id)
+                print("DEBUG: Unchecked task after photo removal: \(task.title)")
+            }
+            
             // Update the daily progress
             let newProgress = DailyProgress(
                 id: currentDailyProgress.id,
                 date: currentDailyProgress.date,
-                completedTaskIDs: currentDailyProgress.completedTaskIDs,
+                completedTaskIDs: completedTaskIDs,
                 photoURLs: photoURLs,
                 isCompleted: currentDailyProgress.isCompleted
             )
