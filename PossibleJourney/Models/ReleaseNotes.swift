@@ -9,6 +9,23 @@ struct ReleaseNotes {
     
     static let allReleaseNotes: [ReleaseNotes] = [
             ReleaseNotes(
+                version: "1.9",
+                buildNumber: 1,
+                title: "Enhanced Photo Management & UI Improvements",
+                notes: [
+                    "📱 Fixed ImagePicker presentation to fill entire screen without black bars",
+                    "🗑️ Improved photo removal functionality - now properly removes photos when clicking 'Remove Photo'",
+                    "✅ Enhanced photo removal logic to automatically uncheck tasks that require photos",
+                    "🎯 Better user experience with full-screen photo selection and camera interface",
+                    "🔧 Fixed photo removal alert to actually remove photos instead of just toggling task completion",
+                    "📸 Improved photo workflow with logical task completion status",
+                    "⚡ Enhanced UI responsiveness and visual consistency",
+                    "🎨 Better presentation of photo selection and camera interfaces",
+                    "🚀 Ready for TestFlight distribution with improved photo management"
+                ],
+                date: Date()
+            ),
+            ReleaseNotes(
                 version: "1.4",
                 buildNumber: 1,
                 title: "Polished Modern UI Design",
