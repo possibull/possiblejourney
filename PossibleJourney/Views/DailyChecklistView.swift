@@ -901,10 +901,10 @@ struct TaskRowView: View {
         .alert("Remove Photo?", isPresented: $showingUncheckAlert) {
             Button("Cancel", role: .cancel) { }
             Button("Remove Photo", role: .destructive) {
-                onToggle()
+                removePhotoOnly()
             }
         } message: {
-            Text("Unchecking this task will remove the photo you've taken. This action cannot be undone.")
+            Text("This will remove the photo you've taken. This action cannot be undone.")
         }
         .onChange(of: showingFullPhoto) { _, isShowing in
             if isShowing {
@@ -945,6 +945,42 @@ struct TaskRowView: View {
     }
     
     @State private var showingUncheckAlert = false
+    
+    // Function to remove photo without toggling task completion
+    private func removePhotoOnly() {
+        var photoURLs = currentDailyProgress.photoURLs
+        
+        if let photoURL = photoURLs[task.id] {
+            // Delete the photo file from storage
+            do {
+                try FileManager.default.removeItem(at: photoURL)
+                print("DEBUG: Deleted photo file for task: \(task.title)")
+            } catch {
+                print("DEBUG: Error deleting photo file: \(error)")
+            }
+            // Remove photo URL from progress
+            photoURLs.removeValue(forKey: task.id)
+            print("DEBUG: Removed photo URL for task: \(task.title)")
+            
+            // Update the daily progress
+            let newProgress = DailyProgress(
+                id: currentDailyProgress.id,
+                date: currentDailyProgress.date,
+                completedTaskIDs: currentDailyProgress.completedTaskIDs,
+                photoURLs: photoURLs,
+                isCompleted: currentDailyProgress.isCompleted
+            )
+            
+            // Update the progress through the callback
+            onUpdateDailyProgress(newProgress)
+            
+            // Clear local photo state
+            thumbnailImage = nil
+            fullImage = nil
+            hasPhoto = false
+            onPhotoRemoved()
+        }
+    }
     
             // MARK: - Computed Properties for Checkbox Styling
         private var themeAccentColor: Color {
