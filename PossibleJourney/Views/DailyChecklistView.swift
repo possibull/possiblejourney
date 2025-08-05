@@ -60,11 +60,42 @@ struct DailyChecklistView: View {
         )
         
         let now = Date()
-        // Start with today's date - the missed day logic will handle finding the first missed day
-        let today = Calendar.current.startOfDay(for: now)
-        let dailyProgress = dailyProgressStorage.load(for: today) ?? DailyProgress(
+        // Check for missed days first to determine the correct starting date
+        let calendar = Calendar.current
+        let startDate = calendar.startOfDay(for: program.startDate)
+        let today = calendar.startOfDay(for: now)
+        
+        // Find the first missed day or use today if no missed days
+        var correctStartDate = today
+        var currentDate = startDate
+        while currentDate <= today {
+            // Skip if we're past the program duration
+            let dayNumber = calendar.dateComponents([.day], from: startDate, to: currentDate).day ?? 0
+            if dayNumber >= program.numberOfDays() {
+                break
+            }
+            
+            // Load the progress for this day and check if it was completed
+            let dayProgress = dailyProgressStorage.load(for: currentDate) ?? DailyProgress(
+                id: UUID(),
+                date: currentDate,
+                completedTaskIDs: [],
+                isCompleted: false
+            )
+            
+            if !dayProgress.isCompleted {
+                // Found the first missed day, start with this date
+                correctStartDate = currentDate
+                break
+            }
+            
+            // Move to next day
+            currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate)!
+        }
+        
+        let dailyProgress = dailyProgressStorage.load(for: correctStartDate) ?? DailyProgress(
             id: UUID(),
-            date: today,
+            date: correctStartDate,
             completedTaskIDs: []
         )
         
