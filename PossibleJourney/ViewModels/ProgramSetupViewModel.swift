@@ -92,6 +92,12 @@ class DailyChecklistViewModel: ObservableObject {
             )
             
             if !viewingDayProgress.isCompleted {
+                // If we're viewing a past date and it's not completed, it's missed
+                let today = calendar.startOfDay(for: Date())
+                if viewingDate < today {
+                    return true
+                }
+                
                 // Check if the viewing date is past its end-of-day (i.e., missed)
                 let now = Date()
                 let completedTaskIDs = Set(viewingDayProgress.completedTaskIDs)
