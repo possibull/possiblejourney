@@ -28,14 +28,27 @@ struct ConfettiView: View {
     private func createParticles() {
         // Use GeometryReader to get available space
         let screenWidth = UIScreen.main.bounds.width
+        let screenHeight = UIScreen.main.bounds.height
         
         particles = (0..<100).map { _ in
-            ConfettiParticle(
+            // Create fountain effect - particles start from bottom center
+            let startX = screenWidth / 2 + Double.random(in: -20...20) // Small spread at base
+            let startY = screenHeight + 50 // Start from bottom
+            
+            // Calculate triangle dispersion pattern
+            let angle = Double.random(in: -45...45) // 90-degree spread (45° left to 45° right)
+            let speed = Double.random(in: 8...15) // Faster upward velocity
+            
+            // Convert angle to velocity components
+            let velocityX = sin(angle * .pi / 180) * speed
+            let velocityY = -cos(angle * .pi / 180) * speed // Negative for upward movement
+            
+            return ConfettiParticle(
                 id: UUID(),
-                x: Double.random(in: 0...screenWidth),
-                y: -50,
-                velocityX: Double.random(in: -2...2),
-                velocityY: Double.random(in: 2...6),
+                x: startX,
+                y: startY,
+                velocityX: velocityX,
+                velocityY: velocityY,
                 rotation: Double.random(in: 0...360),
                 rotationSpeed: Double.random(in: -5...5),
                 color: [.red, .blue, .green, .yellow, .purple, .orange, .pink].randomElement()!,
@@ -60,6 +73,9 @@ struct ConfettiView: View {
         let screenHeight = UIScreen.main.bounds.height
         
         for i in particles.indices {
+            // Apply gravity to make particles fall back down
+            particles[i].velocityY += 0.3
+            
             particles[i].y += particles[i].velocityY
             particles[i].x += particles[i].velocityX
             particles[i].rotation += particles[i].rotationSpeed
@@ -67,10 +83,17 @@ struct ConfettiView: View {
             // Add some wind effect
             particles[i].velocityX += Double.random(in: -0.1...0.1)
             
-            // Reset particles that fall off screen
-            if particles[i].y > screenHeight + 50 {
-                particles[i].y = -50
-                particles[i].x = Double.random(in: 0...screenWidth)
+            // Reset particles that fall off screen or go too high
+            if particles[i].y > screenHeight + 50 || particles[i].y < -50 {
+                // Reset to fountain base
+                particles[i].x = screenWidth / 2 + Double.random(in: -20...20)
+                particles[i].y = screenHeight + 50
+                
+                // New fountain burst
+                let angle = Double.random(in: -45...45)
+                let speed = Double.random(in: 8...15)
+                particles[i].velocityX = sin(angle * .pi / 180) * speed
+                particles[i].velocityY = -cos(angle * .pi / 180) * speed
             }
         }
     }
