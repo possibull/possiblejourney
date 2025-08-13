@@ -189,10 +189,10 @@ struct DailyChecklistView: View {
             }
         }
         .overlay(
-            CelebrationOverlay(
-                celebrationType: celebrationManager.getCurrentCelebrationType(),
-                isShowing: $showingCelebration
-            )
+                            CelebrationOverlay(
+                    celebrationType: celebrationManager.getCelebrationTypeForDisplay(),
+                    isShowing: $showingCelebration
+                )
         )
         .onAppear {
             // Check for missed days and navigate to the first missed day if needed

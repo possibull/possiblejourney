@@ -56,4 +56,12 @@ class CelebrationManager: ObservableObject {
         }
         return celebrationType
     }
+    
+    func getCelebrationTypeForDisplay() -> CelebrationType {
+        // For random, always get a new random type each time
+        if celebrationType == .random {
+            return getRandomCelebrationType()
+        }
+        return celebrationType
+    }
 } 

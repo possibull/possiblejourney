@@ -113,8 +113,8 @@ struct FireworksView: View {
         // Create initial fireworks
         createFirework()
         
-        // Schedule more fireworks
-        animationTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+        // Schedule more fireworks more frequently
+        animationTimer = Timer.scheduledTimer(withTimeInterval: 0.8, repeats: true) { _ in
             createFirework()
         }
     }
@@ -124,7 +124,7 @@ struct FireworksView: View {
             id: UUID(),
             x: Double.random(in: 50...UIScreen.main.bounds.width - 50),
             y: UIScreen.main.bounds.height + 50,
-            targetY: Double.random(in: 100...UIScreen.main.bounds.height - 100),
+            targetY: Double.random(in: 50...UIScreen.main.bounds.height * 0.7), // Better distribution across screen
             color: [.red, .blue, .green, .yellow, .purple, .orange, .pink].randomElement()!,
             particles: []
         )
@@ -132,7 +132,7 @@ struct FireworksView: View {
         fireworks.append(newFirework)
         
         // Remove old fireworks
-        if fireworks.count > 5 {
+        if fireworks.count > 8 {
             fireworks.removeFirst()
         }
     }
@@ -178,17 +178,19 @@ struct CelebrationFireworkView: View {
             if !currentFirework.exploded {
                 Circle()
                     .fill(currentFirework.color)
-                    .frame(width: 8, height: 8)
+                    .frame(width: 12, height: 12) // Made bigger
                     .position(x: currentFirework.x, y: currentFirework.y)
+                    .shadow(color: currentFirework.color.opacity(0.8), radius: 4, x: 0, y: 0) // Added glow effect
             }
             
             // Exploded particles
             ForEach(currentFirework.particles) { particle in
                 Circle()
                     .fill(currentFirework.color)
-                    .frame(width: 4, height: 4)
+                    .frame(width: 6, height: 6) // Made bigger
                     .position(x: particle.x, y: particle.y)
                     .opacity(particle.alpha)
+                    .shadow(color: currentFirework.color.opacity(particle.alpha * 0.5), radius: 2, x: 0, y: 0) // Added glow effect
             }
         }
         .onAppear {
@@ -278,7 +280,7 @@ struct BalloonsView: View {
                 id: UUID(),
                 x: Double.random(in: 0...UIScreen.main.bounds.width),
                 y: UIScreen.main.bounds.height + 100,
-                velocityX: Double.random(in: -1...1),
+                velocityX: Double.random(in: -2...2), // Increased horizontal movement
                 velocityY: Double.random(in: -3...(-1)),
                 rotation: Double.random(in: 0...360),
                 rotationSpeed: Double.random(in: -2...2),
@@ -305,8 +307,18 @@ struct BalloonsView: View {
             balloons[i].x += balloons[i].velocityX
             balloons[i].rotation += balloons[i].rotationSpeed
             
-            // Add gentle swaying
-            balloons[i].velocityX += sin(Date().timeIntervalSince1970 + Double(i)) * 0.1
+            // Add more pronounced swaying for better movement
+            balloons[i].velocityX += sin(Date().timeIntervalSince1970 + Double(i)) * 0.2
+            
+            // Add some wind effect for more natural movement
+            balloons[i].velocityX += Double.random(in: -0.1...0.1)
+            
+            // Keep balloons within screen bounds horizontally
+            if balloons[i].x < -50 {
+                balloons[i].x = UIScreen.main.bounds.width + 50
+            } else if balloons[i].x > UIScreen.main.bounds.width + 50 {
+                balloons[i].x = -50
+            }
             
             // Reset balloons that float off screen
             if balloons[i].y < -100 {
