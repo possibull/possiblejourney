@@ -1,8 +1,8 @@
 {
   "version": "1.10",
-  "build": 2,
-  "releaseNotes": "Enhanced UI Testing Framework & Settings Navigation - Implemented comprehensive UI testing framework with UITestHelperMixin - Fixed settings navigation crash by adding missing CelebrationManager environment object - Added automated test workflow with test-with-tmp.sh script - Improved test reliability with proper UserDefaults clearing between test runs - Enhanced project guidelines with testing best practices and iPhone 16 simulator usage - Added robust popup handling for release notes during UI tests - Implemented auto-commit functionality for successful test runs - Improved settings page accessibility and navigation flow - Enhanced overall app stability and user experience",
+  "build": 3,
+  "releaseNotes": "New version 1.10 build 3",
   "forceUpdate": false,
-  "lastUpdated": "2025-08-13T22:36:28Z",
-  "branch": "v1.10-build2"
+  "lastUpdated": "2025-08-13T22:45:01Z",
+  "branch": "v1.10-build3"
 }
