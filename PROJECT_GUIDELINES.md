@@ -96,6 +96,22 @@ This document serves as a comprehensive reference for all project processes, con
 - `.dSYM` files for crash symbolication
 - App icons in `AppIconSet/` directory
 
+### App Store Connect Authentication
+- **App-Specific Password Required**: For deploying to TestFlight/App Store, you need an app-specific password
+- **Generate App-Specific Password**:
+  1. Go to [appleid.apple.com](https://appleid.apple.com)
+  2. Sign in with your Apple ID (ted@mrpossible.com)
+  3. Navigate to "Sign-in and Security" → "App-Specific Passwords"
+  4. Click "Generate Password" for "PossibleJourney"
+  5. Copy the generated password (it will only be shown once)
+- **Set Environment Variable**: 
+  ```bash
+  export FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD="your-app-specific-password"
+  ```
+- **For GitHub Actions**: Add the password as a repository secret named `FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD`
+- **Alternative**: Use App Store Connect API Key (recommended for production)
+- **Note**: Regular Apple ID password will not work for automated deployments
+
 ## Development Process
 
 ### Feature Development with TDD
@@ -159,6 +175,12 @@ This document serves as a comprehensive reference for all project processes, con
 
 # Build with temp config (auto-commits on success)
 ./build-with-tmp.sh
+
+# Deploy to TestFlight (requires app-specific password)
+./scripts/deploy.sh beta
+
+# Deploy to App Store (requires app-specific password)
+./scripts/deploy.sh release
 ```
 
 ## Build Workflow
