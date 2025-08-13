@@ -98,7 +98,11 @@ This document serves as a comprehensive reference for all project processes, con
 
 ### App Store Connect Authentication
 - **App-Specific Password Required**: For deploying to TestFlight/App Store, you need an app-specific password
-- **Generate App-Specific Password**:
+- **Find Existing Password in Shell History**:
+  ```bash
+  history | grep -i "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD\|app-specific" | tail -10
+  ```
+- **Generate New App-Specific Password** (if needed):
   1. Go to [appleid.apple.com](https://appleid.apple.com)
   2. Sign in with your Apple ID (ted@mrpossible.com)
   3. Navigate to "Sign-in and Security" → "App-Specific Passwords"
@@ -111,6 +115,9 @@ This document serves as a comprehensive reference for all project processes, con
 - **For GitHub Actions**: Add the password as a repository secret named `FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD`
 - **Alternative**: Use App Store Connect API Key (recommended for production)
 - **Note**: Regular Apple ID password will not work for automated deployments
+- **Current Known Passwords** (from shell history):
+  - `thkd-bbia-iyyh-guxx` (most recent)
+  - `hzkk-zjif-yber-yxlk` (previous)
 
 ## Development Process
 
@@ -181,6 +188,9 @@ This document serves as a comprehensive reference for all project processes, con
 
 # Deploy to App Store (requires app-specific password)
 ./scripts/deploy.sh release
+
+# Find app-specific password in shell history
+history | grep -i "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD\|app-specific" | tail -10
 ```
 
 ## Build Workflow
