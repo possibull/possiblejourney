@@ -169,6 +169,10 @@ struct Firework: Identifiable {
     let color: Color
     var particles: [FireworkParticle]
     var exploded: Bool = false
+    var explosionCount: Int = 0
+    var maxExplosions: Int = 3
+    var lastExplosionTime: Date = Date()
+    var explosionDelay: TimeInterval = 0.8
 }
 
 struct FireworkParticle: Identifiable {
@@ -253,12 +257,20 @@ struct CelebrationFireworkView: View {
                 currentFirework.particles[i].x += currentFirework.particles[i].velocityX
                 currentFirework.particles[i].y += currentFirework.particles[i].velocityY
                 
-                // Fade out particles gradually
-                currentFirework.particles[i].alpha -= 0.015
+                // Fade out particles much slower for longer-lasting explosions
+                currentFirework.particles[i].alpha -= 0.008
             }
             
             // Remove faded particles
             currentFirework.particles.removeAll { $0.alpha <= 0 }
+            
+            // Check if we should create additional explosions
+            if currentFirework.explosionCount < currentFirework.maxExplosions {
+                let timeSinceLastExplosion = Date().timeIntervalSince(currentFirework.lastExplosionTime)
+                if timeSinceLastExplosion >= currentFirework.explosionDelay {
+                    createSecondaryExplosion()
+                }
+            }
         }
     }
     
@@ -329,6 +341,73 @@ struct CelebrationFireworkView: View {
         }
         
         currentFirework.particles = allParticles
+        currentFirework.explosionCount += 1
+        currentFirework.lastExplosionTime = Date()
+    }
+    
+    private func createSecondaryExplosion() {
+        // Create a new explosion at a slightly different position
+        let offsetX = Double.random(in: -30...30)
+        let offsetY = Double.random(in: -20...20)
+        let explosionX = currentFirework.x + offsetX
+        let explosionY = currentFirework.y + offsetY
+        
+        var newParticles: [FireworkParticle] = []
+        
+        // Create a different pattern for secondary explosions
+        let explosionType = currentFirework.explosionCount % 3
+        
+        switch explosionType {
+        case 0: // Spiral pattern
+            for i in 0..<25 {
+                let angle = (Double(i) / 25.0) * 2 * .pi * 3 // Triple spiral
+                let speed = Double.random(in: 6...10)
+                
+                newParticles.append(FireworkParticle(
+                    id: UUID(),
+                    x: explosionX,
+                    y: explosionY,
+                    velocityX: cos(angle) * speed,
+                    velocityY: sin(angle) * speed,
+                    alpha: 1.0
+                ))
+            }
+            
+        case 1: // Starburst pattern
+            for i in 0..<30 {
+                let angle = (Double(i) / 30.0) * 2 * .pi
+                let speed = Double.random(in: 8...15)
+                
+                newParticles.append(FireworkParticle(
+                    id: UUID(),
+                    x: explosionX,
+                    y: explosionY,
+                    velocityX: cos(angle) * speed,
+                    velocityY: sin(angle) * speed,
+                    alpha: 1.0
+                ))
+            }
+            
+        default: // Random scatter pattern
+            for _ in 0..<20 {
+                let angle = Double.random(in: 0...2 * .pi)
+                let speed = Double.random(in: 4...12)
+                
+                newParticles.append(FireworkParticle(
+                    id: UUID(),
+                    x: explosionX,
+                    y: explosionY,
+                    velocityX: cos(angle) * speed,
+                    velocityY: sin(angle) * speed,
+                    alpha: 1.0
+                ))
+            }
+        }
+        
+        // Add new particles to existing ones
+        currentFirework.particles.append(contentsOf: newParticles)
+        currentFirework.explosionCount += 1
+        currentFirework.lastExplosionTime = Date()
     }
 }
 
