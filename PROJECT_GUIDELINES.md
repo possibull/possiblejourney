@@ -159,11 +159,50 @@ This document serves as a comprehensive reference for all project processes, con
 1. **Version conflicts**: Always check main branch's `latest-version.json`
 2. **Build errors**: Use `show-build-errors.sh` for diagnostics
 3. **Archive issues**: Check `manage_archives.sh` for archive management
+4. **Authentication failures**: Use shell history to find existing app-specific passwords
+
+### Authentication Troubleshooting
+- **If deployment fails with authentication error**: Search shell history for existing passwords
+- **Shell History Search Commands**:
+  ```bash
+  # Search for app-specific password usage
+  history | grep -i "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD\|app-specific" | tail -10
+  
+  # Search for any password-related commands
+  history | grep -i "password\|FASTLANE_PASSWORD" | tail -15
+  
+  # Search for specific password patterns
+  history | grep -E "hzkk-|thkd-" | tail -5
+  ```
+- **Known Working Passwords** (from shell history):
+  - `thkd-bbia-iyyh-guxx` (most recent, verified working)
+  - `hzkk-zjif-yber-yxlk` (previous, may need regeneration)
+- **Quick Fix**: Copy password from history and set environment variable:
+  ```bash
+  export FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD="thkd-bbia-iyyh-guxx"
+  ```
 
 ### Getting Help
 - Check this document first for process questions
 - Review script comments for usage instructions
 - Consult `DEPLOYMENT.md` for deployment-specific guidance
+
+### Shell History Best Practices
+- **Search Before Regenerating**: Always search shell history for existing app-specific passwords
+- **Password Patterns**: App-specific passwords follow pattern: `xxxx-xxxx-xxxx-xxxx`
+- **History Commands**:
+  ```bash
+  # Most comprehensive search
+  history | grep -i "FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD" | tail -10
+  
+  # Search for specific password patterns
+  history | grep -E "[a-z]{4}-[a-z]{4}-[a-z]{4}-[a-z]{4}" | tail -5
+  
+  # Search for export commands with passwords
+  history | grep "export.*FASTLANE.*PASSWORD" | tail -5
+  ```
+- **Security Note**: Shell history may contain sensitive passwords - be cautious when sharing terminal sessions
+- **Password Rotation**: If passwords stop working, generate new ones at appleid.apple.com
 
 ## Quick Reference Commands
 
