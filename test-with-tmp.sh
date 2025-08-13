@@ -76,21 +76,27 @@ if xcodebuild test -scheme PossibleJourney -destination 'platform=iOS Simulator,
 #!/bin/bash
 # Temporary auto-commit script for test success
 
-# Get the test name from arguments
-TEST_NAME=""
-for arg in "$@"; do
-    if [[ "\$arg" == *"test"* ]]; then
-        TEST_NAME="\$arg"
-        break
-    fi
-done
+        # Extract meaningful test name from arguments
+        TEST_NAME=""
+        for arg in "$@"; do
+            if [[ "\$arg" == *"test"* ]]; then
+                # Extract just the test class and method name
+                if [[ "\$arg" == *"/"* ]]; then
+                    # Format: -only-testing:Target/TestClass/testMethod
+                    TEST_NAME=\$(echo "\$arg" | sed 's/.*\///' | sed 's/-only-testing://')
+                else
+                    TEST_NAME="\$arg"
+                fi
+                break
+            fi
+        done
 
-# Generate commit message
-if [ -n "\$TEST_NAME" ]; then
-    commit_msg="✅ UI test passed: \$TEST_NAME"
-else
-    commit_msg="✅ UI tests passed successfully"
-fi
+        # Generate commit message
+        if [ -n "\$TEST_NAME" ]; then
+            commit_msg="✅ UI test passed: \$TEST_NAME"
+        else
+            commit_msg="✅ UI tests passed successfully"
+        fi
 
 # Stage all changes
 git add .
