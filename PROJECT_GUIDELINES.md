@@ -78,6 +78,8 @@ This document serves as a comprehensive reference for all project processes, con
 - **Run tests before committing changes**
 - **Write tests for all new features and bug fixes**
 - Use `show-build-errors.sh` to check for build issues
+- **Always use iPhone 16 simulator for testing**: `-destination 'platform=iOS Simulator,name=iPhone 16,OS=18.5'`
+- **Run one test at a time during development** to isolate issues and reduce debugging complexity
 - Test on both simulator and device when possible
 - **Ensure all tests pass before merging**
 
