@@ -443,10 +443,37 @@ struct BalloonView: View {
                         .stroke(Color.white.opacity(0.3), lineWidth: 2)
                 )
             
-            // Balloon string
-            Rectangle()
-                .fill(Color.gray)
-                .frame(width: 1, height: 20)
+            // Balloon string - longer, curlier, and pointing opposite to balloon top
+            Path { path in
+                let startX: CGFloat = 0
+                let startY: CGFloat = balloon.size * 0.65 // Start from bottom of balloon
+                let endX: CGFloat = balloon.size * 0.3 // Point towards opposite side
+                let endY: CGFloat = startY + 40 // Longer string
+                
+                path.move(to: CGPoint(x: startX, y: startY))
+                
+                // Create a curly string with multiple curves
+                let control1X = startX + 5
+                let control1Y = startY + 10
+                let control2X = endX - 5
+                let control2Y = endY - 10
+                
+                path.addCurve(
+                    to: CGPoint(x: endX, y: endY),
+                    control1: CGPoint(x: control1X, y: control1Y),
+                    control2: CGPoint(x: control2X, y: control2Y)
+                )
+                
+                // Add a small curl at the end
+                let curlX = endX + 3
+                let curlY = endY + 5
+                path.addCurve(
+                    to: CGPoint(x: curlX, y: curlY),
+                    control1: CGPoint(x: endX + 2, y: endY + 2),
+                    control2: CGPoint(x: curlX, y: curlY)
+                )
+            }
+            .stroke(Color.gray, lineWidth: 1.5)
         }
         .position(x: balloon.x, y: balloon.y)
         .rotationEffect(.degrees(balloon.rotation))
