@@ -1,7 +1,7 @@
 {
   "version": "1.10",
   "build": 3,
-  "releaseNotes": "New version 1.10 build 3",
+  "releaseNotes": "Celebration Bug Fixes & UI Improvements - Fixed celebration fireworks positioning to display across entire screen instead of just bottom - Fixed random celebration to select new type every time tasks are completed instead of once - Enhanced balloon movement with better horizontal travel and natural swaying effects - Improved fireworks visibility with larger size and glow effects - Added more fireworks and increased frequency for better visual impact - Enhanced balloon physics with wind effects and screen boundary handling - Improved celebration animations for better user experience - Fixed celebration type selection logic for random mode",
   "forceUpdate": false,
   "lastUpdated": "2025-08-13T22:45:01Z",
   "branch": "v1.10-build3"
