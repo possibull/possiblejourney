@@ -28,7 +28,6 @@ struct ConfettiView: View {
     private func createParticles() {
         // Use GeometryReader to get available space
         let screenWidth = UIScreen.main.bounds.width
-        let screenHeight = UIScreen.main.bounds.height
         
         particles = (0..<100).map { _ in
             ConfettiParticle(
