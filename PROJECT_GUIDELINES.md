@@ -59,15 +59,27 @@ This document serves as a comprehensive reference for all project processes, con
 
 ## Development Workflow
 
+### TDD (Test-Driven Development) with Slice Down Methodology
+- **Always write tests first** before implementing features
+- **Slice down approach**: Break complex features into small, testable slices
+- **Red-Green-Refactor cycle**:
+  1. Write failing test (Red)
+  2. Implement minimal code to pass test (Green)
+  3. Refactor while keeping tests passing
+- **Test coverage**: Aim for comprehensive test coverage of all new functionality
+- **Integration tests**: Test complete user workflows, not just individual components
+
 ### Branch Management
 - Development branches follow pattern: `v{version}-build{build}`
 - Main branch should only contain stable, deployable code
 - Version information flows from main → development → main (on deployment)
 
 ### Testing
-- Run tests before committing changes
+- **Run tests before committing changes**
+- **Write tests for all new features and bug fixes**
 - Use `show-build-errors.sh` to check for build issues
 - Test on both simulator and device when possible
+- **Ensure all tests pass before merging**
 
 ## Build and Archive Management
 
@@ -82,6 +94,22 @@ This document serves as a comprehensive reference for all project processes, con
 - `.dSYM` files for crash symbolication
 - App icons in `AppIconSet/` directory
 
+## Development Process
+
+### Feature Development with TDD
+1. **Plan the feature** and break it down into small, testable slices
+2. **Write tests first** for the smallest slice
+3. **Implement minimal code** to make tests pass
+4. **Refactor** while keeping tests green
+5. **Repeat** for each slice until feature is complete
+6. **Integration testing** to ensure all slices work together
+
+### Bug Fix Process
+1. **Write a failing test** that reproduces the bug
+2. **Implement the fix** to make the test pass
+3. **Ensure no regressions** by running all tests
+4. **Refactor if needed** while maintaining test coverage
+
 ## User Preferences and Conventions
 
 ### Communication Style
@@ -93,6 +121,7 @@ This document serves as a comprehensive reference for all project processes, con
 - Follow Swift best practices
 - Maintain consistent naming conventions
 - Include appropriate comments for complex logic
+- **Write testable code** that supports TDD methodology
 
 ### File Management
 - Use relative paths when possible
@@ -126,9 +155,24 @@ This document serves as a comprehensive reference for all project processes, con
 # Manage archives
 ./manage_archives.sh
 
-# Build with temp config
+# Build with temp config (auto-commits on success)
 ./build-with-tmp.sh
 ```
+
+## Build Workflow
+
+### Using build-with-tmp.sh (Recommended)
+- **Always use `./build-with-tmp.sh` for builds during development**
+- **Auto-commits changes after successful build**
+- **Creates detailed build logs in temporary directory**
+- **Provides comprehensive error analysis**
+- **Only commit manually if build fails and you need to fix issues**
+
+### Manual Build Process (Not Recommended)
+- Only use direct `xcodebuild` commands for testing specific configurations
+- **Must manually commit changes after successful builds**
+- **No automatic logging or error analysis**
+- **Risk of forgetting to commit changes**
 
 ---
 

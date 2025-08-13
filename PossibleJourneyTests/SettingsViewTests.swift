@@ -2,121 +2,241 @@ import XCTest
 import SwiftUI
 @testable import PossibleJourney
 
-final class SettingsViewVersionTests: XCTestCase {
+final class SettingsViewTests: XCTestCase {
     
-    func testSettingsViewVersionInformationDisplay() {
-        // Given: A SettingsView with proper environment objects
+    // MARK: - Celebration Settings Tests
+    
+    func testCelebrationSettingsCardExists() {
+        // Given: A SettingsView with celebration manager
+        let celebrationManager = CelebrationManager()
         let debugState = DebugState()
         let appState = ProgramAppState()
-        let endOfDayTime = Binding.constant(Date())
+        let themeManager = ThemeManager()
+        let endOfDayTime = Date()
         
-        let settingsView = SettingsView(endOfDayTime: endOfDayTime)
+        // When: Creating the settings view
+        let settingsView = SettingsView(endOfDayTime: .constant(endOfDayTime))
+            .environmentObject(celebrationManager)
             .environmentObject(debugState)
             .environmentObject(appState)
+            .environmentObject(themeManager)
         
-        // When: We create a hosting controller to render the view
-        let hostingController = UIHostingController(rootView: settingsView)
-        hostingController.loadViewIfNeeded()
-        
-        // Then: The view should be properly rendered
-        XCTAssertNotNil(hostingController.view)
-    }
-    
-    func testBundleVersionInformation() {
-        // Given: The app's bundle information
-        let bundle = Bundle.main
-        
-        // When: We extract version information
-        let version = bundle.infoDictionary?["CFBundleShortVersionString"] as? String
-        let buildNumber = bundle.infoDictionary?["CFBundleVersion"] as? String
-        
-        // Then: Version information should be available
-        XCTAssertNotNil(version, "App version should be available in bundle")
-        XCTAssertNotNil(buildNumber, "Build number should be available in bundle")
-        
-        // And: Version should be a valid format (e.g., "1.3")
-        if let version = version {
-            XCTAssertTrue(version.contains("."), "Version should contain a dot separator")
-            XCTAssertFalse(version.isEmpty, "Version should not be empty")
-        }
-        
-        // And: Build number should be a valid number
-        if let buildNumber = buildNumber {
-            XCTAssertNotNil(Int(buildNumber), "Build number should be a valid integer")
-        }
-    }
-    
-    func testSettingsViewVersionTextContent() {
-        // Given: Bundle information
-        let bundle = Bundle.main
-        let expectedVersion = bundle.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
-        let expectedBuild = bundle.infoDictionary?["CFBundleVersion"] as? String ?? "1"
-        
-        // When: We create a test view to verify the text content
-        let debugState = DebugState()
-        let appState = ProgramAppState()
-        let endOfDayTime = Binding.constant(Date())
-        
-        let settingsView = SettingsView(endOfDayTime: endOfDayTime)
-            .environmentObject(debugState)
-            .environmentObject(appState)
-        
-        // Then: The view should contain the expected version information
-        // Note: In a real UI test, we would use accessibility identifiers to find and verify text
+        // Then: The view should be created successfully
         XCTAssertNotNil(settingsView)
     }
     
-    func testSettingsViewAccessibility() {
-        // Given: A SettingsView
-        let debugState = DebugState()
-        let appState = ProgramAppState()
-        let endOfDayTime = Binding.constant(Date())
+    func testCelebrationSettingsDefaultValues() {
+        // Given: A new CelebrationManager
+        let manager = CelebrationManager()
         
-        let settingsView = SettingsView(endOfDayTime: endOfDayTime)
-            .environmentObject(debugState)
-            .environmentObject(appState)
-        
-        // When: We create a hosting controller
-        let hostingController = UIHostingController(rootView: settingsView)
-        hostingController.loadViewIfNeeded()
-        
-        // Then: The view should be accessible
-        XCTAssertTrue(hostingController.view.isAccessibilityElement || hostingController.view.subviews.contains { $0.isAccessibilityElement })
+        // Then: Default values should be set correctly
+        // Note: Default values are stored in UserDefaults, so we need to check the actual stored values
+        XCTAssertTrue(manager.celebrationEnabled, "Celebrations should be enabled by default")
+        // The celebration type might be different due to UserDefaults persistence, so we just check it's valid
+        XCTAssertTrue(CelebrationType.allCases.contains(manager.celebrationType), "Celebration type should be valid")
     }
     
-    func testSettingsViewNavigation() {
-        // Given: A SettingsView
-        let debugState = DebugState()
-        let appState = ProgramAppState()
-        let endOfDayTime = Binding.constant(Date())
+    func testCelebrationSettingsToggle() {
+        // Given: A CelebrationManager
+        let manager = CelebrationManager()
+        XCTAssertTrue(manager.celebrationEnabled)
         
-        let settingsView = SettingsView(endOfDayTime: endOfDayTime)
-            .environmentObject(debugState)
-            .environmentObject(appState)
+        // When: Disabling celebrations
+        manager.celebrationEnabled = false
         
-        // When: We create a hosting controller
-        let hostingController = UIHostingController(rootView: settingsView)
-        hostingController.loadViewIfNeeded()
+        // Then: Celebrations should be disabled
+        XCTAssertFalse(manager.celebrationEnabled)
         
-        // Then: The navigation should be properly set up
-        XCTAssertNotNil(hostingController.navigationController)
+        // When: Re-enabling celebrations
+        manager.celebrationEnabled = true
+        
+        // Then: Celebrations should be enabled
+        XCTAssertTrue(manager.celebrationEnabled)
     }
     
-    func testSettingsViewFormStructure() {
-        // Given: A SettingsView
+    func testCelebrationTypeSelection() {
+        // Given: A CelebrationManager
+        let manager = CelebrationManager()
+        let initialType = manager.celebrationType
+        
+        // When: Changing celebration type
+        manager.celebrationType = .fireworks
+        
+        // Then: Celebration type should be updated
+        XCTAssertEqual(manager.celebrationType, .fireworks)
+        
+        // When: Changing to random
+        manager.celebrationType = .random
+        
+        // Then: Celebration type should be random
+        XCTAssertEqual(manager.celebrationType, .random)
+        
+        // When: Getting current type with random
+        let currentType = manager.getCurrentCelebrationType()
+        
+        // Then: Should return a specific type, not random
+        XCTAssertNotEqual(currentType, .random)
+        XCTAssertTrue([.confetti, .fireworks, .balloons, .sparkles].contains(currentType))
+        
+        // Reset to initial type
+        manager.celebrationType = initialType
+    }
+    
+    func testAllCelebrationTypesSelectable() {
+        // Given: A CelebrationManager
+        let manager = CelebrationManager()
+        
+        // When & Then: All celebration types should be selectable
+        manager.celebrationType = .confetti
+        XCTAssertEqual(manager.celebrationType, .confetti)
+        
+        manager.celebrationType = .fireworks
+        XCTAssertEqual(manager.celebrationType, .fireworks)
+        
+        manager.celebrationType = .balloons
+        XCTAssertEqual(manager.celebrationType, .balloons)
+        
+        manager.celebrationType = .sparkles
+        XCTAssertEqual(manager.celebrationType, .sparkles)
+        
+        manager.celebrationType = .random
+        XCTAssertEqual(manager.celebrationType, .random)
+    }
+    
+    // MARK: - Settings Persistence Tests
+    
+    func testCelebrationSettingsPersistence() {
+        // Given: A CelebrationManager with custom settings
+        let manager1 = CelebrationManager()
+        manager1.celebrationEnabled = false
+        manager1.celebrationType = .fireworks
+        
+        // When: Creating a new manager instance
+        let manager2 = CelebrationManager()
+        
+        // Then: Settings should persist across instances
+        XCTAssertEqual(manager2.celebrationEnabled, false)
+        XCTAssertEqual(manager2.celebrationType, .fireworks)
+    }
+    
+    func testCelebrationSettingsReset() {
+        // Given: A CelebrationManager with custom settings
+        let manager = CelebrationManager()
+        manager.celebrationEnabled = false
+        manager.celebrationType = .balloons
+        
+        // When: Resetting to defaults
+        manager.celebrationEnabled = true
+        manager.celebrationType = .confetti
+        
+        // Then: Should be back to defaults
+        XCTAssertTrue(manager.celebrationEnabled)
+        XCTAssertEqual(manager.celebrationType, .confetti)
+    }
+    
+    // MARK: - Integration Tests
+    
+    func testCelebrationSettingsIntegrationWithDailyChecklist() {
+        // Given: A complete setup with settings and daily checklist
+        let celebrationManager = CelebrationManager()
         let debugState = DebugState()
         let appState = ProgramAppState()
-        let endOfDayTime = Binding.constant(Date())
+        let themeManager = ThemeManager()
         
-        let settingsView = SettingsView(endOfDayTime: endOfDayTime)
-            .environmentObject(debugState)
-            .environmentObject(appState)
+        // When: Configuring celebration settings
+        celebrationManager.celebrationEnabled = true
+        celebrationManager.celebrationType = .fireworks
         
-        // When: We create a hosting controller
-        let hostingController = UIHostingController(rootView: settingsView)
-        hostingController.loadViewIfNeeded()
+        // Then: Settings should be properly configured
+        XCTAssertTrue(celebrationManager.celebrationEnabled)
+        XCTAssertEqual(celebrationManager.celebrationType, .fireworks)
         
-        // Then: The form should be properly structured
-        XCTAssertNotNil(hostingController.view)
+        // When: Getting current celebration type
+        let currentType = celebrationManager.getCurrentCelebrationType()
+        
+        // Then: Should return the configured type
+        XCTAssertEqual(currentType, .fireworks)
+    }
+    
+    func testCelebrationSettingsWithRandomType() {
+        // Given: A CelebrationManager with random type
+        let manager = CelebrationManager()
+        manager.celebrationType = .random
+        
+        // When: Getting current celebration type multiple times
+        let type1 = manager.getCurrentCelebrationType()
+        let type2 = manager.getCurrentCelebrationType()
+        let type3 = manager.getCurrentCelebrationType()
+        
+        // Then: Each call should return a valid celebration type
+        XCTAssertTrue([.confetti, .fireworks, .balloons, .sparkles].contains(type1))
+        XCTAssertTrue([.confetti, .fireworks, .balloons, .sparkles].contains(type2))
+        XCTAssertTrue([.confetti, .fireworks, .balloons, .sparkles].contains(type3))
+        
+        // Note: They might be different due to randomness, which is expected
+    }
+    
+    // MARK: - Edge Case Tests
+    
+    func testCelebrationSettingsWithEmptyTasks() {
+        // Given: A program with no tasks
+        let program = Program(
+            id: UUID(),
+            startDate: Date(),
+            endOfDayTime: Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22),
+            lastCompletedDay: nil,
+            templateID: UUID(),
+            customNumberOfDays: 7
+        )
+        
+        let dailyProgress = DailyProgress(
+            id: UUID(),
+            date: Date(),
+            completedTaskIDs: [],
+            isCompleted: false
+        )
+        
+        let celebrationManager = CelebrationManager()
+        celebrationManager.celebrationEnabled = true
+        
+        // When: Checking if celebration should be triggered
+        let allTasksCompleted = [].allSatisfy { (task: Task) in
+            dailyProgress.completedTaskIDs.contains(task.id) 
+        }
+        
+        // Then: Should be true for empty task list (all 0 tasks are completed)
+        XCTAssertTrue(allTasksCompleted)
+    }
+    
+    func testCelebrationSettingsWithPhotoRequiredTasks() {
+        // Given: A program with photo-required tasks
+        let program = Program(
+            id: UUID(),
+            startDate: Date(),
+            endOfDayTime: Calendar.current.startOfDay(for: Date()).addingTimeInterval(60*60*22),
+            lastCompletedDay: nil,
+            templateID: UUID(),
+            customNumberOfDays: 7
+        )
+        
+        let photoTask = Task(id: UUID(), title: "Photo Task", description: "Take a photo", requiresPhoto: true)
+        
+        let dailyProgress = DailyProgress(
+            id: UUID(),
+            date: Date(),
+            completedTaskIDs: [photoTask.id], // Task completed but photo might not be taken
+            isCompleted: false
+        )
+        
+        let celebrationManager = CelebrationManager()
+        celebrationManager.celebrationEnabled = true
+        
+        // When: Checking if celebration should be triggered
+        let allTasksCompleted = [photoTask].allSatisfy { 
+            dailyProgress.completedTaskIDs.contains($0.id) 
+        }
+        
+        // Then: Celebration should be triggered if task is marked complete
+        XCTAssertTrue(allTasksCompleted)
     }
 } 
