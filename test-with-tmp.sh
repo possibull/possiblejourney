@@ -70,10 +70,47 @@ if xcodebuild test -scheme PossibleJourney -destination 'platform=iOS Simulator,
     
     # Auto-commit on success
     echo -e "${BLUE}💾 Auto-committing successful test run...${NC}"
-    if ./auto-commit.sh "UI tests passed successfully"; then
-        echo -e "${GREEN}✅ Changes committed successfully${NC}"
+    if [ -f "./auto-commit.sh" ]; then
+        # Create a temporary script that calls auto-commit with test-specific message
+        cat > /tmp/auto-commit-test.sh << EOF
+#!/bin/bash
+# Temporary auto-commit script for test success
+
+# Get the test name from arguments
+TEST_NAME=""
+for arg in "$@"; do
+    if [[ "\$arg" == *"test"* ]]; then
+        TEST_NAME="\$arg"
+        break
+    fi
+done
+
+# Generate commit message
+if [ -n "\$TEST_NAME" ]; then
+    commit_msg="✅ UI test passed: \$TEST_NAME"
+else
+    commit_msg="✅ UI tests passed successfully"
+fi
+
+# Stage all changes
+git add .
+
+# Check if there are changes to commit
+if ! git diff --cached --quiet; then
+    git commit -m "\$commit_msg"
+    echo "✅ Auto-committed: \$commit_msg"
+else
+    echo "ℹ️  No changes to commit"
+fi
+EOF
+
+        chmod +x /tmp/auto-commit-test.sh
+        /tmp/auto-commit-test.sh "$@"
+        rm -f /tmp/auto-commit-test.sh
+        
+        echo -e "${GREEN}✅ Auto-commit completed after successful test${NC}"
     else
-        echo -e "${YELLOW}⚠️  Auto-commit failed, but tests passed${NC}"
+        echo -e "${YELLOW}⚠️  auto-commit.sh not found, skipping auto-commit${NC}"
     fi
     
     exit 0
