@@ -1,0 +1,137 @@
+# PossibleJourney Project Guidelines
+
+This document serves as a comprehensive reference for all project processes, conventions, and user preferences. It should be consulted whenever starting work on this project to ensure consistency and proper workflow.
+
+## Version Management
+
+### Starting a New Version
+
+**Script**: `./start-new-version.sh <type>`
+
+**Usage**: The script requires one argument specifying the version type:
+- `major`: Increments major version (1.9 → 2.0)
+- `minor`: Increments minor version (1.9 → 1.10)  
+- `build`: Increments build number (build 1 → build 2)
+
+**Process**:
+1. The script reads the current version from `main` branch's `latest-version.json`
+2. Creates a new branch with naming convention: `v{version}-build{build}`
+3. Updates version in `PossibleJourney.xcodeproj/project.pbxproj`
+4. Updates `latest-version.json` on the development branch
+5. Commits the version changes
+
+**Important Conventions**:
+- Always use the latest version from the `main` branch's `latest-version.json` as the source of truth
+- Do NOT update the main branch's `latest-version.json` until deployment
+- Update `latest-version.json` on the development branch during development
+- Copy the updated `latest-version.json` to main branch only on deployment
+
+### Deployment Process
+
+**When pushing to GitHub**:
+- Push the main branch with ONLY the updated `latest-version.json` and nothing else
+- Use the deploy script for proper deployment workflow
+
+## Release Notes Guidelines
+
+### Content Restrictions
+- **DO NOT** mention hidden themes or Easter eggs in release notes
+- Keep release notes focused on user-facing features and improvements
+- Be professional and clear about what users can expect
+
+### Release Notes Management
+- Update release notes in `latest-version.json` during development
+- Use the `combine-release-notes.sh` script to merge release notes when needed
+
+## Project Structure
+
+### Key Directories
+- `PossibleJourney/` - Main iOS app source code
+- `scripts/` - Build and deployment scripts
+- `fastlane/` - Automated deployment configuration
+- `builds/` - Build artifacts and archives
+
+### Important Files
+- `latest-version.json` - Version tracking and release notes
+- `start-new-version.sh` - Version creation script
+- `deploy.sh` - Deployment script
+- `exportOptions.plist` - App Store export configuration
+
+## Development Workflow
+
+### Branch Management
+- Development branches follow pattern: `v{version}-build{build}`
+- Main branch should only contain stable, deployable code
+- Version information flows from main → development → main (on deployment)
+
+### Testing
+- Run tests before committing changes
+- Use `show-build-errors.sh` to check for build issues
+- Test on both simulator and device when possible
+
+## Build and Archive Management
+
+### Scripts Available
+- `build-with-tmp.sh` - Build with temporary configuration
+- `manage_archives.sh` - Archive management
+- `move_to_organizer.sh` - Move builds to Xcode Organizer
+- `archive_check.sh` - Archive validation
+
+### Build Artifacts
+- `.ipa` files for distribution
+- `.dSYM` files for crash symbolication
+- App icons in `AppIconSet/` directory
+
+## User Preferences and Conventions
+
+### Communication Style
+- Be direct and efficient in responses
+- Focus on actionable solutions
+- Provide clear next steps when completing tasks
+
+### Code Quality
+- Follow Swift best practices
+- Maintain consistent naming conventions
+- Include appropriate comments for complex logic
+
+### File Management
+- Use relative paths when possible
+- Keep build artifacts organized
+- Maintain backup copies of important configurations
+
+## Troubleshooting
+
+### Common Issues
+1. **Version conflicts**: Always check main branch's `latest-version.json`
+2. **Build errors**: Use `show-build-errors.sh` for diagnostics
+3. **Archive issues**: Check `manage_archives.sh` for archive management
+
+### Getting Help
+- Check this document first for process questions
+- Review script comments for usage instructions
+- Consult `DEPLOYMENT.md` for deployment-specific guidance
+
+## Quick Reference Commands
+
+```bash
+# Start new version
+./start-new-version.sh major|minor|build
+
+# Deploy
+./deploy.sh
+
+# Check build errors
+./show-build-errors.sh
+
+# Manage archives
+./manage_archives.sh
+
+# Build with temp config
+./build-with-tmp.sh
+```
+
+---
+
+**Last Updated**: This document should be updated whenever new processes or conventions are established.
+
+**Note**: This document serves as the primary reference for project workflows. Always consult this before starting work to ensure proper adherence to established conventions. 
