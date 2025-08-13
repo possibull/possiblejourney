@@ -7,10 +7,13 @@ struct ConfettiView: View {
     @State private var animationTimer: Timer?
     
     var body: some View {
-        ZStack {
-            ForEach(particles) { particle in
-                ConfettiParticleView(particle: particle)
+        GeometryReader { geometry in
+            ZStack {
+                ForEach(particles) { particle in
+                    ConfettiParticleView(particle: particle)
+                }
             }
+            .frame(width: geometry.size.width, height: geometry.size.height)
         }
         .onAppear {
             // Start immediately without delay
@@ -23,10 +26,14 @@ struct ConfettiView: View {
     }
     
     private func createParticles() {
+        // Use GeometryReader to get available space
+        let screenWidth = UIScreen.main.bounds.width
+        let screenHeight = UIScreen.main.bounds.height
+        
         particles = (0..<100).map { _ in
             ConfettiParticle(
                 id: UUID(),
-                x: Double.random(in: 0...UIScreen.main.bounds.width),
+                x: Double.random(in: 0...screenWidth),
                 y: -50,
                 velocityX: Double.random(in: -2...2),
                 velocityY: Double.random(in: 2...6),
@@ -50,6 +57,9 @@ struct ConfettiView: View {
     }
     
     private func updateParticles() {
+        let screenWidth = UIScreen.main.bounds.width
+        let screenHeight = UIScreen.main.bounds.height
+        
         for i in particles.indices {
             particles[i].y += particles[i].velocityY
             particles[i].x += particles[i].velocityX
@@ -59,9 +69,9 @@ struct ConfettiView: View {
             particles[i].velocityX += Double.random(in: -0.1...0.1)
             
             // Reset particles that fall off screen
-            if particles[i].y > UIScreen.main.bounds.height + 50 {
+            if particles[i].y > screenHeight + 50 {
                 particles[i].y = -50
-                particles[i].x = Double.random(in: 0...UIScreen.main.bounds.width)
+                particles[i].x = Double.random(in: 0...screenWidth)
             }
         }
     }
@@ -97,10 +107,13 @@ struct FireworksView: View {
     @State private var animationTimer: Timer?
     
     var body: some View {
-        ZStack {
-            ForEach(fireworks) { firework in
-                CelebrationFireworkView(firework: firework)
+        GeometryReader { geometry in
+            ZStack {
+                ForEach(fireworks) { firework in
+                    CelebrationFireworkView(firework: firework)
+                }
             }
+            .frame(width: geometry.size.width, height: geometry.size.height)
         }
         .onAppear {
             startFireworks()
@@ -123,11 +136,14 @@ struct FireworksView: View {
     }
     
     private func createFirework() {
+        let screenWidth = UIScreen.main.bounds.width
+        let screenHeight = UIScreen.main.bounds.height
+        
         let newFirework = Firework(
             id: UUID(),
-            x: Double.random(in: 50...UIScreen.main.bounds.width - 50),
-            y: UIScreen.main.bounds.height + 50,
-            targetY: Double.random(in: 50...UIScreen.main.bounds.height * 0.7), // Better distribution across screen
+            x: Double.random(in: 50...screenWidth - 50),
+            y: screenHeight + 50,
+            targetY: Double.random(in: 50...screenHeight * 0.8), // Better distribution across screen
             color: [.red, .blue, .green, .yellow, .purple, .orange, .pink].randomElement()!,
             particles: []
         )
@@ -323,10 +339,13 @@ struct BalloonsView: View {
     @State private var animationTimer: Timer?
     
     var body: some View {
-        ZStack {
-            ForEach(balloons) { balloon in
-                BalloonView(balloon: balloon)
+        GeometryReader { geometry in
+            ZStack {
+                ForEach(balloons) { balloon in
+                    BalloonView(balloon: balloon)
+                }
             }
+            .frame(width: geometry.size.width, height: geometry.size.height)
         }
         .onAppear {
             // Start immediately without delay
@@ -339,11 +358,14 @@ struct BalloonsView: View {
     }
     
     private func createBalloons() {
+        let screenWidth = UIScreen.main.bounds.width
+        let screenHeight = UIScreen.main.bounds.height
+        
         balloons = (0..<15).map { _ in
             Balloon(
                 id: UUID(),
-                x: Double.random(in: 0...UIScreen.main.bounds.width),
-                y: UIScreen.main.bounds.height + 100,
+                x: Double.random(in: 0...screenWidth),
+                y: screenHeight + 100,
                 velocityX: Double.random(in: -2...2), // Increased horizontal movement
                 velocityY: Double.random(in: -3...(-1)),
                 rotation: Double.random(in: 0...360),
@@ -366,6 +388,9 @@ struct BalloonsView: View {
     }
     
     private func updateBalloons() {
+        let screenWidth = UIScreen.main.bounds.width
+        let screenHeight = UIScreen.main.bounds.height
+        
         for i in balloons.indices {
             balloons[i].y += balloons[i].velocityY
             balloons[i].x += balloons[i].velocityX
@@ -379,15 +404,15 @@ struct BalloonsView: View {
             
             // Keep balloons within screen bounds horizontally
             if balloons[i].x < -50 {
-                balloons[i].x = UIScreen.main.bounds.width + 50
-            } else if balloons[i].x > UIScreen.main.bounds.width + 50 {
+                balloons[i].x = screenWidth + 50
+            } else if balloons[i].x > screenWidth + 50 {
                 balloons[i].x = -50
             }
             
             // Reset balloons that float off screen
             if balloons[i].y < -100 {
-                balloons[i].y = UIScreen.main.bounds.height + 100
-                balloons[i].x = Double.random(in: 0...UIScreen.main.bounds.width)
+                balloons[i].y = screenHeight + 100
+                balloons[i].x = Double.random(in: 0...screenWidth)
             }
         }
     }
@@ -435,10 +460,13 @@ struct SparklesView: View {
     @State private var animationTimer: Timer?
     
     var body: some View {
-        ZStack {
-            ForEach(sparkles) { sparkle in
-                SparkleView(sparkle: sparkle)
+        GeometryReader { geometry in
+            ZStack {
+                ForEach(sparkles) { sparkle in
+                    SparkleView(sparkle: sparkle)
+                }
             }
+            .frame(width: geometry.size.width, height: geometry.size.height)
         }
         .onAppear {
             // Start immediately without delay
@@ -451,11 +479,14 @@ struct SparklesView: View {
     }
     
     private func createSparkles() {
+        let screenWidth = UIScreen.main.bounds.width
+        let screenHeight = UIScreen.main.bounds.height
+        
         sparkles = (0..<50).map { _ in
             Sparkle(
                 id: UUID(),
-                x: Double.random(in: 0...UIScreen.main.bounds.width),
-                y: Double.random(in: 0...UIScreen.main.bounds.height),
+                x: Double.random(in: 0...screenWidth),
+                y: Double.random(in: 0...screenHeight),
                 scale: Double.random(in: 0.5...1.5),
                 rotation: Double.random(in: 0...360),
                 rotationSpeed: Double.random(in: -3...3),
@@ -530,7 +561,7 @@ struct CelebrationOverlay: View {
                     }
                 
                 // Celebration content
-                VStack(spacing: 20) {
+                VStack(spacing: 10) {
                     Text("🎉 Congratulations! 🎉")
                         .font(.largeTitle)
                         .fontWeight(.bold)
@@ -542,11 +573,12 @@ struct CelebrationOverlay: View {
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
                     
-                    // Celebration animation
+                    // Celebration animation - now uses more screen space
                     celebrationAnimation
-                        .frame(height: 300)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-                .padding()
+                .padding(.horizontal, 20)
+                .padding(.top, 40)
             }
             .transition(.opacity)
         }
