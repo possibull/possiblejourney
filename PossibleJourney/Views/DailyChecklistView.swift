@@ -585,7 +585,8 @@ struct DailyChecklistView: View {
         NavigationLink(destination: SettingsView(endOfDayTime: $viewModel.program.endOfDayTime)
             .environmentObject(debugState)
             .environmentObject(appState)
-            .environmentObject(themeManager)) {
+            .environmentObject(themeManager)
+            .environmentObject(celebrationManager)) {
             Image(systemName: "gearshape.fill")
                 .foregroundColor(.blue)
         }
