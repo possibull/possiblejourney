@@ -559,30 +559,24 @@ struct CelebrationOverlay: View {
                         }
                     }
                 
-                // Celebration content
-                VStack(spacing: 0) {
-                    Spacer()
+                // Celebration animations as background
+                celebrationAnimation
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                
+                // Centered congratulations text overlay
+                VStack(spacing: 10) {
+                    Text("🎉 Congratulations! 🎉")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
                     
-                    VStack(spacing: 10) {
-                        Text("🎉 Congratulations! 🎉")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                            .multilineTextAlignment(.center)
-                        
-                        Text("All tasks completed!")
-                            .font(.title2)
-                            .foregroundColor(.white)
-                            .multilineTextAlignment(.center)
-                    }
-                    .padding(.horizontal, 20)
-                    
-                    Spacer()
-                    
-                    // Celebration animation - now uses more screen space
-                    celebrationAnimation
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    Text("All tasks completed!")
+                        .font(.title2)
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
                 }
+                .padding(.horizontal, 20)
             }
             .transition(.opacity)
         }
