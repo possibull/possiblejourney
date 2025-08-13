@@ -531,6 +531,7 @@ struct PossibleJourneyApp: App {
     @StateObject private var debugState = DebugState()
     @StateObject private var updateChecker = AppUpdateChecker()
     @StateObject private var themeManager = ThemeManager()
+    @StateObject private var celebrationManager = CelebrationManager()
     @State private var showSplash = true
     @State private var forceNavigationUpdate = false
     @State private var navigationKey = UUID()
@@ -571,6 +572,7 @@ struct PossibleJourneyApp: App {
             if showSplash {
                 SplashView(showSplash: $showSplash)
                     .environmentObject(themeManager)
+                    .environmentObject(celebrationManager)
                     .onAppear {
                         // Check for updates when app starts
                         updateChecker.checkForUpdates()
@@ -586,6 +588,7 @@ struct PossibleJourneyApp: App {
                                 .environmentObject(debugState)
                                 .environmentObject(themeManager)
                                 .environmentObject(appState)
+                                .environmentObject(celebrationManager)
                                 .onAppear {
                                     // Check for August 4th birthday theme activation
                                     checkAugust4thBirthdayActivation()
@@ -598,6 +601,7 @@ struct PossibleJourneyApp: App {
                             .environmentObject(debugState)
                             .environmentObject(themeManager)
                                 .environmentObject(appState)
+                                .environmentObject(celebrationManager)
                                 .onAppear {
                                     // Check for August 4th birthday theme activation
                                     checkAugust4thBirthdayActivation()

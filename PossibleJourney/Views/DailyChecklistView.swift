@@ -16,9 +16,11 @@ struct DailyChecklistView: View {
     @EnvironmentObject var updateChecker: AppUpdateChecker
     @EnvironmentObject var themeManager: ThemeManager
     @EnvironmentObject var debugState: DebugState
+    @EnvironmentObject var celebrationManager: CelebrationManager
     @State private var showingCalendar = false
     @State private var autoAdvanceTimer: Timer?
     @State private var showingReleaseNotes = false
+    @State private var showingCelebration = false
     
     // Computed property to check if current date is August 4th, 2025
     private var isAugust4th2025: Bool {
@@ -186,6 +188,12 @@ struct DailyChecklistView: View {
                 }
             }
         }
+        .overlay(
+            CelebrationOverlay(
+                celebrationType: celebrationManager.getCurrentCelebrationType(),
+                isShowing: $showingCelebration
+            )
+        )
         .onAppear {
             // Check for missed days and navigate to the first missed day if needed
             checkForMissedDaysAndNavigate()
@@ -657,6 +665,20 @@ struct DailyChecklistView: View {
         let allTasksCompleted = viewModel.program.tasks().allSatisfy { completed.contains($0.id) }
         if allTasksCompleted {
             viewModel.completeCurrentDay()
+            
+            // Show celebration if enabled
+            if celebrationManager.celebrationEnabled {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    showingCelebration = true
+                }
+                
+                // Auto-hide celebration after 5 seconds
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        showingCelebration = false
+                    }
+                }
+            }
         } else if viewModel.dailyProgress.isCompleted {
             // If not all tasks are completed but the day was marked as completed, unmark it
             viewModel.dailyProgress.isCompleted = false

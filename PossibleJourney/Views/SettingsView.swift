@@ -11,6 +11,7 @@ struct SettingsView: View {
     @EnvironmentObject var debugState: DebugState
     @EnvironmentObject var appState: ProgramAppState
     @EnvironmentObject var themeManager: ThemeManager
+    @EnvironmentObject var celebrationManager: CelebrationManager
     @Environment(\.dismiss) private var dismiss
     @State private var forceRefresh = false
     
@@ -96,6 +97,90 @@ struct SettingsView: View {
                                         let comps = calendar.dateComponents([.hour, .minute], from: newValue)
                                         endOfDayTime = calendar.date(bySettingHour: comps.hour ?? 0, minute: comps.minute ?? 0, second: 0, of: Date()) ?? newValue
                                     }
+                            }
+                        }
+                        .padding(20)
+                        .themeAwareCard()
+                        
+                        // Celebration Settings Card
+                        VStack(alignment: .leading, spacing: 20) {
+                            HStack {
+                                Image(systemName: "party.popper.fill")
+                                    .font(.system(size: 20, weight: .semibold))
+                                    .foregroundColor(.pink)
+                                    .frame(width: 40, height: 40)
+                                    .background(Circle().fill(Color.pink.opacity(0.1)))
+                                
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Celebration Settings")
+                                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                                        .foregroundColor(.primary)
+                                    Text("Configure completion celebrations")
+                                        .font(.system(size: 14, weight: .medium, design: .rounded))
+                                        .foregroundColor(.secondary)
+                                }
+                                Spacer()
+                            }
+                            
+                            VStack(spacing: 16) {
+                                // Enable/Disable Celebrations
+                                HStack {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .font(.system(size: 16, weight: .medium))
+                                        .foregroundColor(.pink)
+                                        .frame(width: 32, height: 32)
+                                        .background(Circle().fill(Color.pink.opacity(0.1)))
+                                    
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Enable Celebrations")
+                                            .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                            .foregroundColor(.primary)
+                                        Text("Show celebrations when all tasks are completed")
+                                            .font(.system(size: 14, weight: .regular, design: .rounded))
+                                            .foregroundColor(.secondary)
+                                    }
+                                    Spacer()
+                                    
+                                    Toggle("", isOn: $celebrationManager.celebrationEnabled)
+                                        .toggleStyle(SwitchToggleStyle(tint: .pink))
+                                        .accessibilityIdentifier("CelebrationToggle")
+                                }
+                                
+                                // Celebration Type Selection
+                                if celebrationManager.celebrationEnabled {
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        HStack {
+                                            Image(systemName: "star.fill")
+                                                .font(.system(size: 16, weight: .medium))
+                                                .foregroundColor(.pink)
+                                                .frame(width: 32, height: 32)
+                                                .background(Circle().fill(Color.pink.opacity(0.1)))
+                                            
+                                            VStack(alignment: .leading, spacing: 2) {
+                                                Text("Celebration Type")
+                                                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                                    .foregroundColor(.primary)
+                                                Text("Choose your preferred celebration style")
+                                                    .font(.system(size: 14, weight: .regular, design: .rounded))
+                                                    .foregroundColor(.secondary)
+                                            }
+                                            Spacer()
+                                        }
+                                        
+                                        Picker("Celebration Type", selection: $celebrationManager.celebrationType) {
+                                            ForEach(CelebrationType.allCases) { type in
+                                                HStack {
+                                                    Image(systemName: type.icon)
+                                                        .foregroundColor(.pink)
+                                                    Text(type.displayName)
+                                                }
+                                                .tag(type)
+                                            }
+                                        }
+                                        .pickerStyle(MenuPickerStyle())
+                                        .accentColor(.pink)
+                                    }
+                                }
                             }
                         }
                         .padding(20)
