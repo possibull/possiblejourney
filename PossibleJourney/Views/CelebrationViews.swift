@@ -182,6 +182,9 @@ struct FireworkParticle: Identifiable {
     var velocityX: Double
     var velocityY: Double
     var alpha: Double
+    var size: Double
+    var life: Double = 1.0
+    var maxLife: Double = 1.0
 }
 
 struct CelebrationFireworkView: View {
@@ -196,23 +199,49 @@ struct CelebrationFireworkView: View {
     
     var body: some View {
         ZStack {
-            // Rising firework
+            // Rising firework with trail effect
             if !currentFirework.exploded {
+                // Main firework body
                 Circle()
                     .fill(currentFirework.color)
-                    .frame(width: 12, height: 12) // Made bigger
+                    .frame(width: 8, height: 8)
                     .position(x: currentFirework.x, y: currentFirework.y)
-                    .shadow(color: currentFirework.color.opacity(0.8), radius: 4, x: 0, y: 0) // Added glow effect
+                    .shadow(color: currentFirework.color.opacity(0.9), radius: 6, x: 0, y: 0)
+                
+                // Trailing particles for realistic rocket effect
+                ForEach(0..<3, id: \.self) { i in
+                    Circle()
+                        .fill(currentFirework.color.opacity(0.6 - Double(i) * 0.2))
+                        .frame(width: 4 - Double(i), height: 4 - Double(i))
+                        .position(x: currentFirework.x, y: currentFirework.y + 15 + Double(i * 8))
+                        .shadow(color: currentFirework.color.opacity(0.4), radius: 2, x: 0, y: 0)
+                }
             }
             
-            // Exploded particles
+            // Exploded particles with enhanced visuals
             ForEach(currentFirework.particles) { particle in
-                Circle()
-                    .fill(currentFirework.color)
-                    .frame(width: 6, height: 6) // Made bigger
-                    .position(x: particle.x, y: particle.y)
-                    .opacity(particle.alpha)
-                    .shadow(color: currentFirework.color.opacity(particle.alpha * 0.5), radius: 2, x: 0, y: 0) // Added glow effect
+                ZStack {
+                    // Outer glow
+                    Circle()
+                        .fill(currentFirework.color.opacity(0.3))
+                        .frame(width: particle.size * 2, height: particle.size * 2)
+                        .position(x: particle.x, y: particle.y)
+                        .blur(radius: 2)
+                    
+                    // Main particle
+                    Circle()
+                        .fill(currentFirework.color)
+                        .frame(width: particle.size, height: particle.size)
+                        .position(x: particle.x, y: particle.y)
+                        .shadow(color: currentFirework.color.opacity(particle.alpha * 0.8), radius: 3, x: 0, y: 0)
+                    
+                    // Inner highlight
+                    Circle()
+                        .fill(Color.white.opacity(0.6))
+                        .frame(width: particle.size * 0.4, height: particle.size * 0.4)
+                        .position(x: particle.x - particle.size * 0.2, y: particle.y - particle.size * 0.2)
+                }
+                .opacity(particle.alpha)
             }
         }
         .onAppear {
@@ -236,33 +265,44 @@ struct CelebrationFireworkView: View {
     
     private func updateFirework() {
         if !currentFirework.exploded {
-            // Move firework up faster for more excitement
-            currentFirework.y -= 5
+            // Move firework up with realistic physics
+            currentFirework.y -= 4.5
+            
+            // Add slight horizontal drift for realism
+            currentFirework.x += Double.random(in: -0.3...0.3)
             
             // Check if it should explode
             if currentFirework.y <= currentFirework.targetY {
                 explodeFirework()
             }
         } else {
-            // Update particles with gravity and air resistance for realistic explosion
+            // Update particles with enhanced physics for realistic explosion
             for i in currentFirework.particles.indices {
-                // Apply gravity
-                currentFirework.particles[i].velocityY += 0.1
+                // Apply realistic gravity
+                currentFirework.particles[i].velocityY += 0.15
                 
-                // Apply air resistance
-                currentFirework.particles[i].velocityX *= 0.98
-                currentFirework.particles[i].velocityY *= 0.98
+                // Apply air resistance with variation
+                let resistance = 0.985 + Double.random(in: -0.005...0.005)
+                currentFirework.particles[i].velocityX *= resistance
+                currentFirework.particles[i].velocityY *= resistance
+                
+                // Add wind effect
+                currentFirework.particles[i].velocityX += Double.random(in: -0.05...0.05)
                 
                 // Update position
                 currentFirework.particles[i].x += currentFirework.particles[i].velocityX
                 currentFirework.particles[i].y += currentFirework.particles[i].velocityY
                 
-                // Fade out particles much slower for longer-lasting explosions
-                currentFirework.particles[i].alpha -= 0.008
+                // Update life and alpha based on life
+                currentFirework.particles[i].life -= 0.012
+                currentFirework.particles[i].alpha = currentFirework.particles[i].life / currentFirework.particles[i].maxLife
+                
+                // Shrink particles as they age
+                currentFirework.particles[i].size = max(2.0, currentFirework.particles[i].size * 0.998)
             }
             
-            // Remove faded particles
-            currentFirework.particles.removeAll { $0.alpha <= 0 }
+            // Remove dead particles
+            currentFirework.particles.removeAll { $0.life <= 0 }
             
             // Check if we should create additional explosions
             if currentFirework.explosionCount < currentFirework.maxExplosions {
@@ -280,10 +320,12 @@ struct CelebrationFireworkView: View {
         // Create multiple explosion rings for realistic firework effect
         var allParticles: [FireworkParticle] = []
         
-        // Inner ring - fast particles
-        for i in 0..<20 {
-            let angle = (Double(i) / 20.0) * 2 * .pi
-            let speed = Double.random(in: 8...12)
+        // Inner ring - fast particles with varied sizes
+        for i in 0..<25 {
+            let angle = (Double(i) / 25.0) * 2 * .pi
+            let speed = Double.random(in: 10...15)
+            let size = Double.random(in: 4...8)
+            let life = Double.random(in: 0.8...1.2)
             
             allParticles.append(FireworkParticle(
                 id: UUID(),
@@ -291,14 +333,39 @@ struct CelebrationFireworkView: View {
                 y: currentFirework.y,
                 velocityX: cos(angle) * speed,
                 velocityY: sin(angle) * speed,
-                alpha: 1.0
+                alpha: 1.0,
+                size: size,
+                life: life,
+                maxLife: life
             ))
         }
         
         // Middle ring - medium speed particles
+        for i in 0..<20 {
+            let angle = (Double(i) / 20.0) * 2 * .pi + Double.random(in: -0.3...0.3)
+            let speed = Double.random(in: 6...10)
+            let size = Double.random(in: 3...6)
+            let life = Double.random(in: 0.9...1.1)
+            
+            allParticles.append(FireworkParticle(
+                id: UUID(),
+                x: currentFirework.x,
+                y: currentFirework.y,
+                velocityX: cos(angle) * speed,
+                velocityY: sin(angle) * speed,
+                alpha: 1.0,
+                size: size,
+                life: life,
+                maxLife: life
+            ))
+        }
+        
+        // Outer ring - slower particles with longer life
         for i in 0..<15 {
-            let angle = (Double(i) / 15.0) * 2 * .pi + Double.random(in: -0.2...0.2)
-            let speed = Double.random(in: 5...8)
+            let angle = (Double(i) / 15.0) * 2 * .pi + Double.random(in: -0.4...0.4)
+            let speed = Double.random(in: 4...8)
+            let size = Double.random(in: 2...5)
+            let life = Double.random(in: 1.0...1.3)
             
             allParticles.append(FireworkParticle(
                 id: UUID(),
@@ -306,29 +373,19 @@ struct CelebrationFireworkView: View {
                 y: currentFirework.y,
                 velocityX: cos(angle) * speed,
                 velocityY: sin(angle) * speed,
-                alpha: 1.0
+                alpha: 1.0,
+                size: size,
+                life: life,
+                maxLife: life
             ))
         }
         
-        // Outer ring - slower particles
-        for i in 0..<10 {
-            let angle = (Double(i) / 10.0) * 2 * .pi + Double.random(in: -0.3...0.3)
-            let speed = Double.random(in: 3...6)
-            
-            allParticles.append(FireworkParticle(
-                id: UUID(),
-                x: currentFirework.x,
-                y: currentFirework.y,
-                velocityX: cos(angle) * speed,
-                velocityY: sin(angle) * speed,
-                alpha: 1.0
-            ))
-        }
-        
-        // Add some random particles for sparkle effect
-        for _ in 0..<15 {
+        // Add sparkle particles for extra effect
+        for _ in 0..<20 {
             let angle = Double.random(in: 0...2 * .pi)
-            let speed = Double.random(in: 2...10)
+            let speed = Double.random(in: 3...12)
+            let size = Double.random(in: 1...4)
+            let life = Double.random(in: 0.7...1.0)
             
             allParticles.append(FireworkParticle(
                 id: UUID(),
@@ -336,7 +393,10 @@ struct CelebrationFireworkView: View {
                 y: currentFirework.y,
                 velocityX: cos(angle) * speed,
                 velocityY: sin(angle) * speed,
-                alpha: 1.0
+                alpha: 1.0,
+                size: size,
+                life: life,
+                maxLife: life
             ))
         }
         
@@ -362,6 +422,8 @@ struct CelebrationFireworkView: View {
             for i in 0..<25 {
                 let angle = (Double(i) / 25.0) * 2 * .pi * 3 // Triple spiral
                 let speed = Double.random(in: 6...10)
+                let size = Double.random(in: 3...6)
+                let life = Double.random(in: 0.8...1.1)
                 
                 newParticles.append(FireworkParticle(
                     id: UUID(),
@@ -369,7 +431,10 @@ struct CelebrationFireworkView: View {
                     y: explosionY,
                     velocityX: cos(angle) * speed,
                     velocityY: sin(angle) * speed,
-                    alpha: 1.0
+                    alpha: 1.0,
+                    size: size,
+                    life: life,
+                    maxLife: life
                 ))
             }
             
@@ -377,6 +442,8 @@ struct CelebrationFireworkView: View {
             for i in 0..<30 {
                 let angle = (Double(i) / 30.0) * 2 * .pi
                 let speed = Double.random(in: 8...15)
+                let size = Double.random(in: 4...8)
+                let life = Double.random(in: 0.9...1.2)
                 
                 newParticles.append(FireworkParticle(
                     id: UUID(),
@@ -384,7 +451,10 @@ struct CelebrationFireworkView: View {
                     y: explosionY,
                     velocityX: cos(angle) * speed,
                     velocityY: sin(angle) * speed,
-                    alpha: 1.0
+                    alpha: 1.0,
+                    size: size,
+                    life: life,
+                    maxLife: life
                 ))
             }
             
@@ -392,6 +462,8 @@ struct CelebrationFireworkView: View {
             for _ in 0..<20 {
                 let angle = Double.random(in: 0...2 * .pi)
                 let speed = Double.random(in: 4...12)
+                let size = Double.random(in: 2...5)
+                let life = Double.random(in: 0.7...1.0)
                 
                 newParticles.append(FireworkParticle(
                     id: UUID(),
@@ -399,7 +471,10 @@ struct CelebrationFireworkView: View {
                     y: explosionY,
                     velocityX: cos(angle) * speed,
                     velocityY: sin(angle) * speed,
-                    alpha: 1.0
+                    alpha: 1.0,
+                    size: size,
+                    life: life,
+                    maxLife: life
                 ))
             }
         }
