@@ -13,6 +13,7 @@ struct ConfettiView: View {
             }
         }
         .onAppear {
+            // Start immediately without delay
             createParticles()
             startAnimation()
         }
@@ -110,11 +111,13 @@ struct FireworksView: View {
     }
     
     private func startFireworks() {
-        // Create initial fireworks
+        // Create multiple initial fireworks immediately
+        createFirework()
+        createFirework()
         createFirework()
         
         // Schedule more fireworks more frequently
-        animationTimer = Timer.scheduledTimer(withTimeInterval: 0.8, repeats: true) { _ in
+        animationTimer = Timer.scheduledTimer(withTimeInterval: 0.6, repeats: true) { _ in
             createFirework()
         }
     }
@@ -214,19 +217,29 @@ struct CelebrationFireworkView: View {
     
     private func updateFirework() {
         if !currentFirework.exploded {
-            // Move firework up
-            currentFirework.y -= 3
+            // Move firework up faster for more excitement
+            currentFirework.y -= 5
             
             // Check if it should explode
             if currentFirework.y <= currentFirework.targetY {
                 explodeFirework()
             }
         } else {
-            // Update particles
+            // Update particles with gravity and air resistance for realistic explosion
             for i in currentFirework.particles.indices {
+                // Apply gravity
+                currentFirework.particles[i].velocityY += 0.1
+                
+                // Apply air resistance
+                currentFirework.particles[i].velocityX *= 0.98
+                currentFirework.particles[i].velocityY *= 0.98
+                
+                // Update position
                 currentFirework.particles[i].x += currentFirework.particles[i].velocityX
                 currentFirework.particles[i].y += currentFirework.particles[i].velocityY
-                currentFirework.particles[i].alpha -= 0.02
+                
+                // Fade out particles gradually
+                currentFirework.particles[i].alpha -= 0.015
             }
             
             // Remove faded particles
@@ -237,20 +250,70 @@ struct CelebrationFireworkView: View {
     private func explodeFirework() {
         currentFirework.exploded = true
         
-        // Create explosion particles
-        currentFirework.particles = (0..<30).map { _ in
-            let angle = Double.random(in: 0...2 * .pi)
-            let speed = Double.random(in: 2...6)
+        // Create multiple explosion rings for realistic firework effect
+        var allParticles: [FireworkParticle] = []
+        
+        // Inner ring - fast particles
+        for i in 0..<20 {
+            let angle = (Double(i) / 20.0) * 2 * .pi
+            let speed = Double.random(in: 8...12)
             
-            return FireworkParticle(
+            allParticles.append(FireworkParticle(
                 id: UUID(),
                 x: currentFirework.x,
                 y: currentFirework.y,
                 velocityX: cos(angle) * speed,
                 velocityY: sin(angle) * speed,
                 alpha: 1.0
-            )
+            ))
         }
+        
+        // Middle ring - medium speed particles
+        for i in 0..<15 {
+            let angle = (Double(i) / 15.0) * 2 * .pi + Double.random(in: -0.2...0.2)
+            let speed = Double.random(in: 5...8)
+            
+            allParticles.append(FireworkParticle(
+                id: UUID(),
+                x: currentFirework.x,
+                y: currentFirework.y,
+                velocityX: cos(angle) * speed,
+                velocityY: sin(angle) * speed,
+                alpha: 1.0
+            ))
+        }
+        
+        // Outer ring - slower particles
+        for i in 0..<10 {
+            let angle = (Double(i) / 10.0) * 2 * .pi + Double.random(in: -0.3...0.3)
+            let speed = Double.random(in: 3...6)
+            
+            allParticles.append(FireworkParticle(
+                id: UUID(),
+                x: currentFirework.x,
+                y: currentFirework.y,
+                velocityX: cos(angle) * speed,
+                velocityY: sin(angle) * speed,
+                alpha: 1.0
+            ))
+        }
+        
+        // Add some random particles for sparkle effect
+        for _ in 0..<15 {
+            let angle = Double.random(in: 0...2 * .pi)
+            let speed = Double.random(in: 2...10)
+            
+            allParticles.append(FireworkParticle(
+                id: UUID(),
+                x: currentFirework.x,
+                y: currentFirework.y,
+                velocityX: cos(angle) * speed,
+                velocityY: sin(angle) * speed,
+                alpha: 1.0
+            ))
+        }
+        
+        currentFirework.particles = allParticles
     }
 }
 
@@ -266,6 +329,7 @@ struct BalloonsView: View {
             }
         }
         .onAppear {
+            // Start immediately without delay
             createBalloons()
             startAnimation()
         }
@@ -377,6 +441,7 @@ struct SparklesView: View {
             }
         }
         .onAppear {
+            // Start immediately without delay
             createSparkles()
             startAnimation()
         }

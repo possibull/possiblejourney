@@ -669,9 +669,8 @@ struct DailyChecklistView: View {
             
             // Show celebration if enabled
             if celebrationManager.celebrationEnabled {
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    showingCelebration = true
-                }
+                // Show celebration immediately without delay
+                showingCelebration = true
                 
                 // Auto-hide celebration after 5 seconds
                 DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
