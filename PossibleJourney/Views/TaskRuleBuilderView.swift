@@ -72,7 +72,10 @@ struct TaskRuleBuilderView: View {
                     MetricAutocompleteView(
                         metricStorage: metricStorage,
                         selectedMetricId: $selectedMetricId,
-                        selectedMetricName: $selectedMetricName
+                        selectedMetricName: $selectedMetricName,
+                        onTapToCreate: {
+                            showingMetricCreation = true
+                        }
                     )
                     
                     Button(action: {
@@ -177,14 +180,12 @@ struct TaskRuleBuilderView: View {
                 updateRule()
             }
         }
-        .onChange(of: selectedComparator) { _, newValue in
-            print("🔍 TaskRuleBuilderView: selectedComparator onChange triggered - newValue: '\(newValue)', isLoadingExistingRule: \(isLoadingExistingRule)")
+        .onChange(of: selectedComparator) { _, _ in
             if !isLoadingExistingRule {
                 updateRule()
             }
         }
-        .onChange(of: targetValue) { _, newValue in
-            print("🔍 TaskRuleBuilderView: targetValue onChange triggered - newValue: '\(newValue)', isLoadingExistingRule: \(isLoadingExistingRule)")
+        .onChange(of: targetValue) { _, _ in
             if !isLoadingExistingRule {
                 updateRule()
             }
@@ -223,7 +224,21 @@ struct TaskRuleBuilderView: View {
         if selectedMetricType == .boolean {
             target = targetBoolean ? "true" : "false"
         } else {
-            target = targetValue.isEmpty ? "0" : targetValue
+            if targetValue.isEmpty {
+                target = "0"
+            } else {
+                // Format the number to remove unnecessary .0 for whole numbers
+                if let doubleValue = Double(targetValue) {
+                    if doubleValue.truncatingRemainder(dividingBy: 1) == 0 {
+                        target = String(format: "%.0f", doubleValue)
+                    } else {
+                        target = targetValue
+                    }
+                } else {
+                    target = targetValue
+                }
+            }
+            
             if !selectedMetricUnit.isEmpty {
                 target = "\(target) \(selectedMetricUnit)"
             }
@@ -239,15 +254,13 @@ struct TaskRuleBuilderView: View {
     private func loadExistingRule() {
         isLoadingExistingRule = true
         
-        print("🔍 TaskRuleBuilderView: loadExistingRule() called")
-        print("🔍 TaskRuleBuilderView: progressRule = \(String(describing: progressRule))")
-        
         if case .threshold(let metricAlias, let comparator, let target) = progressRule {
-            print("🔍 TaskRuleBuilderView: Found threshold rule - alias: '\(metricAlias)', comparator: '\(comparator)', target: \(target)")
+            print("🔍 Loading existing rule: metricAlias='\(metricAlias)', comparator='\(comparator)', target=\(target)")
+            print("📊 Available metrics: \(metricStorage.metrics.map { $0.name })")
             
             // Find metric by alias (name)
             if let metric = metricStorage.metrics.first(where: { $0.name.lowercased() == metricAlias.lowercased() }) {
-                print("🔍 TaskRuleBuilderView: Found matching metric: \(metric.name)")
+                print("✅ Found metric: \(metric.name) (ID: \(metric.id))")
                 selectedMetricId = metric.id
                 selectedMetricName = metric.name
                 selectedMetricType = metric.type
@@ -257,22 +270,25 @@ struct TaskRuleBuilderView: View {
                 if metric.type == .boolean {
                     targetBoolean = target > 0
                 } else {
-                    targetValue = String(target)
+                    // Format the number to remove unnecessary .0 for whole numbers
+                    if target.truncatingRemainder(dividingBy: 1) == 0 {
+                        targetValue = String(format: "%.0f", target)
+                    } else {
+                        targetValue = String(target)
+                    }
                 }
-                
-                print("🔍 TaskRuleBuilderView: Set selectedMetricName = '\(selectedMetricName)'")
-                print("🔍 TaskRuleBuilderView: Set selectedComparator = '\(selectedComparator)'")
-                print("🔍 TaskRuleBuilderView: Set targetValue = '\(targetValue)'")
-                print("🔍 TaskRuleBuilderView: Set targetBoolean = \(targetBoolean)")
-                print("🔍 TaskRuleBuilderView: isLoadingExistingRule = \(isLoadingExistingRule)")
             } else {
-                print("❌ TaskRuleBuilderView: No metric found for alias: '\(metricAlias)'")
+                print("❌ Metric not found: '\(metricAlias)'")
+                print("📋 Available metric names: \(metricStorage.metrics.map { $0.name })")
             }
         } else {
-            print("❌ TaskRuleBuilderView: progressRule is not a threshold rule")
+            print("⚠️ No threshold rule found in progressRule: \(String(describing: progressRule))")
         }
         
-        isLoadingExistingRule = false
+        // Use async to ensure isLoadingExistingRule is set to false after all state changes
+        DispatchQueue.main.async {
+            self.isLoadingExistingRule = false
+        }
     }
     
     private func updateMetricInfo() {
@@ -321,19 +337,11 @@ struct TaskRuleBuilderView: View {
             target = Double(targetValue) ?? 0.0
         }
         
-        let newRule = ProgressRule.threshold(
+        progressRule = .threshold(
             metricAlias: selectedMetricName,
             comparator: selectedComparator,
             target: target
         )
-        
-        print("🔍 TaskRuleBuilderView: updateRule() called")
-        print("🔍 TaskRuleBuilderView: selectedMetricName = '\(selectedMetricName)'")
-        print("🔍 TaskRuleBuilderView: selectedComparator = '\(selectedComparator)'")
-        print("🔍 TaskRuleBuilderView: target = \(target)")
-        print("🔍 TaskRuleBuilderView: newRule = \(newRule)")
-        
-        progressRule = newRule
     }
 }
 

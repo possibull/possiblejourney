@@ -12,6 +12,7 @@ struct MetricAutocompleteView: View {
     @Binding var selectedMetricId: String
     @Binding var selectedMetricName: String
     @State private var showingSuggestions = false
+    var onTapToCreate: (() -> Void)? = nil
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -22,12 +23,41 @@ struct MetricAutocompleteView: View {
                     showingSuggestions = !newValue.isEmpty
                 }
                 .onTapGesture {
-                    showingSuggestions = true
+                    if selectedMetricName.isEmpty {
+                        // If field is empty, show suggestions or trigger create
+                        if metricStorage.getActiveMetrics().isEmpty {
+                            onTapToCreate?()
+                        } else {
+                            showingSuggestions = true
+                        }
+                    } else {
+                        showingSuggestions = true
+                    }
                 }
             
             // Autocomplete suggestions
-            if showingSuggestions && !filteredMetrics.isEmpty {
+            if showingSuggestions {
                 VStack(alignment: .leading, spacing: 2) {
+                    // Create new metric option
+                    Button(action: {
+                        onTapToCreate?()
+                        showingSuggestions = false
+                    }) {
+                        HStack {
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundColor(.accentColor)
+                                .font(.caption)
+                            Text("Create new metric...")
+                                .font(.caption)
+                                .foregroundColor(.accentColor)
+                            Spacer()
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    
+                    // Existing metrics
                     ForEach(filteredMetrics.prefix(5), id: \.id) { metric in
                         Button(action: {
                             selectMetric(metric)
@@ -55,9 +85,6 @@ struct MetricAutocompleteView: View {
                 .shadow(radius: 2)
                 .padding(.top, 2)
             }
-        }
-        .onTapGesture {
-            showingSuggestions = false
         }
     }
     
