@@ -1111,6 +1111,7 @@ struct TaskEditRow: View {
     @State private var title: String
     @State private var description: String
     @State private var requiresPhoto: Bool
+    @State private var taskType: String = "growth"
     
     init(task: Task, onUpdate: @escaping (Task) -> Void) {
         self.task = task
@@ -1151,6 +1152,18 @@ struct TaskEditRow: View {
                         updateTask()
                     }
                 
+                // Task Type Selection
+                Picker("Task Type", selection: $taskType) {
+                    Text("Growth").tag("growth")
+                    Text("Maintenance").tag("maintenance")
+                    Text("Recovery").tag("recovery")
+                }
+                .pickerStyle(SegmentedPickerStyle())
+                .font(.caption)
+                .onChange(of: taskType) { _, newValue in
+                    updateTask()
+                }
+                
                 Toggle("Requires Photo", isOn: $requiresPhoto)
                     .font(.caption)
                     .onChange(of: requiresPhoto) { _, newValue in
@@ -1164,6 +1177,7 @@ struct TaskEditRow: View {
             title = task.title
             description = task.description ?? ""
             requiresPhoto = task.requiresPhoto
+            taskType = "growth" // Default to growth for now
         }
     }
     
