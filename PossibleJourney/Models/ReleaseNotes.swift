@@ -10,7 +10,7 @@ struct ReleaseNotes {
     static let allReleaseNotes: [ReleaseNotes] = [
             ReleaseNotes(
                 version: "2.0",
-                buildNumber: 2,
+                buildNumber: 1,
                 title: "Major UI/UX Improvements & Metrics Management",
                 notes: [
                     "✨ NEW: Comprehensive Metrics Management screen accessible from Settings",
