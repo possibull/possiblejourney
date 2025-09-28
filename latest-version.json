@@ -1,8 +1,8 @@
 {
-  "version": "1.10",
-  "build": 3,
-  "releaseNotes": "Enhanced Celebration Experience - Completely redesigned fireworks with realistic physics and multiple explosions per firework - Added trailing particle effects to rising fireworks for authentic rocket appearance - Enhanced particle visuals with multi-layered glow effects, highlights, and dynamic sizing - Improved fireworks positioning and centering for better screen coverage - Enhanced balloon strings with longer, curlier design pointing in opposite direction - Fixed celebration positioning to display closer to congratulations text - Added realistic physics including gravity, air resistance, wind effects, and particle lifecycles - Multiple explosion patterns including spiral, starburst, and random scatter effects - Improved celebration animations with longer-lasting, more visually impressive displays",
+  "version": "2.0",
+  "build": 2,
+  "releaseNotes": "Version 2.0 Build 2 - Major UI/UX Improvements:\n\n✨ NEW FEATURES:\n• Added comprehensive Metrics Management screen accessible from Settings\n• View, create, edit, and archive all your metrics in one place\n• See all default metrics and custom metrics with full details\n\n🔧 IMPROVEMENTS:\n• Removed photo requirement toggle from Add Task alerts (simplified workflow)\n• Fixed workout duration defaulting to previous values on new program start\n• Enhanced data reset functionality to properly clear all stored measurements\n• Improved metric input persistence across app restarts\n• Better visual feedback for threshold-based task completion\n\n🐛 BUG FIXES:\n• Fixed auto-checking loop for numeric threshold tasks\n• Resolved Missed Task Protocol appearing inappropriately\n• Fixed bidirectional threshold checking (lock returns when value drops below threshold)\n• Corrected measurement persistence issues after app restart\n• Fixed photo toggle removal from task creation alerts\n\n📱 USER EXPERIENCE:\n• Streamlined task creation process\n• Better metric management and organization\n• More reliable data persistence\n• Cleaner, more intuitive interface",
   "forceUpdate": false,
-  "lastUpdated": "2025-08-13T22:45:01Z",
-  "branch": "v1.10-build3"
+  "lastUpdated": "2025-09-28T14:42:00Z",
+  "branch": "v2.0-build2"
 }
