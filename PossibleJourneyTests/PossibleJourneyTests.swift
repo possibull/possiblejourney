@@ -48,6 +48,34 @@ final class TaskModelTests: XCTestCase {
         let task = Task(id: UUID(), title: "Test Task", description: "Test Description")
         XCTAssertEqual(task.taskType, .growth) // Default should be growth
     }
+    
+    // MARK: - UI-TaskType Integration Tests (TDD Red Phase)
+    func testTaskTypeCanBeUpdated() {
+        // Test that Task taskType can be updated to different values
+        var task = Task(id: UUID(), title: "Test Task", description: "Test Description", taskType: .growth)
+        XCTAssertEqual(task.taskType, .growth)
+        
+        task.taskType = .maintenance
+        XCTAssertEqual(task.taskType, .maintenance)
+        
+        task.taskType = .recovery
+        XCTAssertEqual(task.taskType, .recovery)
+    }
+    
+    func testTaskTypeStringValues() {
+        // Test that TaskType has correct string values for UI binding
+        XCTAssertEqual(TaskType.growth.rawValue, "growth")
+        XCTAssertEqual(TaskType.maintenance.rawValue, "maintenance")
+        XCTAssertEqual(TaskType.recovery.rawValue, "recovery")
+    }
+    
+    func testTaskTypeFromString() {
+        // Test that TaskType can be created from string values (for UI binding)
+        XCTAssertEqual(TaskType(rawValue: "growth"), .growth)
+        XCTAssertEqual(TaskType(rawValue: "maintenance"), .maintenance)
+        XCTAssertEqual(TaskType(rawValue: "recovery"), .recovery)
+        XCTAssertNil(TaskType(rawValue: "invalid"))
+    }
 }
 
 final class ProgramModelTests: XCTestCase {
