@@ -1177,7 +1177,7 @@ struct TaskEditRow: View {
             title = task.title
             description = task.description ?? ""
             requiresPhoto = task.requiresPhoto
-            taskType = "growth" // Default to growth for now
+            taskType = task.taskType.rawValue // Use actual taskType from data model
         }
     }
     
@@ -1186,7 +1186,8 @@ struct TaskEditRow: View {
             id: task.id,
             title: title,
             description: description.isEmpty ? nil : description,
-            requiresPhoto: requiresPhoto
+            requiresPhoto: requiresPhoto,
+            taskType: TaskType(rawValue: taskType) ?? .growth
         )
         onUpdate(updatedTask)
     }
