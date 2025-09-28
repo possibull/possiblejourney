@@ -47,8 +47,16 @@ DEPLOY_TYPE=${1:-beta}
 case $DEPLOY_TYPE in
     "beta")
         print_status "Deploying to TestFlight..."
-        fastlane beta
-        print_success "Successfully deployed to TestFlight!"
+        # Use the working xcrun altool method instead of fastlane
+        if [ -f "builds/PossibleJourney.ipa" ]; then
+            print_status "Uploading existing IPA file..."
+            xcrun altool --upload-app -f builds/PossibleJourney.ipa -u ted@mrpossible.com -p "${FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD:-thkd-bbia-iyyh-guxx}" --type ios
+            print_success "Successfully deployed to TestFlight!"
+        else
+            print_status "Building and uploading with fastlane..."
+            fastlane beta
+            print_success "Successfully deployed to TestFlight!"
+        fi
         
         # Update latest-version.json on main branch after successful deployment
         print_status "Updating latest-version.json on main branch..."
