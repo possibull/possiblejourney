@@ -1,8 +1,8 @@
 {
-  "version": "1.10",
-  "build": 3,
-  "releaseNotes": "Enhanced Celebration Experience - Completely redesigned fireworks with realistic physics and multiple explosions per firework - Added trailing particle effects to rising fireworks for authentic rocket appearance - Enhanced particle visuals with multi-layered glow effects, highlights, and dynamic sizing - Improved fireworks positioning and centering for better screen coverage - Enhanced balloon strings with longer, curlier design pointing in opposite direction - Fixed celebration positioning to display closer to congratulations text - Added realistic physics including gravity, air resistance, wind effects, and particle lifecycles - Multiple explosion patterns including spiral, starburst, and random scatter effects - Improved celebration animations with longer-lasting, more visually impressive displays",
+  "version": "2.0",
+  "build": 1,
+  "releaseNotes": "New version 2.0 build 1",
   "forceUpdate": false,
-  "lastUpdated": "2025-08-13T22:45:01Z",
-  "branch": "v1.10-build3"
+  "lastUpdated": "2025-09-28T05:08:48Z",
+  "branch": "v2.0-build1"
 }
