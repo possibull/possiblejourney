@@ -33,4 +33,20 @@ struct Task: Codable, Identifiable, Equatable {
         self.progressRule = progressRule
         self.linkedMetric = linkedMetric
     }
+    
+    // MARK: - Codable Implementation for Backward Compatibility
+    enum CodingKeys: String, CodingKey {
+        case id, title, description, requiresPhoto, taskType, progressRule, linkedMetric
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        title = try container.decode(String.self, forKey: .title)
+        description = try container.decodeIfPresent(String.self, forKey: .description)
+        requiresPhoto = try container.decodeIfPresent(Bool.self, forKey: .requiresPhoto) ?? false
+        taskType = try container.decodeIfPresent(TaskType.self, forKey: .taskType) ?? .growth
+        progressRule = try container.decodeIfPresent(ProgressRule.self, forKey: .progressRule)
+        linkedMetric = try container.decodeIfPresent(String.self, forKey: .linkedMetric)
+    }
 } 
