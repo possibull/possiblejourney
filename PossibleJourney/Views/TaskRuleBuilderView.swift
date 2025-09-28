@@ -91,23 +91,25 @@ struct TaskRuleBuilderView: View {
             // Comparator and Target (only show if metric is selected)
             if !selectedMetricId.isEmpty {
                 HStack(spacing: 12) {
-                    // Comparator
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Comparator")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        
-                        Picker("Comparator", selection: $selectedComparator) {
-                            ForEach(availableComparators, id: \.0) { value, display in
-                                Text(display).tag(value)
+                    // Comparator (only show for non-boolean metrics)
+                    if selectedMetricType != .boolean {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Comparator")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            
+                            Picker("Comparator", selection: $selectedComparator) {
+                                ForEach(availableComparators, id: \.0) { value, display in
+                                    Text(display).tag(value)
+                                }
                             }
+                            .pickerStyle(MenuPickerStyle())
+                            .frame(maxWidth: .infinity)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(Color.gray.opacity(0.1))
+                            .cornerRadius(8)
                         }
-                        .pickerStyle(MenuPickerStyle())
-                        .frame(maxWidth: .infinity)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(Color.gray.opacity(0.1))
-                        .cornerRadius(8)
                     }
                     
                     // Target
@@ -173,6 +175,14 @@ struct TaskRuleBuilderView: View {
         }
         .onAppear {
             loadExistingRule()
+        }
+        .onChange(of: progressRule) { _, newRule in
+            // Reload when the progressRule binding changes (e.g., from TaskEditRow onAppear)
+            if newRule != nil {
+                DispatchQueue.main.async {
+                    loadExistingRule()
+                }
+            }
         }
         .onChange(of: selectedMetricId) { _, newValue in
             if !isLoadingExistingRule && !newValue.isEmpty {
@@ -244,9 +254,13 @@ struct TaskRuleBuilderView: View {
             }
         }
         
-        let comparatorDisplay = availableComparators.first { $0.0 == selectedComparator }?.1 ?? selectedComparator
-        
-        return "\(selectedMetricName) \(comparatorDisplay) \(target)"
+        // For boolean metrics, don't show comparator in preview
+        if selectedMetricType == .boolean {
+            return "\(selectedMetricName): \(target)"
+        } else {
+            let comparatorDisplay = availableComparators.first { $0.0 == selectedComparator }?.1 ?? selectedComparator
+            return "\(selectedMetricName) \(comparatorDisplay) \(target)"
+        }
     }
     
     // MARK: - Helper Methods
@@ -254,8 +268,12 @@ struct TaskRuleBuilderView: View {
     private func loadExistingRule() {
         isLoadingExistingRule = true
         
+        print("🔍 TaskRuleBuilderView.loadExistingRule() called")
+        print("🔍 progressRule: \(String(describing: progressRule))")
+        
         if case .threshold(let metricAlias, let comparator, let target) = progressRule {
             print("🔍 Loading existing rule: metricAlias='\(metricAlias)', comparator='\(comparator)', target=\(target)")
+            print("📊 Available metrics count: \(metricStorage.metrics.count)")
             print("📊 Available metrics: \(metricStorage.metrics.map { $0.name })")
             
             // Find metric by alias (name)
@@ -280,6 +298,61 @@ struct TaskRuleBuilderView: View {
             } else {
                 print("❌ Metric not found: '\(metricAlias)'")
                 print("📋 Available metric names: \(metricStorage.metrics.map { $0.name })")
+                
+                // If metrics are empty, try to reload them
+                if metricStorage.metrics.isEmpty {
+                    print("🔄 Metrics are empty, trying to reload...")
+                    metricStorage.resetToDefaults()
+                    
+                    // Try again after reload
+                    if let metric = metricStorage.metrics.first(where: { $0.name.lowercased() == metricAlias.lowercased() }) {
+                        print("✅ Found metric after reload: \(metric.name) (ID: \(metric.id))")
+                        selectedMetricId = metric.id
+                        selectedMetricName = metric.name
+                        selectedMetricType = metric.type
+                        selectedMetricUnit = metric.unit
+                        selectedComparator = comparator
+                        
+                        if metric.type == .boolean {
+                            targetBoolean = target > 0
+                        } else {
+                            // Format the number to remove unnecessary .0 for whole numbers
+                            if target.truncatingRemainder(dividingBy: 1) == 0 {
+                                targetValue = String(format: "%.0f", target)
+                            } else {
+                                targetValue = String(target)
+                            }
+                        }
+                    } else {
+                        print("❌ Still no metric found after reload: '\(metricAlias)'")
+                    }
+                } else {
+                    print("🔄 Metrics exist but don't match. Trying to reload...")
+                    metricStorage.resetToDefaults()
+                    
+                    // Try again after reload
+                    if let metric = metricStorage.metrics.first(where: { $0.name.lowercased() == metricAlias.lowercased() }) {
+                        print("✅ Found metric after reload: \(metric.name) (ID: \(metric.id))")
+                        selectedMetricId = metric.id
+                        selectedMetricName = metric.name
+                        selectedMetricType = metric.type
+                        selectedMetricUnit = metric.unit
+                        selectedComparator = comparator
+                        
+                        if metric.type == .boolean {
+                            targetBoolean = target > 0
+                        } else {
+                            // Format the number to remove unnecessary .0 for whole numbers
+                            if target.truncatingRemainder(dividingBy: 1) == 0 {
+                                targetValue = String(format: "%.0f", target)
+                            } else {
+                                targetValue = String(target)
+                            }
+                        }
+                    } else {
+                        print("❌ Still no metric found after reload: '\(metricAlias)'")
+                    }
+                }
             }
         } else {
             print("⚠️ No threshold rule found in progressRule: \(String(describing: progressRule))")
@@ -299,10 +372,8 @@ struct TaskRuleBuilderView: View {
             
             // Only set defaults if we're not loading an existing rule
             if !isLoadingExistingRule {
-                // Set default comparator based on type
-                if metric.type == .boolean {
-                    selectedComparator = "=="
-                } else {
+                // Set default comparator based on type (only for non-boolean metrics)
+                if metric.type != .boolean {
                     selectedComparator = ">="
                 }
                 
@@ -337,9 +408,12 @@ struct TaskRuleBuilderView: View {
             target = Double(targetValue) ?? 0.0
         }
         
+        // For boolean metrics, use "==" as the default comparator
+        let comparator = selectedMetricType == .boolean ? "==" : selectedComparator
+        
         progressRule = .threshold(
             metricAlias: selectedMetricName,
-            comparator: selectedComparator,
+            comparator: comparator,
             target: target
         )
     }

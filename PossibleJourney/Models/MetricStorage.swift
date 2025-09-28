@@ -86,12 +86,14 @@ class MetricStorage: ObservableObject {
     private func loadMetrics() {
         guard let data = userDefaults.data(forKey: metricsKey) else {
             // First time setup - load default metrics
+            print("📊 MetricStorage: No metrics found in UserDefaults, loading default metrics")
             loadDefaultMetrics()
             return
         }
         
         do {
             metrics = try JSONDecoder().decode([Metric].self, from: data)
+            print("📊 MetricStorage: Loaded \(metrics.count) metrics from UserDefaults")
         } catch {
             print("Failed to load metrics: \(error)")
             // Fallback to default metrics if loading fails
@@ -101,6 +103,7 @@ class MetricStorage: ObservableObject {
     
     private func loadDefaultMetrics() {
         metrics = Metric.defaultMetrics
+        print("📊 MetricStorage: Loaded \(metrics.count) default metrics: \(metrics.map { $0.name })")
         saveMetrics()
     }
     

@@ -518,6 +518,7 @@ func resetForUITestingIfNeeded() {
     if CommandLine.arguments.contains("--uitesting-reset") {
         ProgramStorage().clear()
         DailyProgressStorage().clearAll()
+        UserDefaults.standard.removeObject(forKey: "measurements")
     }
 }
 

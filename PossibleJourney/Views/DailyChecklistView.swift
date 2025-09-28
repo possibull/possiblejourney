@@ -715,6 +715,12 @@ struct TaskRowView: View {
     @State private var cardScale: CGFloat = 1.0
     @State private var checkboxScale: CGFloat = 1.0
     
+    // Metric input support
+    @StateObject private var metricStorage = MetricStorage()
+    @StateObject private var measurementStorage = MeasurementStorage()
+    @State private var showingMissedTaskProtocol = false
+    @State private var isAutoChecking = false
+    
     // Get the photo URL for this task
     private func photoURL(from dailyProgress: DailyProgress) -> URL? {
         let url = dailyProgress.photoURLs[task.id]
@@ -726,6 +732,132 @@ struct TaskRowView: View {
         print("DEBUG: Progress ID: \(dailyProgress.id)")
         
         return url
+    }
+    
+    // Create metric input view based on metric type
+    @ViewBuilder
+    private func metricInputView(for metricAlias: String, comparator: String, target: Double) -> some View {
+        if let metric = metricStorage.metrics.first(where: { $0.name.lowercased() == metricAlias.lowercased() }) {
+            MetricInputViewWrapper(
+                metric: metric,
+                progressRule: .threshold(metricAlias: metricAlias, comparator: comparator, target: target),
+                onMeasurementSaved: { measurement in
+                    measurementStorage.addMeasurement(measurement)
+                    // Check if rule passes and enable check-off
+                    checkRuleAndUpdateTask(measurement: measurement)
+                }
+            )
+        } else {
+            Text("Metric '\(metricAlias)' not found")
+                .font(.caption)
+                .foregroundColor(.red)
+        }
+    }
+    
+    // Check if progress rule passes and update task completion
+    private func checkRuleAndUpdateTask(measurement: Measurement) {
+        guard let progressRule = task.progressRule else { return }
+        
+        // For threshold rules, we can evaluate directly without complex context
+        if case .threshold(_, _, _) = progressRule {
+            // The threshold evaluation is handled by updateThresholdStatus()
+            // No need to trigger Missed Task Protocol here - that should only happen
+            // when tasks are actually missed or fail validation intentionally
+        }
+    }
+    
+    // Simple threshold evaluation
+    private func evaluateThreshold(currentValue: Double, comparator: String, target: Double) -> Bool {
+        switch comparator {
+        case ">=":
+            return currentValue >= target
+        case "<=":
+            return currentValue <= target
+        case "==":
+            return currentValue == target
+        case "!=":
+            return currentValue != target
+        default:
+            return false
+        }
+    }
+    
+    // Check if task can be checked off (threshold rules must pass)
+    private var canCheckOff: Bool {
+        guard let progressRule = task.progressRule,
+              case .threshold(let metricAlias, let comparator, let target) = progressRule else {
+            return true // Non-threshold tasks can always be checked off
+        }
+        
+        // Try to find the metric by alias first, then by ID
+        let metric = metricStorage.metrics.first(where: { 
+            $0.name.lowercased() == metricAlias.lowercased() || $0.id == task.linkedMetricId 
+        })
+        
+        // Boolean metrics can always be checked off (they show empty checkbox until tapped)
+        if let metric = metric, metric.type == .boolean {
+            return true
+        }
+        
+        // Non-boolean threshold metrics: check latest measurement directly
+        // Use the metric ID from the found metric, not task.linkedMetricId
+        let metricId = metric?.id ?? task.linkedMetricId
+        guard let metricId = metricId else {
+            return false // No metric found means threshold not met
+        }
+        
+        let latestMeasurement = measurementStorage.measurements
+            .filter { $0.metricId == metricId }
+            .max(by: { $0.timestamp < $1.timestamp })
+        
+        if let measurement = latestMeasurement {
+            return evaluateThreshold(currentValue: measurement.value, comparator: comparator, target: target)
+        } else {
+            return false // No measurement means threshold not met
+        }
+    }
+    
+    // Update threshold status based on latest measurement
+    private func updateThresholdStatus() {
+        // Prevent multiple rapid auto-checks/unchecks
+        guard !isAutoChecking else { return }
+        
+        guard let progressRule = task.progressRule,
+              case .threshold(let metricAlias, _, _) = progressRule else {
+            return
+        }
+        
+        // Try to find the metric by alias first, then by ID
+        let metric = metricStorage.metrics.first(where: { 
+            $0.name.lowercased() == metricAlias.lowercased() || $0.id == task.linkedMetricId 
+        })
+        
+        // Check if this is a boolean metric - if so, don't auto-check/uncheck
+        if let metric = metric, metric.type == .boolean {
+            // Boolean tasks should not auto-check/uncheck - they require manual interaction
+            return
+        }
+        
+        // Handle numeric threshold tasks
+        if canCheckOff && !isCompleted {
+            // Auto-check when threshold is met
+            isAutoChecking = true
+            onToggle()
+            
+            // Reset the flag after a short delay
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.isAutoChecking = false
+            }
+        } else if !canCheckOff && isCompleted {
+            // Auto-uncheck when threshold is no longer met
+            isAutoChecking = true
+            onToggle()
+            
+            // Reset the flag after a short delay
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.isAutoChecking = false
+            }
+        }
     }
     
     var body: some View {
@@ -748,12 +880,33 @@ struct TaskRowView: View {
                                 x: 0,
                                 y: 2
                             )
+                            .opacity(checkboxOpacity) // Dim when disabled for non-boolean thresholds
                         
                         if isCompleted {
                             Image(systemName: "checkmark")
                                 .font(.system(size: 14, weight: .bold))
                                 .foregroundColor(.white)
+                        } else if task.progressRule != nil {
+                            // Check if this is a boolean metric by looking at the progress rule
+                            if case .threshold(let metricAlias, _, _) = task.progressRule {
+                                // Try to find the metric by alias first, then by ID
+                                let metric = metricStorage.metrics.first(where: { 
+                                    $0.name.lowercased() == metricAlias.lowercased() || $0.id == task.linkedMetricId 
+                                })
+                                
+                                if let metric = metric, metric.type == .boolean {
+                                    // Boolean metrics: empty checkbox until tapped (no icon)
+                                    // The checkbox will be filled when completed
+                                } else {
+                                    // Non-boolean threshold metrics: always show lock icon until completed
+                                    // Lock icon when threshold not met
+                                    Image(systemName: "lock.fill")
+                                        .font(.system(size: 10, weight: .bold))
+                                        .foregroundColor(.gray)
+                                }
+                            }
                         }
+                        // If no progress rule, show empty checkbox (no icon)
                     }
                 }
                 .scaleEffect(checkboxScale)
@@ -778,6 +931,12 @@ struct TaskRowView: View {
                                     .strikethrough(isCompleted)
                                     .multilineTextAlignment(.leading)
                                     .lineLimit(2)
+                            }
+                            
+                            // Metric input for threshold rules
+                            if let progressRule = task.progressRule, 
+                               case .threshold(let metricAlias, let comparator, let target) = progressRule {
+                                metricInputView(for: metricAlias, comparator: comparator, target: target)
                             }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -885,6 +1044,12 @@ struct TaskRowView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
+        .onAppear {
+            updateThresholdStatus()
+        }
+        .onReceive(measurementStorage.$measurements) { _ in
+            updateThresholdStatus()
+        }
         .actionSheet(isPresented: $showingPhotoPicker) {
             ActionSheet(
                 title: Text("Add Photo"),
@@ -963,6 +1128,14 @@ struct TaskRowView: View {
                 onPhotoRemoved()
                 print("DEBUG: Cleared photo state for unchecked task: \(task.title)")
             }
+        }
+        .sheet(isPresented: $showingMissedTaskProtocol) {
+            MissedTaskProtocolView(
+                task: task,
+                onDismiss: {
+                    showingMissedTaskProtocol = false
+                }
+            )
         }
     }
     
@@ -1066,7 +1239,57 @@ struct TaskRowView: View {
         (isCompleted && themeManager.colorScheme == .dark) ? 4 : 0
     }
     
+    private var checkboxOpacity: Double {
+        // Boolean metrics are always fully visible (tappable)
+        if let metric = metricStorage.metrics.first(where: { $0.id == task.linkedMetricId }),
+           metric.type == .boolean {
+            return 1.0
+        }
+        // Non-boolean threshold metrics: dim when threshold not met
+        return canCheckOff ? 1.0 : 0.3
+    }
+    
     private func handleCheckboxTap() {
+        // For boolean tasks with threshold rules, clicking the checkbox sets the boolean value to true
+        if let progressRule = task.progressRule,
+           case .threshold(let metricAlias, _, _) = progressRule {
+            // Try to find the metric by alias first, then by ID
+            let metric = metricStorage.metrics.first(where: { 
+                $0.name.lowercased() == metricAlias.lowercased() || $0.id == task.linkedMetricId 
+            })
+            
+            // Check if this is a boolean metric
+            if let metric = metric, metric.type == .boolean {
+                // For boolean tasks, clicking the checkbox creates a measurement with value true and manually checks the task
+                if !isCompleted {
+                    let measurement = Measurement(
+                        id: UUID().uuidString,
+                        metricId: metric.id,
+                        timestamp: Date(),
+                        value: 1.0, // true
+                        booleanValue: true,
+                        compositeValue: nil,
+                        source: .manual,
+                        notes: nil
+                    )
+                    measurementStorage.addMeasurement(measurement)
+                    // Manually check the task for boolean metrics (they don't auto-check)
+                    onToggle()
+                    return
+                } else {
+                    // If already completed, allow unchecking
+                    onToggle()
+                    return
+                }
+            } else {
+                // For non-boolean tasks, check if threshold is met
+                if !canCheckOff && !isCompleted {
+                    // Task cannot be checked off yet - threshold not met
+                    return
+                }
+            }
+        }
+        
         // If task requires photo and doesn't have one yet, show photo picker
         if task.requiresPhoto && !hasPhoto && !isCompleted {
             showingPhotoPicker = true
@@ -1521,6 +1744,130 @@ struct ImagePicker: UIViewControllerRepresentable {
         
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
             parent.presentationMode.wrappedValue.dismiss()
+        }
+    }
+}
+
+// MARK: - Metric Input View Wrapper
+struct MetricInputViewWrapper: View {
+    let metric: Metric
+    let progressRule: ProgressRule
+    let onMeasurementSaved: (Measurement) -> Void
+    
+    @State private var value: Double = 0.0
+    @StateObject private var measurementStorage = MeasurementStorage()
+    
+    // Determine increment value based on metric type
+    private var incrementValue: Double {
+        switch metric.name.lowercased() {
+        case "pages read":
+            return 1.0
+        case "workout duration":
+            return 5.0
+        case "water gallons":
+            return 0.25
+        case "caffeine mg":
+            return 25.0
+        default:
+            return 1.0
+        }
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(metric.name)
+                    .font(.caption)
+                    .fontWeight(.medium)
+                Spacer()
+                if !metric.unit.isEmpty {
+                    Text(metric.unit)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                }
+            }
+            
+            HStack {
+                if metric.type == .boolean {
+                    // For boolean metrics, just show the metric name - the checkbox will handle the interaction
+                    Text("Tap checkbox when condition is met")
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .italic()
+                } else {
+                    // Number input with +/- buttons
+                    HStack(spacing: 8) {
+                        Button(action: {
+                            value = max(0, value - incrementValue)
+                            saveMeasurement()
+                        }) {
+                            Image(systemName: "minus.circle.fill")
+                                .foregroundColor(.blue)
+                                .font(.title3)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        
+                        TextField("0", value: $value, format: .number)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .keyboardType(.decimalPad)
+                            .font(.caption)
+                            .frame(width: 60)
+                            .multilineTextAlignment(.center)
+                            .onChange(of: value) { _, newValue in
+                                saveMeasurement()
+                            }
+                        
+                        Button(action: {
+                            value += incrementValue
+                            saveMeasurement()
+                        }) {
+                            Image(systemName: "plus.circle.fill")
+                                .foregroundColor(.blue)
+                                .font(.title3)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                }
+                
+                Spacer()
+            }
+        }
+        .padding(.vertical, 4)
+        .onAppear {
+            loadLatestMeasurement()
+        }
+    }
+    
+    private func loadLatestMeasurement() {
+        // Get measurements for today only
+        let todayMeasurements = measurementStorage.getMeasurementsForDate(Date(), metricId: metric.id)
+        
+        // Use the latest measurement for today, or start with 0 if no measurements today
+        if let latestTodayMeasurement = todayMeasurements.last {
+            value = latestTodayMeasurement.value
+        } else {
+            // Start with 0 for new days - don't load historical data
+            value = 0.0
+        }
+    }
+    
+    
+    private func saveMeasurement() {
+        // Boolean metrics are now handled directly by the checkbox tap
+        // This function only handles numeric metrics
+        if metric.type != .boolean {
+            let measurement = Measurement(
+                id: UUID().uuidString,
+                metricId: metric.id,
+                timestamp: Date(),
+                value: value,
+                booleanValue: nil,
+                compositeValue: nil,
+                source: .manual,
+                notes: nil
+            )
+            
+            onMeasurementSaved(measurement)
         }
     }
 }

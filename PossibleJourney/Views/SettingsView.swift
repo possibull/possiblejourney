@@ -14,6 +14,8 @@ struct SettingsView: View {
     @EnvironmentObject var celebrationManager: CelebrationManager
     @Environment(\.dismiss) private var dismiss
     @State private var forceRefresh = false
+    @State private var showingMetricsManagement = false
+    @StateObject private var metricStorage = MetricStorage()
     
     // Check for August 4th birthday theme activation
     private func checkAugust4thBirthdayActivation() {
@@ -334,6 +336,53 @@ struct SettingsView: View {
                         .themeAwareCard()
                         .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.blue.opacity(0.2), lineWidth: 1))
                         
+                        // Metrics Management Card
+                        VStack(alignment: .leading, spacing: 20) {
+                            HStack {
+                                Image(systemName: "chart.bar.fill")
+                                    .font(.system(size: 20, weight: .semibold))
+                                    .foregroundColor(.purple)
+                                    .frame(width: 40, height: 40)
+                                    .background(Circle().fill(Color.purple.opacity(0.1)))
+                                
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Metrics Management")
+                                        .font(.system(size: 18, weight: .bold, design: .rounded))
+                                        .foregroundColor(.primary)
+                                    Text("View and manage all your metrics")
+                                        .font(.system(size: 14, weight: .medium, design: .rounded))
+                                        .foregroundColor(.secondary)
+                                }
+                                Spacer()
+                            }
+                            
+                            Button(action: {
+                                showingMetricsManagement = true
+                            }) {
+                                HStack {
+                                    Image(systemName: "chart.bar.fill")
+                                        .font(.system(size: 16, weight: .medium))
+                                        .foregroundColor(.white)
+                                        .frame(width: 32, height: 32)
+                                        .background(Circle().fill(Color.purple))
+                                    
+                                    Text("Manage Metrics")
+                                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                                        .foregroundColor(.white)
+                                    
+                                    Spacer()
+                                }
+                                .padding(.vertical, 12)
+                                .padding(.horizontal, 16)
+                                .background(RoundedRectangle(cornerRadius: 12).fill(Color.purple))
+                                .shadow(color: .purple.opacity(0.3), radius: 8, x: 0, y: 4)
+                            }
+                            .accessibilityIdentifier("ManageMetricsButton")
+                        }
+                        .padding(20)
+                        .themeAwareCard()
+                        .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.purple.opacity(0.2), lineWidth: 1))
+                        
                         // Reset All Preferences Card
                         VStack(alignment: .leading, spacing: 20) {
                             HStack {
@@ -357,6 +406,7 @@ struct SettingsView: View {
                             Button(action: {
                                 ProgramStorage().clear()
                                 DailyProgressStorage().clearAll()
+                                UserDefaults.standard.removeObject(forKey: "measurements")
                                 UserDefaults.standard.removeObject(forKey: "debug")
                                 UserDefaults.standard.removeObject(forKey: "debugWindowExpanded")
                                 appState.loadedProgram = nil
@@ -395,5 +445,8 @@ struct SettingsView: View {
         }
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.large)
+        .sheet(isPresented: $showingMetricsManagement) {
+            MetricsManagementView(metricStorage: metricStorage)
+        }
     }
 }

@@ -944,8 +944,6 @@ struct TemplateCreateView: View {
             .alert("Add New Task", isPresented: $showingAddTask) {
                 TextField("Task Title", text: $newTaskTitle)
                 TextField("Task Description (Optional)", text: $newTaskDescription)
-                Toggle("Photo Requirement", isOn: $newTaskRequiresPhoto)
-                    .accessibilityIdentifier("Photo Requirement")
                 Button("Cancel", role: .cancel) { }
                 Button("Add") {
                     addTask()
@@ -1091,8 +1089,6 @@ struct TemplateEditView: View {
             .alert("Add New Task", isPresented: $showingAddTask) {
                 TextField("Task Title", text: $newTaskTitle)
                 TextField("Task Description (Optional)", text: $newTaskDescription)
-                Toggle("Photo Requirement", isOn: $newTaskRequiresPhoto)
-                    .accessibilityIdentifier("Photo Requirement")
                 Button("Cancel", role: .cancel) { }
                 Button("Add") {
                     addTask()

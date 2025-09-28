@@ -45,7 +45,6 @@ struct TemplateTaskListView: View {
         .alert("Add Task", isPresented: $showingAddTask) {
             TextField("Task Title", text: $newTaskTitle)
             TextField("Description (Optional)", text: $newTaskDescription)
-            Toggle("Requires Photo", isOn: $newTaskRequiresPhoto)
             Button("Add") {
                 addTask()
             }

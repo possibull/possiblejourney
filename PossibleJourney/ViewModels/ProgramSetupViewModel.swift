@@ -132,6 +132,7 @@ class DailyChecklistViewModel: ObservableObject {
         // This preserves the historical program data and allows starting fresh
         ProgramStorage().clear()
         DailyProgressStorage().clearAll()
+        UserDefaults.standard.removeObject(forKey: "measurements")
     }
     
     // Auto-advance to the next incomplete day after completing the current day
