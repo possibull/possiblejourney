@@ -1,4 +1,5 @@
 import XCTest
+import SwiftUI
 @testable import PossibleJourney
 
 final class TaskModelTests: XCTestCase {
@@ -106,16 +107,16 @@ final class TaskModelTests: XCTestCase {
     }
     
     func testTaskHasLinkedMetricProperty() {
-        // Test that Task has a linkedMetric property for Growth tasks
+        // Test that Task has a linkedMetricId property for Growth tasks
         let task = Task(
             id: UUID(),
             title: "Strength Training",
             description: "Bench press workout", 
             taskType: .growth,
-            linkedMetric: "bench_press_weight"
+            linkedMetricId: "bench_press_weight"
         )
         XCTAssertEqual(task.taskType, .growth)
-        XCTAssertEqual(task.linkedMetric, "bench_press_weight")
+        XCTAssertEqual(task.linkedMetricId, "bench_press_weight")
     }
     
     func testNonGrowthTasksDontRequireProgressRules() {
@@ -135,11 +136,11 @@ final class TaskModelTests: XCTestCase {
         
         XCTAssertEqual(maintenanceTask.taskType, .maintenance)
         XCTAssertNil(maintenanceTask.progressRule)
-        XCTAssertNil(maintenanceTask.linkedMetric)
+        XCTAssertNil(maintenanceTask.linkedMetricId)
         
         XCTAssertEqual(recoveryTask.taskType, .recovery)
         XCTAssertNil(recoveryTask.progressRule)
-        XCTAssertNil(recoveryTask.linkedMetric)
+        XCTAssertNil(recoveryTask.linkedMetricId)
     }
 }
 
@@ -827,4 +828,254 @@ final class DailyChecklistViewModelTests: XCTestCase {
     }
     
 
+}
+
+// MARK: - Red Phase: Failing Tests for Metric Input UI Components
+
+final class MetricInputUITests: XCTestCase {
+    
+    func testNumberMetricInputViewExists() {
+        // This test will fail until we implement NumberMetricInputView
+        let metric = Metric(name: "Sleep Hours", unit: "hrs", direction: .increase, type: .number)
+        let inputView = NumberMetricInputView(metric: metric, value: .constant(7.5))
+        XCTAssertNotNil(inputView)
+    }
+    
+    func testCountMetricInputViewExists() {
+        // This test will fail until we implement CountMetricInputView
+        let metric = Metric(name: "Tax Sections", unit: "sections", direction: .increase, type: .count)
+        let inputView = CountMetricInputView(metric: metric, value: .constant(1))
+        XCTAssertNotNil(inputView)
+    }
+    
+    func testBooleanMetricInputViewExists() {
+        // This test will fail until we implement BooleanMetricInputView
+        let metric = Metric(name: "Phone in Bedroom", unit: "boolean", direction: .decrease, type: .boolean)
+        let inputView = BooleanMetricInputView(metric: metric, value: .constant(false))
+        XCTAssertNotNil(inputView)
+    }
+    
+    func testCompositeMetricInputViewExists() {
+        // This test will fail until we implement CompositeMetricInputView
+        let metric = Metric(name: "Strength Training", unit: "lbs", direction: .increase, type: .number)
+        let inputView = CompositeMetricInputView(metric: metric, weight: .constant(135.0), reps: .constant(8))
+        XCTAssertNotNil(inputView)
+    }
+    
+    func testMetricInputViewShowsCorrectLabel() {
+        // Test that metric input views display the correct metric name and unit
+        let metric = Metric(name: "Sleep Hours", unit: "hrs", direction: .increase, type: .number)
+        let inputView = NumberMetricInputView(metric: metric, value: .constant(7.5))
+        
+        // This will fail until we implement the view and add a way to test its label
+        XCTAssertEqual(inputView.metricName, "Sleep Hours")
+        XCTAssertEqual(inputView.metricUnit, "hrs")
+    }
+    
+    func testMetricInputViewUpdatesValue() {
+        // Test that metric input views can update their values
+        let metric = Metric(name: "Weight", unit: "lbs", direction: .decrease, type: .number)
+        let inputView = NumberMetricInputView(metric: metric, value: .constant(150.0))
+        
+        // This will fail until we implement the view and add a way to test value updates
+        inputView.updateValue(155.0)
+        XCTAssertEqual(inputView.currentValue, 155.0)
+    }
+    
+    func testMetricInputViewValidatesInput() {
+        // Test that metric input views validate input values
+        let metric = Metric(name: "Sleep Hours", unit: "hrs", direction: .increase, type: .number)
+        let inputView = NumberMetricInputView(metric: metric, value: .constant(7.5))
+        
+        // This will fail until we implement validation logic
+        XCTAssertTrue(inputView.isValidInput("8.5"))
+        XCTAssertFalse(inputView.isValidInput("abc"))
+        XCTAssertFalse(inputView.isValidInput("-5"))
+    }
+    
+    func testMetricInputViewShowsProgressRuleFeedback() {
+        // Test that metric input views can show progress rule evaluation feedback
+        let metric = Metric(name: "Sleep Hours", unit: "hrs", direction: .increase, type: .number)
+        let progressRule = ProgressRule.deltaThreshold(minimumImprovement: 0.5)
+        let inputView = NumberMetricInputView(metric: metric, value: .constant(7.5), progressRule: progressRule)
+        
+        // This will fail until we implement progress rule feedback
+        XCTAssertNotNil(inputView.progressRuleFeedback)
+        XCTAssertEqual(inputView.progressRuleFeedback?.status, .pending)
+    }
+    
+    func testMetricInputViewEnablesCheckOffWhenRulePasses() {
+        // Test that metric input views enable check-off when progress rule passes
+        let metric = Metric(name: "Sleep Hours", unit: "hrs", direction: .increase, type: .number)
+        let progressRule = ProgressRule.deltaThreshold(minimumImprovement: 0.5)
+        let inputView = NumberMetricInputView(metric: metric, value: .constant(8.0), progressRule: progressRule)
+        
+        // This will fail until we implement rule evaluation and check-off logic
+        XCTAssertTrue(inputView.canCheckOff)
+        XCTAssertEqual(inputView.checkOffButtonState, .enabled)
+    }
+    
+    func testMetricInputViewDisablesCheckOffWhenRuleFails() {
+        // Test that metric input views disable check-off when progress rule fails
+        let metric = Metric(name: "Sleep Hours", unit: "hrs", direction: .increase, type: .number)
+        let progressRule = ProgressRule.deltaThreshold(minimumImprovement: 0.5)
+        let inputView = NumberMetricInputView(metric: metric, value: .constant(7.0), progressRule: progressRule)
+        
+        // This will fail until we implement rule evaluation and check-off logic
+        XCTAssertFalse(inputView.canCheckOff)
+        XCTAssertEqual(inputView.checkOffButtonState, .disabled)
+    }
+    
+    func testMetricInputViewShowsMissedTaskProtocolWhenRuleFails() {
+        // Test that metric input views show missed task protocol when progress rule fails
+        let metric = Metric(name: "Sleep Hours", unit: "hrs", direction: .increase, type: .number)
+        let progressRule = ProgressRule.deltaThreshold(minimumImprovement: 0.5)
+        let inputView = NumberMetricInputView(metric: metric, value: .constant(7.0), progressRule: progressRule)
+        
+        // This will fail until we implement missed task protocol UI
+        XCTAssertTrue(inputView.showsMissedTaskProtocol)
+        XCTAssertNotNil(inputView.missedTaskProtocolView)
+    }
+    
+    func testMetricInputViewIntegratesWithDailyChecklistView() {
+        // Test that metric input views can be integrated into the daily checklist view
+        let metric = Metric(name: "Sleep Hours", unit: "hrs", direction: .increase, type: .number)
+        let task = Task(
+            id: UUID(),
+            title: "Sleep 8 Hours",
+            description: "Get quality rest",
+            taskType: .growth,
+            progressRule: ProgressRule.deltaThreshold(minimumImprovement: 0.5),
+            linkedMetricId: metric.id
+        )
+        
+        // This will fail until we implement integration with DailyChecklistView
+        let inputView = NumberMetricInputView(metric: metric, value: .constant(7.5))
+        let taskRow = TaskRow(task: task, metricInputView: AnyView(inputView))
+        
+        XCTAssertNotNil(taskRow)
+        XCTAssertEqual(taskRow.task.title, "Sleep 8 Hours")
+    }
+}
+
+// MARK: - Red Phase: Failing Tests for Progress Rule Evaluation Integration
+
+final class ProgressRuleEvaluationIntegrationTests: XCTestCase {
+    
+    func testProgressRuleEvaluatorIntegratesWithMetricInput() {
+        // Test that ProgressRuleEvaluator can be integrated with metric input views
+        let metric = Metric(name: "Sleep Hours", unit: "hrs", direction: .increase, type: .number)
+        let progressRule = ProgressRule.deltaThreshold(minimumImprovement: 0.5)
+        let inputView = NumberMetricInputView(metric: metric, value: .constant(8.0), progressRule: progressRule)
+        
+        // This will fail until we implement the integration
+        let evaluator = ProgressRuleEvaluator()
+        let context = inputView.createEvaluationContext()
+        XCTAssertNotNil(context)
+        // Note: The actual evaluation would need a proper context with measurements
+    }
+    
+    func testProgressRuleEvaluationUpdatesInRealTime() {
+        // Test that progress rule evaluation updates in real-time as user types
+        let metric = Metric(name: "Sleep Hours", unit: "hrs", direction: .increase, type: .number)
+        let progressRule = ProgressRule.deltaThreshold(minimumImprovement: 0.5)
+        let inputView = NumberMetricInputView(metric: metric, value: .constant(7.0), progressRule: progressRule)
+        
+        // This will fail until we implement real-time evaluation
+        inputView.updateValue(8.0)
+        XCTAssertTrue(inputView.progressRuleFeedback?.passed ?? false)
+        
+        inputView.updateValue(7.0)
+        XCTAssertFalse(inputView.progressRuleFeedback?.passed ?? true)
+    }
+    
+    func testProgressRuleEvaluationShowsVisualFeedback() {
+        // Test that progress rule evaluation shows visual feedback (green/red indicators)
+        let metric = Metric(name: "Sleep Hours", unit: "hrs", direction: .increase, type: .number)
+        let progressRule = ProgressRule.deltaThreshold(minimumImprovement: 0.5)
+        let inputView = NumberMetricInputView(metric: metric, value: .constant(8.0), progressRule: progressRule)
+        
+        // This will fail until we implement visual feedback
+        XCTAssertNotNil(inputView.progressRuleFeedback)
+        XCTAssertTrue(inputView.canCheckOff)
+        XCTAssertEqual(inputView.checkOffButtonState, .enabled)
+        
+        inputView.updateValue(7.0)
+        XCTAssertNotNil(inputView.progressRuleFeedback)
+    }
+}
+
+// MARK: - Red Phase: Failing Tests for TaskInstance Management
+
+final class TaskInstanceManagementTests: XCTestCase {
+    
+    func testTaskInstanceCreationFromMetricInput() {
+        // Test that TaskInstance can be created from metric input
+        let metric = Metric(name: "Sleep Hours", unit: "hrs", direction: .increase, type: .number)
+        let task = Task(
+            id: UUID(),
+            title: "Sleep 8 Hours",
+            description: "Get quality rest",
+            taskType: .growth,
+            progressRule: ProgressRule.deltaThreshold(minimumImprovement: 0.5),
+            linkedMetricId: metric.id
+        )
+        let inputView = NumberMetricInputView(metric: metric, value: .constant(8.0), progressRule: task.progressRule!)
+        
+        // This will fail until we implement TaskInstance creation
+        let taskInstance = inputView.createTaskInstance(for: task, on: Date())
+        
+        XCTAssertNotNil(taskInstance)
+        XCTAssertEqual(taskInstance?.taskId, task.id.uuidString)
+        XCTAssertEqual(taskInstance?.status, .passed)
+        XCTAssertNotNil(taskInstance?.measurementId)
+    }
+    
+    func testTaskInstanceStatusUpdatesBasedOnRuleEvaluation() {
+        // Test that TaskInstance status updates based on progress rule evaluation
+        let metric = Metric(name: "Sleep Hours", unit: "hrs", direction: .increase, type: .number)
+        let task = Task(
+            id: UUID(),
+            title: "Sleep 8 Hours",
+            description: "Get quality rest",
+            taskType: .growth,
+            progressRule: ProgressRule.deltaThreshold(minimumImprovement: 0.5),
+            linkedMetricId: metric.id
+        )
+        let inputView = NumberMetricInputView(metric: metric, value: .constant(7.0), progressRule: task.progressRule!)
+        
+        // This will fail until we implement TaskInstance status updates
+        let taskInstance = inputView.createTaskInstance(for: task, on: Date())
+        
+        XCTAssertEqual(taskInstance?.status, .blocked)
+        XCTAssertEqual(taskInstance?.blockReason, .progressRuleFailed)
+        XCTAssertNotNil(taskInstance?.notes)
+    }
+    
+    func testTaskInstancePersistence() {
+        // Test that TaskInstance can be persisted and retrieved
+        let metric = Metric(name: "Sleep Hours", unit: "hrs", direction: .increase, type: .number)
+        let task = Task(
+            id: UUID(),
+            title: "Sleep 8 Hours",
+            description: "Get quality rest",
+            taskType: .growth,
+            progressRule: ProgressRule.deltaThreshold(minimumImprovement: 0.5),
+            linkedMetricId: metric.id
+        )
+        let inputView = NumberMetricInputView(metric: metric, value: .constant(8.0), progressRule: task.progressRule!)
+        
+        // This will fail until we implement TaskInstance persistence
+        let taskInstance = inputView.createTaskInstance(for: task, on: Date())
+        let storage = TaskInstanceStorage()
+        
+        if let instance = taskInstance {
+            storage.save(instance)
+            let loaded = storage.load(for: task.id, on: Date())
+            
+            XCTAssertNotNil(loaded)
+            XCTAssertEqual(loaded?.id, instance.id)
+            XCTAssertEqual(loaded?.status, .passed)
+        }
+    }
 } 

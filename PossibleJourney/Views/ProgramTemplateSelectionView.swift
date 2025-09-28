@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ProgramTemplateSelectionView: View {
     @StateObject private var viewModel = ProgramTemplateViewModel()
+    @StateObject private var metricStorage = MetricStorage()
     @State private var selectedTemplate: ProgramTemplate?
     @State private var showingCustomSetup = false
     @State private var editingTemplate: ProgramTemplate?
@@ -188,10 +189,10 @@ struct ProgramTemplateSelectionView: View {
                 )
             }
             .sheet(item: $editingTemplate) { template in
-                TemplateEditView(template: template) { updatedTemplate in
+                TemplateEditView(template: template, onSave: { updatedTemplate in
                     viewModel.updateTemplate(updatedTemplate)
                     editingTemplate = nil
-                }
+                }, metricStorage: metricStorage)
             }
             .alert("Delete Template", isPresented: Binding(
                 get: { templateToDelete != nil },
@@ -212,10 +213,10 @@ struct ProgramTemplateSelectionView: View {
                 }
             }
             .sheet(isPresented: $showingTemplateCreate) {
-                TemplateCreateView { newTemplate in
+                TemplateCreateView(onSave: { newTemplate in
                     viewModel.addTemplate(newTemplate)
                     showingTemplateCreate = false
-                }
+                }, metricStorage: metricStorage)
             }
         }
     }
@@ -820,11 +821,12 @@ struct TemplateCreateView: View {
     @State private var newTaskTitle = ""
     @State private var newTaskDescription = ""
     @State private var newTaskRequiresPhoto = false
+    @ObservedObject var metricStorage: MetricStorage
     
     let onSave: (ProgramTemplate) -> Void
     @Environment(\.presentationMode) private var presentationMode
     
-    init(onSave: @escaping (ProgramTemplate) -> Void) {
+    init(onSave: @escaping (ProgramTemplate) -> Void, metricStorage: MetricStorage) {
         // Create a new template with reasonable defaults
         let newTemplate = ProgramTemplate(
             name: "New Template",
@@ -835,6 +837,7 @@ struct TemplateCreateView: View {
             isDefault: false
         )
         self._template = State(initialValue: newTemplate)
+        self.metricStorage = metricStorage
         self.onSave = onSave
     }
     
@@ -902,7 +905,8 @@ struct TemplateCreateView: View {
                                     if let index = template.tasks.firstIndex(where: { $0.id == task.id }) {
                                         template.tasks[index] = updatedTask
                                     }
-                                }
+                                },
+                                metricStorage: metricStorage
                             )
                         }
                         .onDelete(perform: deleteTask)
@@ -951,7 +955,14 @@ struct TemplateCreateView: View {
     }
     
     private func addTask() {
-        let newTask = Task(title: newTaskTitle, description: newTaskDescription.isEmpty ? nil : newTaskDescription, requiresPhoto: newTaskRequiresPhoto)
+        let newTask = Task(
+            title: newTaskTitle, 
+            description: newTaskDescription.isEmpty ? nil : newTaskDescription, 
+            requiresPhoto: newTaskRequiresPhoto,
+            taskType: .growth, // Default to growth task type
+            progressRule: nil, // No progress rule initially
+            linkedMetricId: nil  // No linked metric initially
+        )
         template.tasks.append(newTask)
         newTaskTitle = ""
         newTaskDescription = ""
@@ -973,12 +984,14 @@ struct TemplateEditView: View {
     @State private var newTaskTitle = ""
     @State private var newTaskDescription = ""
     @State private var newTaskRequiresPhoto = false
+    @ObservedObject var metricStorage: MetricStorage
     
     let onSave: (ProgramTemplate) -> Void
     @Environment(\.presentationMode) private var presentationMode
     
-    init(template: ProgramTemplate, onSave: @escaping (ProgramTemplate) -> Void) {
+    init(template: ProgramTemplate, onSave: @escaping (ProgramTemplate) -> Void, metricStorage: MetricStorage) {
         self._template = State(initialValue: template)
+        self.metricStorage = metricStorage
         self.onSave = onSave
     }
     
@@ -1040,7 +1053,8 @@ struct TemplateEditView: View {
                                 if let index = template.tasks.firstIndex(where: { $0.id == task.id }) {
                                     template.tasks[index] = updatedTask
                                 }
-                            }
+                            },
+                            metricStorage: metricStorage
                         )
                     }
                     .onDelete(perform: deleteTask)
@@ -1088,7 +1102,14 @@ struct TemplateEditView: View {
     }
     
     private func addTask() {
-        let newTask = Task(title: newTaskTitle, description: newTaskDescription.isEmpty ? nil : newTaskDescription, requiresPhoto: newTaskRequiresPhoto)
+        let newTask = Task(
+            title: newTaskTitle, 
+            description: newTaskDescription.isEmpty ? nil : newTaskDescription, 
+            requiresPhoto: newTaskRequiresPhoto,
+            taskType: .growth, // Default to growth task type
+            progressRule: nil, // No progress rule initially
+            linkedMetricId: nil  // No linked metric initially
+        )
         template.tasks.append(newTask)
         newTaskTitle = ""
         newTaskDescription = ""
@@ -1107,22 +1128,28 @@ struct TemplateEditView: View {
 struct TaskEditRow: View {
     let task: Task
     let onUpdate: (Task) -> Void
+    @ObservedObject var metricStorage: MetricStorage
     
     @State private var title: String
     @State private var description: String
     @State private var requiresPhoto: Bool
     @State private var taskType: String = "growth"
-    @State private var linkedMetric: String = ""
+    @State private var linkedMetricId: String = ""
+    @State private var linkedMetricName: String = ""
     @State private var progressRuleType: String = "delta_threshold"
     @State private var ruleConfiguration: String = ""
+    @State private var progressRule: ProgressRule?
     
-    init(task: Task, onUpdate: @escaping (Task) -> Void) {
+    init(task: Task, onUpdate: @escaping (Task) -> Void, metricStorage: MetricStorage) {
         self.task = task
         self.onUpdate = onUpdate
+        self.metricStorage = metricStorage
         self._title = State(initialValue: task.title)
         self._description = State(initialValue: task.description ?? "")
         self._requiresPhoto = State(initialValue: task.requiresPhoto)
+        self._progressRule = State(initialValue: task.progressRule)
     }
+    
     
     var body: some View {
         HStack {
@@ -1169,83 +1196,17 @@ struct TaskEditRow: View {
                 
                 // Progress Rules UI (only show for Growth tasks)
                 if taskType == "growth" {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Progress Rule Configuration")
-                            .font(.caption)
-                            .fontWeight(.semibold)
-                        
-                        // Linked Metric
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Linked Metric")
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                            TextField("e.g., Bench Press Weight/Reps", text: $linkedMetric)
-                                .textFieldStyle(RoundedBorderTextFieldStyle())
-                                .font(.caption)
-                                .onChange(of: linkedMetric) { _, newValue in
-                                    updateTask()
-                                }
-                        }
-                        
-                        // Progress Rule Type
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Progress Rule Type")
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                            Picker("Rule Type", selection: $progressRuleType) {
-                                Text("Delta Threshold").tag("delta_threshold")
-                                Text("Count Minimum").tag("count_min")
-                                Text("Boolean Condition").tag("boolean_condition")
-                                Text("Rolling Window").tag("rolling_window")
-                            }
-                            .pickerStyle(MenuPickerStyle())
-                            .font(.caption)
-                            .onChange(of: progressRuleType) { _, newValue in
-                                updateTask()
-                            }
-                        }
-                        
-                        // Rule Configuration (based on selected type)
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Rule Configuration")
-                                .font(.caption2)
-                                .foregroundColor(.secondary)
-                            
-                            if progressRuleType == "delta_threshold" {
-                                TextField("e.g., +1 rep or +2.5 lbs", text: $ruleConfiguration)
-                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                                    .font(.caption)
-                                    .onChange(of: ruleConfiguration) { _, newValue in
-                                        updateTask()
-                                    }
-                            } else if progressRuleType == "count_min" {
-                                TextField("e.g., ≥ 1 tax section", text: $ruleConfiguration)
-                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                                    .font(.caption)
-                                    .onChange(of: ruleConfiguration) { _, newValue in
-                                        updateTask()
-                                    }
-                            } else if progressRuleType == "boolean_condition" {
-                                TextField("e.g., Sleep ≥7 hrs AND phone_in_room == false", text: $ruleConfiguration)
-                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                                    .font(.caption)
-                                    .onChange(of: ruleConfiguration) { _, newValue in
-                                        updateTask()
-                                    }
-                            } else if progressRuleType == "rolling_window" {
-                                TextField("e.g., ≥5 connections in 7 days", text: $ruleConfiguration)
-                                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                                    .font(.caption)
-                                    .onChange(of: ruleConfiguration) { _, newValue in
-                                        updateTask()
-                                    }
-                            }
-                        }
-                    }
+                    TaskRuleBuilderView(
+                        metricStorage: metricStorage,
+                        progressRule: $progressRule
+                    )
                     .padding(.vertical, 8)
                     .padding(.horizontal, 12)
                     .background(Color(.systemGray6).opacity(0.5))
                     .cornerRadius(8)
+                    .onChange(of: progressRule) { _, _ in
+                        updateTask()
+                    }
                 }
                 
                 Toggle("Requires Photo", isOn: $requiresPhoto)
@@ -1262,57 +1223,21 @@ struct TaskEditRow: View {
             description = task.description ?? ""
             requiresPhoto = task.requiresPhoto
             taskType = task.taskType.rawValue // Use actual taskType from data model
-            linkedMetric = task.linkedMetric ?? ""
+            linkedMetricId = task.linkedMetricId ?? ""
+            progressRule = task.progressRule // Initialize progress rule
             
-            // Initialize progress rule type and configuration from task
-            if let progressRule = task.progressRule {
-                switch progressRule {
-                case .deltaThreshold(let minimumImprovement):
-                    progressRuleType = "delta_threshold"
-                    ruleConfiguration = "+\(minimumImprovement)"
-                case .countMin(let minimumCount):
-                    progressRuleType = "count_min"
-                    ruleConfiguration = "≥ \(minimumCount)"
-                case .booleanCondition(let condition):
-                    progressRuleType = "boolean_condition"
-                    ruleConfiguration = condition
-                case .rollingWindow(let targetCount, let windowDays):
-                    progressRuleType = "rolling_window"
-                    ruleConfiguration = "≥\(targetCount) in \(windowDays) days"
-                }
+            
+            // Initialize metric name from ID
+            if let metricId = task.linkedMetricId,
+               let metric = metricStorage.getMetric(by: metricId) {
+                linkedMetricName = metric.name
             } else {
-                progressRuleType = "delta_threshold"
-                ruleConfiguration = ""
+                linkedMetricName = ""
             }
         }
     }
     
     private func updateTask() {
-        // Create progress rule based on UI state
-        var progressRule: ProgressRule? = nil
-        if taskType == "growth" && !ruleConfiguration.isEmpty {
-            switch progressRuleType {
-            case "delta_threshold":
-                // Parse numeric value from configuration (e.g., "+2.5" -> 2.5)
-                let numericValue = Double(ruleConfiguration.replacingOccurrences(of: "+", with: "")) ?? 1.0
-                progressRule = .deltaThreshold(minimumImprovement: numericValue)
-            case "count_min":
-                // Parse numeric value from configuration (e.g., "≥ 1" -> 1)
-                let numericValue = Int(ruleConfiguration.replacingOccurrences(of: "≥ ", with: "")) ?? 1
-                progressRule = .countMin(minimumCount: numericValue)
-            case "boolean_condition":
-                progressRule = .booleanCondition(condition: ruleConfiguration)
-            case "rolling_window":
-                // Parse "≥5 in 7 days" format
-                let components = ruleConfiguration.components(separatedBy: " in ")
-                let targetCount = Int(components.first?.replacingOccurrences(of: "≥", with: "") ?? "1") ?? 1
-                let windowDays = Int(components.last?.replacingOccurrences(of: " days", with: "") ?? "7") ?? 7
-                progressRule = .rollingWindow(targetCount: targetCount, windowDays: windowDays)
-            default:
-                break
-            }
-        }
-        
         let updatedTask = Task(
             id: task.id,
             title: title,
@@ -1320,7 +1245,7 @@ struct TaskEditRow: View {
             requiresPhoto: requiresPhoto,
             taskType: TaskType(rawValue: taskType) ?? .growth,
             progressRule: progressRule,
-            linkedMetric: linkedMetric.isEmpty ? nil : linkedMetric
+            linkedMetricId: linkedMetricId.isEmpty ? nil : linkedMetricId
         )
         onUpdate(updatedTask)
     }

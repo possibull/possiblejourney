@@ -13,6 +13,7 @@ enum ProgressRule: Codable, Equatable {
     case countMin(minimumCount: Int)
     case booleanCondition(condition: String)
     case rollingWindow(targetCount: Int, windowDays: Int)
+    case threshold(metricAlias: String, comparator: String, target: Double)
 }
 
 struct Task: Codable, Identifiable, Equatable {
@@ -22,21 +23,21 @@ struct Task: Codable, Identifiable, Equatable {
     var requiresPhoto: Bool
     var taskType: TaskType
     var progressRule: ProgressRule?
-    var linkedMetric: String?
+    var linkedMetricId: String?
     
-    init(id: UUID = UUID(), title: String, description: String? = nil, requiresPhoto: Bool = false, taskType: TaskType = .growth, progressRule: ProgressRule? = nil, linkedMetric: String? = nil) {
+    init(id: UUID = UUID(), title: String, description: String? = nil, requiresPhoto: Bool = false, taskType: TaskType = .growth, progressRule: ProgressRule? = nil, linkedMetricId: String? = nil) {
         self.id = id
         self.title = title
         self.description = description
         self.requiresPhoto = requiresPhoto
         self.taskType = taskType
         self.progressRule = progressRule
-        self.linkedMetric = linkedMetric
+        self.linkedMetricId = linkedMetricId
     }
     
     // MARK: - Codable Implementation for Backward Compatibility
     enum CodingKeys: String, CodingKey {
-        case id, title, description, requiresPhoto, taskType, progressRule, linkedMetric
+        case id, title, description, requiresPhoto, taskType, progressRule, linkedMetricId
     }
     
     init(from decoder: Decoder) throws {
@@ -47,6 +48,6 @@ struct Task: Codable, Identifiable, Equatable {
         requiresPhoto = try container.decodeIfPresent(Bool.self, forKey: .requiresPhoto) ?? false
         taskType = try container.decodeIfPresent(TaskType.self, forKey: .taskType) ?? .growth
         progressRule = try container.decodeIfPresent(ProgressRule.self, forKey: .progressRule)
-        linkedMetric = try container.decodeIfPresent(String.self, forKey: .linkedMetric)
+        linkedMetricId = try container.decodeIfPresent(String.self, forKey: .linkedMetricId)
     }
 } 

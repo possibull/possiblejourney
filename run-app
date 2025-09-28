@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Simple alias script for running the app
+# Usage: ./run-app [quick]
+
+if [ "$1" = "quick" ]; then
+    ./scripts/quick-run.sh
+else
+    ./scripts/run-app.sh
+fi

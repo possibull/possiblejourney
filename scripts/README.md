@@ -1,8 +1,51 @@
 # Automation Scripts for PossibleJourney
 
-This directory contains scripts to automate the process of updating the `latest-version.json` file on GitHub.
+This directory contains scripts to automate development tasks including app building, running, and version management.
 
 ## Scripts Overview
+
+### App Development Scripts
+
+#### 1. `run-app.sh` (Full Build & Run)
+**Use this for complete build and run cycle**
+
+This script:
+- Builds the app for iPhone 16 Pro Max simulator
+- Installs the app on the simulator
+- Launches the app
+- Provides helpful testing instructions
+
+**Usage:**
+```bash
+./scripts/run-app.sh
+```
+
+#### 2. `quick-run.sh` (Quick Run)
+**Use this when app is already built**
+
+This script:
+- Finds the existing built app
+- Installs and launches it on the simulator
+- Much faster than full build
+
+**Usage:**
+```bash
+./scripts/quick-run.sh
+```
+
+#### 3. `run-app` (Convenience Script)
+**Simple alias for running the app**
+
+**Usage:**
+```bash
+# Full build and run
+./run-app
+
+# Quick run (if already built)
+./run-app quick
+```
+
+### Version Management Scripts
 
 ### 1. `update-version-json.sh` (Simple Local Update)
 **Use this for quick updates without GitHub Actions**

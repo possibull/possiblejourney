@@ -184,17 +184,59 @@ class ProgramTemplateStorage {
             // 75Hard Challenge (last so it appears first in the list)
             ProgramTemplate(
                 name: "75Hard",
-                description: "A 75-day mental toughness and fitness challenge",
+                description: "A 75-day mental toughness and fitness challenge with threshold-based progress tracking",
                 category: .health,
                 defaultNumberOfDays: 75,
                 tasks: [
-                    Task(id: UUID(), title: "Follow a diet", description: "Choose a diet and stick to it - no cheat meals"),
-                    Task(id: UUID(), title: "No cheat meals and no alcohol", description: "Stick to your chosen diet with zero exceptions and complete abstinence from alcohol"),
-                    Task(id: UUID(), title: "Indoor workout (45 minutes)", description: "Complete a 45-minute workout indoors"),
-                    Task(id: UUID(), title: "Outdoor workout (45 minutes)", description: "Complete a 45-minute workout outdoors, regardless of weather"),
-                    Task(id: UUID(), title: "Drink 1 gallon of water", description: "Stay hydrated throughout the day"),
-                    Task(id: UUID(), title: "Read 10 pages", description: "Read from a non-fiction book"),
-                    Task(id: UUID(), title: "Take a progress photo", description: "Document your journey daily", requiresPhoto: true)
+                    Task(
+                        id: UUID(), 
+                        title: "Follow a diet", 
+                        description: "Choose a diet and stick to it - no cheat meals",
+                        taskType: .growth,
+                        progressRule: .threshold(metricAlias: "Diet Compliance", comparator: "==", target: 1.0)
+                    ),
+                    Task(
+                        id: UUID(), 
+                        title: "No alcohol", 
+                        description: "Complete abstinence from alcohol",
+                        taskType: .growth,
+                        progressRule: .threshold(metricAlias: "Alcohol Abstinence", comparator: "==", target: 1.0)
+                    ),
+                    Task(
+                        id: UUID(), 
+                        title: "Indoor workout (45 minutes)", 
+                        description: "Complete a 45-minute workout indoors",
+                        taskType: .growth,
+                        progressRule: .threshold(metricAlias: "Workout Duration", comparator: ">=", target: 45.0)
+                    ),
+                    Task(
+                        id: UUID(), 
+                        title: "Outdoor workout (45 minutes)", 
+                        description: "Complete a 45-minute workout outdoors, regardless of weather",
+                        taskType: .growth,
+                        progressRule: .threshold(metricAlias: "Workout Duration", comparator: ">=", target: 45.0)
+                    ),
+                    Task(
+                        id: UUID(), 
+                        title: "Drink 1 gallon of water", 
+                        description: "Stay hydrated throughout the day",
+                        taskType: .growth,
+                        progressRule: .threshold(metricAlias: "Water Gallons", comparator: ">=", target: 1.0)
+                    ),
+                    Task(
+                        id: UUID(), 
+                        title: "Read 10 pages", 
+                        description: "Read from a non-fiction book",
+                        taskType: .growth,
+                        progressRule: .threshold(metricAlias: "Pages Read", comparator: ">=", target: 10.0)
+                    ),
+                    Task(
+                        id: UUID(), 
+                        title: "Take a progress photo", 
+                        description: "Document your journey daily", 
+                        requiresPhoto: true,
+                        taskType: .maintenance
+                    )
                 ],
                 isDefault: true
             )
