@@ -76,6 +76,71 @@ final class TaskModelTests: XCTestCase {
         XCTAssertEqual(TaskType(rawValue: "recovery"), .recovery)
         XCTAssertNil(TaskType(rawValue: "invalid"))
     }
+    
+    // MARK: - Progress Rules Tests (TDD Red Phase)
+    func testProgressRuleEnumExists() {
+        // Test that ProgressRule enum exists with all required cases
+        let deltaRule = ProgressRule.deltaThreshold(minimumImprovement: 1.0)
+        let countRule = ProgressRule.countMin(minimumCount: 1)
+        let booleanRule = ProgressRule.booleanCondition(condition: "sleep >= 7")
+        let rollingRule = ProgressRule.rollingWindow(targetCount: 5, windowDays: 7)
+        
+        XCTAssertNotNil(deltaRule)
+        XCTAssertNotNil(countRule)
+        XCTAssertNotNil(booleanRule)
+        XCTAssertNotNil(rollingRule)
+    }
+    
+    func testTaskHasProgressRuleProperty() {
+        // Test that Task has a progressRule property for Growth tasks
+        let progressRule = ProgressRule.deltaThreshold(minimumImprovement: 1.0)
+        let task = Task(
+            id: UUID(), 
+            title: "Strength Training", 
+            description: "Bench press workout",
+            taskType: .growth,
+            progressRule: progressRule
+        )
+        XCTAssertEqual(task.taskType, .growth)
+        XCTAssertNotNil(task.progressRule)
+    }
+    
+    func testTaskHasLinkedMetricProperty() {
+        // Test that Task has a linkedMetric property for Growth tasks
+        let task = Task(
+            id: UUID(),
+            title: "Strength Training",
+            description: "Bench press workout", 
+            taskType: .growth,
+            linkedMetric: "bench_press_weight"
+        )
+        XCTAssertEqual(task.taskType, .growth)
+        XCTAssertEqual(task.linkedMetric, "bench_press_weight")
+    }
+    
+    func testNonGrowthTasksDontRequireProgressRules() {
+        // Test that Maintenance and Recovery tasks don't require progress rules
+        let maintenanceTask = Task(
+            id: UUID(),
+            title: "Drink Water",
+            description: "Stay hydrated",
+            taskType: .maintenance
+        )
+        let recoveryTask = Task(
+            id: UUID(),
+            title: "Sleep 8 Hours",
+            description: "Quality rest",
+            taskType: .recovery
+        )
+        
+        XCTAssertEqual(maintenanceTask.taskType, .maintenance)
+        XCTAssertNil(maintenanceTask.progressRule)
+        XCTAssertNil(maintenanceTask.linkedMetric)
+        
+        XCTAssertEqual(recoveryTask.taskType, .recovery)
+        XCTAssertNil(recoveryTask.progressRule)
+        XCTAssertNil(recoveryTask.linkedMetric)
+    }
 }
 
 final class ProgramModelTests: XCTestCase {
