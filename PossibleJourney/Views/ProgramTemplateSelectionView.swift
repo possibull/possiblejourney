@@ -1112,6 +1112,9 @@ struct TaskEditRow: View {
     @State private var description: String
     @State private var requiresPhoto: Bool
     @State private var taskType: String = "growth"
+    @State private var linkedMetric: String = ""
+    @State private var progressRuleType: String = "delta_threshold"
+    @State private var ruleConfiguration: String = ""
     
     init(task: Task, onUpdate: @escaping (Task) -> Void) {
         self.task = task
@@ -1164,6 +1167,87 @@ struct TaskEditRow: View {
                     updateTask()
                 }
                 
+                // Progress Rules UI (only show for Growth tasks)
+                if taskType == "growth" {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Progress Rule Configuration")
+                            .font(.caption)
+                            .fontWeight(.semibold)
+                        
+                        // Linked Metric
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Linked Metric")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                            TextField("e.g., Bench Press Weight/Reps", text: $linkedMetric)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .font(.caption)
+                                .onChange(of: linkedMetric) { _, newValue in
+                                    updateTask()
+                                }
+                        }
+                        
+                        // Progress Rule Type
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Progress Rule Type")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                            Picker("Rule Type", selection: $progressRuleType) {
+                                Text("Delta Threshold").tag("delta_threshold")
+                                Text("Count Minimum").tag("count_min")
+                                Text("Boolean Condition").tag("boolean_condition")
+                                Text("Rolling Window").tag("rolling_window")
+                            }
+                            .pickerStyle(MenuPickerStyle())
+                            .font(.caption)
+                            .onChange(of: progressRuleType) { _, newValue in
+                                updateTask()
+                            }
+                        }
+                        
+                        // Rule Configuration (based on selected type)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Rule Configuration")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                            
+                            if progressRuleType == "delta_threshold" {
+                                TextField("e.g., +1 rep or +2.5 lbs", text: $ruleConfiguration)
+                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    .font(.caption)
+                                    .onChange(of: ruleConfiguration) { _, newValue in
+                                        updateTask()
+                                    }
+                            } else if progressRuleType == "count_min" {
+                                TextField("e.g., ≥ 1 tax section", text: $ruleConfiguration)
+                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    .font(.caption)
+                                    .onChange(of: ruleConfiguration) { _, newValue in
+                                        updateTask()
+                                    }
+                            } else if progressRuleType == "boolean_condition" {
+                                TextField("e.g., Sleep ≥7 hrs AND phone_in_room == false", text: $ruleConfiguration)
+                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    .font(.caption)
+                                    .onChange(of: ruleConfiguration) { _, newValue in
+                                        updateTask()
+                                    }
+                            } else if progressRuleType == "rolling_window" {
+                                TextField("e.g., ≥5 connections in 7 days", text: $ruleConfiguration)
+                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    .font(.caption)
+                                    .onChange(of: ruleConfiguration) { _, newValue in
+                                        updateTask()
+                                    }
+                            }
+                        }
+                    }
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 12)
+                    .background(Color(.systemGray6).opacity(0.5))
+                    .cornerRadius(8)
+                }
+                
                 Toggle("Requires Photo", isOn: $requiresPhoto)
                     .font(.caption)
                     .onChange(of: requiresPhoto) { _, newValue in
@@ -1178,16 +1262,65 @@ struct TaskEditRow: View {
             description = task.description ?? ""
             requiresPhoto = task.requiresPhoto
             taskType = task.taskType.rawValue // Use actual taskType from data model
+            linkedMetric = task.linkedMetric ?? ""
+            
+            // Initialize progress rule type and configuration from task
+            if let progressRule = task.progressRule {
+                switch progressRule {
+                case .deltaThreshold(let minimumImprovement):
+                    progressRuleType = "delta_threshold"
+                    ruleConfiguration = "+\(minimumImprovement)"
+                case .countMin(let minimumCount):
+                    progressRuleType = "count_min"
+                    ruleConfiguration = "≥ \(minimumCount)"
+                case .booleanCondition(let condition):
+                    progressRuleType = "boolean_condition"
+                    ruleConfiguration = condition
+                case .rollingWindow(let targetCount, let windowDays):
+                    progressRuleType = "rolling_window"
+                    ruleConfiguration = "≥\(targetCount) in \(windowDays) days"
+                }
+            } else {
+                progressRuleType = "delta_threshold"
+                ruleConfiguration = ""
+            }
         }
     }
     
     private func updateTask() {
+        // Create progress rule based on UI state
+        var progressRule: ProgressRule? = nil
+        if taskType == "growth" && !ruleConfiguration.isEmpty {
+            switch progressRuleType {
+            case "delta_threshold":
+                // Parse numeric value from configuration (e.g., "+2.5" -> 2.5)
+                let numericValue = Double(ruleConfiguration.replacingOccurrences(of: "+", with: "")) ?? 1.0
+                progressRule = .deltaThreshold(minimumImprovement: numericValue)
+            case "count_min":
+                // Parse numeric value from configuration (e.g., "≥ 1" -> 1)
+                let numericValue = Int(ruleConfiguration.replacingOccurrences(of: "≥ ", with: "")) ?? 1
+                progressRule = .countMin(minimumCount: numericValue)
+            case "boolean_condition":
+                progressRule = .booleanCondition(condition: ruleConfiguration)
+            case "rolling_window":
+                // Parse "≥5 in 7 days" format
+                let components = ruleConfiguration.components(separatedBy: " in ")
+                let targetCount = Int(components.first?.replacingOccurrences(of: "≥", with: "") ?? "1") ?? 1
+                let windowDays = Int(components.last?.replacingOccurrences(of: " days", with: "") ?? "7") ?? 7
+                progressRule = .rollingWindow(targetCount: targetCount, windowDays: windowDays)
+            default:
+                break
+            }
+        }
+        
         let updatedTask = Task(
             id: task.id,
             title: title,
             description: description.isEmpty ? nil : description,
             requiresPhoto: requiresPhoto,
-            taskType: TaskType(rawValue: taskType) ?? .growth
+            taskType: TaskType(rawValue: taskType) ?? .growth,
+            progressRule: progressRule,
+            linkedMetric: linkedMetric.isEmpty ? nil : linkedMetric
         )
         onUpdate(updatedTask)
     }
