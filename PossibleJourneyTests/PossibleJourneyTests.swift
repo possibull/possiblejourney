@@ -18,6 +18,36 @@ final class TaskModelTests: XCTestCase {
         let task = Task(id: UUID(), title: "Read", description: "Read 10 pages")
         XCTAssertFalse(task.requiresPhoto)
     }
+    
+    // MARK: - TaskType Tests (TDD Red Phase)
+    func testTaskTypeEnumExists() {
+        // This test will fail until we implement TaskType enum
+        let taskType = TaskType.growth
+        XCTAssertEqual(taskType, .growth)
+    }
+    
+    func testTaskTypeHasThreeCases() {
+        // Test that TaskType has all three required cases
+        let growthType = TaskType.growth
+        let maintenanceType = TaskType.maintenance
+        let recoveryType = TaskType.recovery
+        
+        XCTAssertEqual(growthType, .growth)
+        XCTAssertEqual(maintenanceType, .maintenance)
+        XCTAssertEqual(recoveryType, .recovery)
+    }
+    
+    func testTaskHasTaskTypeProperty() {
+        // Test that Task struct has a taskType property
+        let task = Task(id: UUID(), title: "Test Task", description: "Test Description", taskType: .growth)
+        XCTAssertEqual(task.taskType, .growth)
+    }
+    
+    func testTaskTypeDefaultValue() {
+        // Test that Task has a default taskType value
+        let task = Task(id: UUID(), title: "Test Task", description: "Test Description")
+        XCTAssertEqual(task.taskType, .growth) // Default should be growth
+    }
 }
 
 final class ProgramModelTests: XCTestCase {
