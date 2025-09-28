@@ -9,6 +9,29 @@ struct ReleaseNotes {
     
     static let allReleaseNotes: [ReleaseNotes] = [
             ReleaseNotes(
+                version: "2.0",
+                buildNumber: 2,
+                title: "Major UI/UX Improvements & Metrics Management",
+                notes: [
+                    "✨ NEW: Comprehensive Metrics Management screen accessible from Settings",
+                    "📊 View, create, edit, and archive all your metrics in one centralized location",
+                    "🎯 See all default metrics and custom metrics with full details and organization",
+                    "🔧 IMPROVED: Removed photo requirement toggle from Add Task alerts for simplified workflow",
+                    "⚡ FIXED: Workout duration no longer defaults to previous values on new program start",
+                    "🗑️ ENHANCED: Data reset functionality now properly clears all stored measurements",
+                    "💾 IMPROVED: Better metric input persistence across app restarts",
+                    "🎨 ENHANCED: Better visual feedback for threshold-based task completion",
+                    "🐛 FIXED: Auto-checking loop for numeric threshold tasks resolved",
+                    "🚫 FIXED: Missed Task Protocol no longer appears inappropriately",
+                    "🔄 FIXED: Bidirectional threshold checking - lock returns when value drops below threshold",
+                    "💾 FIXED: Measurement persistence issues after app restart resolved",
+                    "📱 STREAMLINED: Cleaner, more intuitive task creation process",
+                    "🎯 IMPROVED: Better metric management and organization throughout the app",
+                    "⚡ ENHANCED: More reliable data persistence and user experience"
+                ],
+                date: Date()
+            ),
+            ReleaseNotes(
                 version: "1.9",
                 buildNumber: 1,
                 title: "Enhanced Photo Management & UI Improvements",
