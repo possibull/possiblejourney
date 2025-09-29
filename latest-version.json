@@ -1,8 +1,8 @@
 {
   "version": "2.1",
-  "build": 1,
-  "releaseNotes": "Navigation Improvements & Threshold Task Enhancements - Consistent header navigation, calendar Done button, and improved threshold task behavior",
+  "build": 3,
+  "releaseNotes": "Settings UI Improvements - Program name in header, cleaner layout, and better program context",
   "forceUpdate": false,
-  "lastUpdated": "2025-09-28T23:21:00Z",
-  "branch": "v2.1-build1"
+  "lastUpdated": "2025-09-28T19:10:00Z",
+  "branch": "v2.1-build2"
 }
