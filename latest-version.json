@@ -1,8 +1,8 @@
 {
   "version": "2.1",
-  "build": 6,
-  "releaseNotes": "Number Input Persistence Fix - Fixed issue where number input values would reset to 1 when navigating away, added Done button to keyboard, and improved data persistence",
+  "build": 7,
+  "releaseNotes": "Multiple Done Buttons Fix - Fixed issue where multiple Done buttons appeared in keyboard toolbar when multiple threshold tasks were present, now shows single clean Done button",
   "forceUpdate": false,
-  "lastUpdated": "2025-09-29T02:20:00Z",
-  "branch": "v2.1-build6"
+  "lastUpdated": "2025-09-29T02:30:00Z",
+  "branch": "v2.1-build7"
 }
