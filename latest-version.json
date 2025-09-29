@@ -1,8 +1,8 @@
 {
   "version": "2.1",
-  "build": 10,
-  "releaseNotes": "Shared Storage Fix - Fixed issue where number input values would reset to 0 when scrolling between threshold tasks, now all inputs share the same measurement storage instance",
+  "build": 11,
+  "releaseNotes": "Threshold Value Persistence Fix - Fixed issue where updating one threshold and then updating another would cause the previous threshold to revert to its old value",
   "forceUpdate": false,
-  "lastUpdated": "2025-09-29T11:40:00Z",
-  "branch": "v2.1-build10"
+  "lastUpdated": "2025-09-29T12:10:00Z",
+  "branch": "v2.1-build11"
 }
